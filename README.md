@@ -1,4 +1,4 @@
-# spring4security
+# springboot: hellow wordl example with Thymeleaf
 -Examples shows a secured web application with Spring 4 
 -To run:
 -->run the Application.java as a java application
