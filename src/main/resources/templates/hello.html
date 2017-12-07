@@ -5,14 +5,33 @@
 	<title>Hello World</title>
 	<link rel="stylesheet" type="text/css"	href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 	<link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
+	<link rel="stylesheet" th:href="@{/css/style.css}" href="../../css/style.css" />
 </head>
 <body>
-	<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-	<form th:action="@{/logout}" method="post">
-		<input type="submit" value="Sign Out"/>
-	</form>
 	
+	<div class="login-page">
+		<div class="form">
+			<form class="register-form">
+				<h1>The Doctor's Office</h1>
+				<input type="text" placeholder="name" /> <input type="text"	placeholder="email address" /> 
+					<input type="password" placeholder="password" />
+				<button>Register</button>
+				<p class="message">
+					Already registered? <a href="#">Check-in</a>
+				</p>
+			</form>
+			<form class="login-form" th:action="@{/logout}" method="post">
+				<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+				<button>Sign Out</button><!-- <input type="submit" value="Sign Out"/> --> 
+				<p class="message">	
+					Not registered? <a href="#">Create a registration</a>
+				</p>
+			</form>
+		</div>
+	</div>
+
 	<script type="text/javascript" src="webjars/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" th:href="@{/js/animation.js}" src="../../js/animation.js"></script>
 	<script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
