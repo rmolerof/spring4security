@@ -1,4 +1,4 @@
-package hello.cotroller;
+package hello.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +28,11 @@ public class DefaultController {
 	@GetMapping("/about")
 	public String about(){
 		return "/about";
+	}
+	
+	@GetMapping("/ajax")
+	public String ajax(){
+		return "/ajax";
 	}
 	
 	@GetMapping("/login")
