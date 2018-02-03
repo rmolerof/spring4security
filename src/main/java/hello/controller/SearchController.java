@@ -47,12 +47,6 @@ public class SearchController {
 		}
 		result.setResult(users);
 		
-		try {
-			TimeUnit.SECONDS.sleep(5);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
 		return ResponseEntity.ok(result);
 		
 	}
