@@ -55,7 +55,19 @@
 		    <groupId>org.webjars</groupId>
 		    <artifactId>jquery</artifactId>
 		    <version>3.2.1</version>
-		</dependency>		
+		</dependency>
+		<!-- React js -->
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>react</artifactId>
+		    <version>15.6.1</version>
+		</dependency>	
+		<!-- React dom -->
+		<dependency>
+		    <groupId>org.webjars.npm</groupId>
+		    <artifactId>react-dom</artifactId>
+		    <version>15.6.1</version>
+		</dependency>
 		
 	</dependencies>
 	
