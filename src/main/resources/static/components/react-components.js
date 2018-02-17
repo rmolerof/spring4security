@@ -47,10 +47,7 @@ class CommentBox extends React.Component{
 		super();
 		this.state = {
 			showComments: false,
-			comments: [
-				{id: 1, author: 'Morgan Freeman', body: 'Great picture', avatarUrl: 'assets/layouts/layout3/img/avatar3.jpg'},
-				{id: 2, author: 'Bending Bender', body: 'Excellent stuff', avatarUrl: 'assets/layouts/layout3/img/avatar2.jpg'}
-			]
+			comments: []
 		};
 	}
 	
@@ -70,25 +67,6 @@ class CommentBox extends React.Component{
 		}
 	}
 	
-	render(){
-		const comments = this._getComments();
-		let commentNodes;
-		let buttonText = 'Show comments';
-		if(this.state.showComments){
-			commentNodes = <div className="comment-list">{comments}</div>;
-			buttonText = 'Hide comments';
-		}
-		return(
-				<div className="comment-box">
-					<CommentForm addComment={this._addComment.bind(this)}/>
-					<h3>Comments</h3>
-					<h4 className="comment-count">{this._getCommentsTitle(comments.length)}</h4>
-					<button onClick={this._handleClick.bind(this)}>{buttonText}</button>
-					{commentNodes}
-				</div>			
-		);
-	}
-	
 	_handleClick(){
 		this.setState({showComments: !this.state.showComments});
 	}
@@ -101,6 +79,64 @@ class CommentBox extends React.Component{
 			avatarUrl: 'assets/layouts/layout3/img/avatar1.jpg'
 		};
 		this.setState({comments: this.state.comments.concat([comment])});
+	}
+	
+	_fetchComments(){
+		jQuery.ajax({
+			method: 'GET',
+			url: 'https://jsonplaceholder.typicode.com/posts',
+			success: (comments) => {
+				var commentsResponse = [];
+				for(var i = 0; i< 5; i++){
+					var comment = {
+							id: comments[i].id, 
+							author: comments[i].userId, 
+							body: comments[i].body, 
+							avatarUrl: 'assets/layouts/layout3/img/avatar3.jpg'};
+					commentsResponse.push(comment);
+				}
+				this.setState({comments: commentsResponse})
+			}
+		});
+	}
+	
+	_getAvatars(){
+		return this.state.comments.map((comment) => {
+			return comment.avatarUrl;
+		});
+	}
+	
+	componentWillMount(){
+		this._fetchComments();
+	}
+	
+	render(){
+		const comments = this._getComments();
+		const avatars = this._getAvatars();
+		let commentNodes;
+		let buttonText = 'Show comments';
+		if(this.state.showComments){
+			commentNodes = <div className="comment-list">{comments}</div>;
+			buttonText = 'Hide comments';
+		}
+		return(
+				<div className="comment-box">
+					<CommentForm addComment={this._addComment.bind(this)}/>
+					<CommentAvatarList avatars={this._getAvatars()}/>
+					<h3>Comments</h3>
+					<h4 className="comment-count">{this._getCommentsTitle(comments.length)}</h4>
+					<button onClick={this._handleClick.bind(this)}>{buttonText}</button>
+					{commentNodes}
+				</div>			
+		);
+	}
+	
+	componentDidMount(){
+		this._timer = setInterval(() => this._fetchComments(), 5000);
+	}
+	
+	componentWillUnmount(){
+		clearInterval(this._timer);
 	}
 }
 
@@ -152,6 +188,24 @@ class CommentForm extends React.Component {
 	
 	_getCharacterCount() {
 		this.setState({characters: (this._body.value).length});
+	}
+}
+
+class CommentAvatarList extends React.Component {
+	render() {
+		const {avatars = []} = this.props;
+		return (
+			<div className="comment-avatars">
+				<h4>Authors</h4>
+				<ul>
+					{avatars.map((avatarUrl, i) => (
+						<li key={i}>
+							<img src={avatarUrl}/>
+						</li>
+					))}
+				</ul>
+			</div>
+		);
 	}
 }
 
