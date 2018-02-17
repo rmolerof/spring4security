@@ -25,14 +25,24 @@ class Comment extends React.Component {
 							{commentBody}
 						</p>
 						<div className="comment-actions">
-							<a href="#" className="comment-footer-delete">
-								Delete comment
-							</a>&#160;&#160; 
+							<a href="#" className="comment-footer-delete" onClick={this._handleDelete.bind(this)}>Delete comment</a>&#160;&#160;
+							<RemoveCommentConfirmation onDelete={this._handleDeleteCustom.bind(this)}/>&#160;&#160;
 							<a href="#" onClick={this._toggleAbuse.bind(this)}>{abuseText}</a>
 						</div>
 					</div>
 				</div>
 		);
+	}
+	
+	_handleDelete(event) {
+		event.preventDefault();// prevents page from reloading when 'delete comment' is clicked 
+		if(confirm('Are you sure?')){
+			this.props.onDelete(this.props.comment);
+		}
+	}
+	
+	_handleDeleteCustom() {
+		this.props.onDelete(this.props.comment);
 	}
 	
 	_toggleAbuse(event){
@@ -53,7 +63,12 @@ class CommentBox extends React.Component{
 	
 	_getComments(){
 		return this.state.comments.map((comment)=>{
-			return (<Comment author={comment.author} body={comment.body} avatarUrl={comment.avatarUrl} key={comment.id}/>);
+			return (<Comment 
+						author={comment.author} 
+						body={comment.body} 
+						avatarUrl={comment.avatarUrl} 
+						key={comment.id}
+						onDelete={this._deleteComment.bind(this)}/>);
 		});
 	}
 	
@@ -72,6 +87,13 @@ class CommentBox extends React.Component{
 	}
 	
 	_addComment(author, body){
+		
+		/*const commentAjax = {author, body, avatarUrl: 'assets/layouts/layout3/img/avatar1.jpg'};
+		
+		jQuery.post('/api/comments', {commentAjax}).success(newComment=>{
+			this.setState({comments: this.state.comments.concat([commentAjax])});
+		});*/
+		
 		const comment= {
 			id: this.state.comments.length + 1,
 			author,
@@ -79,6 +101,19 @@ class CommentBox extends React.Component{
 			avatarUrl: 'assets/layouts/layout3/img/avatar1.jpg'
 		};
 		this.setState({comments: this.state.comments.concat([comment])});
+	}
+	
+	_deleteComment(comment){
+		/*jQuery.ajax({
+			method: 'DELETE',
+			url: `/api/comments/${comment.id}`
+		});*/
+		
+		const comments = [...this.state.comments];// clones existing array with spread operator
+		const commentIndex = comments.indexOf(comment);
+		comments.splice(commentIndex, 1);
+		
+		this.setState({comments});
 	}
 	
 	_fetchComments(){
@@ -206,6 +241,44 @@ class CommentAvatarList extends React.Component {
 				</ul>
 			</div>
 		);
+	}
+}
+
+class RemoveCommentConfirmation extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+				showConfirm: false
+		};
+	}
+	
+	render() {
+		let confirmNode;
+		if (this.state.showConfirm) {
+			return(
+					<span>
+						<a href="" onClick={this._confirmDelete.bind(this)}>Yes</a> - or - <a href="" onClick={this._toggleConfirmMessage.bind(this)}>No</a>
+					</span>
+			);
+		} else {
+			confirmNode = <a href="" onClick={this._toggleConfirmMessage.bind(this)}>Delete comment?</a>;
+		}
+		
+		return (
+				<span>{confirmNode}</span>
+		);
+	}
+	
+	_toggleConfirmMessage(e) {
+		e.preventDefault();
+		
+		this.setState({showConfirm: !this.state.showConfirm});
+	}
+	
+	_confirmDelete(e) {
+		e.preventDefault();
+		this.props.onDelete();
+		this.setState({showConfirm: !this.state.showConfirm});
 	}
 }
 
