@@ -1,66 +1,25 @@
-package hello.services;
+package com.businessModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
+import hello.businessModel.Company;
 import hello.businessModel.Dispenser;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TotalDay;
-import hello.model.DayDataCriteria;
-import hello.model.User;
 
-@Service
-public class UserService {
+public class BusinessModelTest {
 
-	private List<User> users;
-	private Station currentStation;
-	
-	@PostConstruct
-	private void initDataForTesting() {
-		users = new ArrayList<User>();
-        
-        User user1 = new User("mkyong", "password111", "mkyong@yahoo.com");
-        User user2 = new User("yflow", "password222", "yflow@yahoo.com");
-        User user3 = new User("laplap", "password333", "mkyong@yahoo.com");
-        
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-	}
-	
-	public List<User> findByUserNameOrEmail(String username){
-		if(username.equals("current")) {
-			// Retrieving actual users
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			return new ArrayList<User>(Arrays.asList(new User(authentication.getName(), "*********", authentication.getAuthorities().toString())));
-		} else {
-			List<User> result = users.stream().
-					filter(x -> x.getUsername().equalsIgnoreCase(username)).
-					collect(Collectors.toList());
-			return result;
-		}
+	public static void main(String[] args) {
 		
-	}
-	
-	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
+		Company com = new Company(100, "Molfer");
 		Station laJoya = new Station();
 		laJoya.setId(101L);
 		laJoya.setName("La Joya");
-		laJoya.setDate(new Date(1533441600000L));
 		
 		Tank d2 = new Tank(1, "d2", 10000D);
 		Tank g90 = new Tank(2, "g90", 3000D);
@@ -104,35 +63,25 @@ public class UserService {
 		
 		laJoya.setDispensers(dispensers);
 		
-		setCurrentStation(laJoya);
-		
-		return Stream.of(laJoya).collect(Collectors.toList());
-	}
-	
-	
-	public List<Station> submitDayData(DayDataCriteria dateDataCriteria) {
-		
-		Station updatedStation = updateStation(getCurrentStation(), dateDataCriteria);
-		
-		return Stream.of(updatedStation).collect(Collectors.toList());
-	}
+		// Simulation
+		Map<String, Double> dayData = new HashMap<String, Double>();
+		dayData.put("d2_1", 289041.95);
+		dayData.put("d2_2", 144382.63);
+		dayData.put("d2_3", 73242.59);
+		dayData.put("d2_4", 211990.12);
+		dayData.put("d2_5", 724116.58);
+		dayData.put("d2_6", 83397.64);
+		dayData.put("g90_1", 39187.64);
+		dayData.put("g90_2", 32222.86);
+		dayData.put("g90_3", 64773.44);
+		dayData.put("g90_4", 174827.79);
+		dayData.put("g95_1", 96795.94);
+		dayData.put("g95_2", 99017.05);
 
-	public Station getCurrentStation() {
-		return currentStation;
-	}
-
-	public void setCurrentStation(Station currentStation) {
-		this.currentStation = currentStation;
-	}
-	
-	private Station updateStation(Station currentStation, DayDataCriteria dateDataCriteria) {
-		
-		Map<String, Double> dayData = dateDataCriteria.getDayData();
-		Date date = dateDataCriteria.getDate();
 		
 		TotalDay totalDay = new TotalDay();
 		
-		for (Entry<String, Dispenser> entry: currentStation.getDispensers().entrySet()) {
+		for (Entry<String, Dispenser> entry: laJoya.getDispensers().entrySet()) {
 			
 			double gallonsDiff = dayData.get(entry.getKey()) - entry.getValue().getGallons();
 			String name = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));
@@ -141,29 +90,14 @@ public class UserService {
 			totalDay.setTotalSolesRevenueDay(totalDay.getTotalSolesRevenueDay() + gallonsDiff * entry.getValue().getPrice());
 			totalDay.setTotalProfitDay(name, totalDay.getTotalGalsSoldDay(name) * (entry.getValue().getPrice() - entry.getValue().getCost()));
 			totalDay.setTotalProfitDay(totalDay.getTotalProfitDay() + gallonsDiff * (entry.getValue().getPrice() - entry.getValue().getCost()));
-			totalDay.setStockGals(name, currentStation.getTanks().get(name).getGals() - totalDay.getTotalGalsSoldDay(name));
+			totalDay.setStockGals(name, tanks.get(name).getGals() - totalDay.getTotalGalsSoldDay(name));
 		}
 		
-		// Update Station numbers
-		Station newCurrentStation = new Station(currentStation);
+		com.setStations(new ArrayList<Station>(Arrays.asList(laJoya)));
 		
-		newCurrentStation.setDate(date);
+		// Report
+		System.out.println(totalDay.toString());
 		
-		// Update gallons counter
-		for (Entry<String, Dispenser> entry: newCurrentStation.getDispensers().entrySet()) {
-			entry.getValue().setGallons(dayData.get(entry.getKey()));
-		}
-		
-		// Update tanks' stock
-		for (Entry<String, Tank> entry: newCurrentStation.getTanks().entrySet()) {
-			entry.getValue().setGals(totalDay.getStockGals(entry.getKey()));
-		}
-		
-		// Save updated station status
-		System.out.println(newCurrentStation);
-		
-		return newCurrentStation;
 	}
-	
-	
+
 }
