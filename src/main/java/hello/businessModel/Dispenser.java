@@ -6,14 +6,16 @@ public class Dispenser {
 	public double gallons;
 	public double price;
 	public double cost;
+	public long pattern;
 	
-	public Dispenser(long id, String name, double gallons, double price, double cost) {
+	public Dispenser(long id, String name, double gallons, double price, double cost, long pattern) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.gallons = gallons;
 		this.price = price;
 		this.cost = cost;
+		this.pattern = pattern;
 	}
 
 	@Override
@@ -60,6 +62,14 @@ public class Dispenser {
 
 	public void setCost(double cost) {
 		this.cost = cost;
+	}
+
+	public long getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(long pattern) {
+		this.pattern = pattern;
 	}
 		
 }

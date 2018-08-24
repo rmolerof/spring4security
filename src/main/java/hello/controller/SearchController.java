@@ -99,4 +99,27 @@ public class SearchController {
 		return ResponseEntity.ok(result);
 		
 	}
+	
+	@PostMapping("/api/resetStatus")
+	public ResponseEntity<?> resetStatus(@Valid @RequestBody DayDataCriteria dayDataCriteria, Errors errors){
+		AjaxGetStationResponse result = new AjaxGetStationResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<Station> stations = userService.resetStatus(dayDataCriteria);
+		if(stations.isEmpty()) {
+			result.setMsg("No hay datos para la fecha: " + dayDataCriteria.getDate());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(stations);
+		
+		return ResponseEntity.ok(result);
+		
+	}
 }

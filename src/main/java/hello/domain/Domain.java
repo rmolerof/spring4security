@@ -21,14 +21,11 @@ public class Domain {
 	private String last_name;
 	
 	@Override
-    public String toString() {
-        return "Domain{" +
-                "id=" + id +
-                ", domain='" + domain + '\'' +
-                ", displayAds=" + displayAds +
-                '}';
-    }
-		
+	public String toString() {
+		return "Domain [id=" + id + ", domain=" + domain + ", displayAds=" + displayAds + ", first_name=" + first_name
+				+ ", last_name=" + last_name + "]";
+	}
+	
 	public String getDomain() {
 		return domain;
 	}

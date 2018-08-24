@@ -18,7 +18,7 @@ public class BusinessModelTest {
 		
 		Company com = new Company(100, "Molfer");
 		Station laJoya = new Station();
-		laJoya.setId(101L);
+		laJoya.setStationId(101L);
 		laJoya.setName("La Joya");
 		
 		Tank d2 = new Tank(1, "d2", 10000D);
@@ -32,18 +32,18 @@ public class BusinessModelTest {
 		
 		laJoya.setTanks(tanks);
 		
-		Dispenser d2_1 = new Dispenser(1, "d2", 288934.73,	12.39,	11.01);
-		Dispenser d2_2 = new Dispenser(2, "d2", 144360.82,	12.39,	11.01);
-		Dispenser d2_3 = new Dispenser(3, "d2", 73147.96,	12.39,	11.01);
-		Dispenser d2_4 = new Dispenser(4, "d2", 211896.21,	12.39,	11.01);
-		Dispenser d2_5 = new Dispenser(5, "d2", 723954.62,	12.39,	11.01);
-		Dispenser d2_6 = new Dispenser(6, "d2", 83166.11,	12.39,	11.01);
-		Dispenser g90_1 = new Dispenser(1, "g90", 39150.31,	12.89,	10.48);
-		Dispenser g90_2 = new Dispenser(2, "g90", 32190.28,	12.89,	10.48);
-		Dispenser g90_3 = new Dispenser(3, "g90", 64742.82,	12.89,	10.48);
-		Dispenser g90_4 = new Dispenser(4, "g90", 174792.25, 12.89,	10.48);
-		Dispenser g95_1 = new Dispenser(1, "g95", 96791.69,	13.99,	11.45);
-		Dispenser g95_2 = new Dispenser(2, "g95", 98998.05,	13.99,	11.45);
+		Dispenser d2_1 = new Dispenser(1, "d2", 288934.73,	12.39,	11.01, 9);
+		Dispenser d2_2 = new Dispenser(2, "d2", 144360.82,	12.39,	11.01, 9);
+		Dispenser d2_3 = new Dispenser(3, "d2", 73147.96,	12.39,	11.01, 8);
+		Dispenser d2_4 = new Dispenser(4, "d2", 211896.21,	12.39,	11.01, 9);
+		Dispenser d2_5 = new Dispenser(5, "d2", 723954.62,	12.39,	11.01, 9);
+		Dispenser d2_6 = new Dispenser(6, "d2", 83166.11,	12.39,	11.01, 8);
+		Dispenser g90_1 = new Dispenser(1, "g90", 39150.31,	12.89,	10.48, 8);
+		Dispenser g90_2 = new Dispenser(2, "g90", 32190.28,	12.89,	10.48, 8);
+		Dispenser g90_3 = new Dispenser(3, "g90", 64742.82,	12.89,	10.48, 8);
+		Dispenser g90_4 = new Dispenser(4, "g90", 174792.25, 12.89,	10.48, 9);
+		Dispenser g95_1 = new Dispenser(1, "g95", 96791.69,	13.99,	11.45, 8);
+		Dispenser g95_2 = new Dispenser(2, "g95", 98998.05,	13.99,	11.45, 8);
 
 		
 		

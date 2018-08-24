@@ -35,6 +35,11 @@ public class DefaultController {
 		return "/ajax";
 	}
 	
+	@GetMapping("/reset-status-page")
+	public String resetStatusPage(){
+		return "/reset-status-page";
+	}
+	
 	@GetMapping("/login")
     public String login() {
         return "/login";

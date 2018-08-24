@@ -2,12 +2,16 @@ package hello.businessModel;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import hello.domain.StationDao;
 
 public class Station {
 
-	private Long id;
+	private Long stationId;
 	private String name;
+	private String pumpAttendantNames;
 	private String shift;
 	private Date date;
 	private Map<String, Tank> tanks;
@@ -21,39 +25,57 @@ public class Station {
 	    if (null == original.getShift()) {
 	    	original.setShift("1");
 	    }
-		this.id = original.id;
+		this.stationId = original.stationId;
 	    this.name = new String(original.name);
-	    this.shift = new String(getNextShift(original.shift));
+	    this.pumpAttendantNames = new String(original.pumpAttendantNames);
+	    this.shift = new String(original.shift);
 	    this.date = new Date(original.getDate().getTime());
 	    this.tanks = new HashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	}
 	
+	public Station(StationDao stationDao) {
+		this.stationId = new Long(stationDao.getStationId());
+	    this.name = new String(stationDao.getName());
+	    this.pumpAttendantNames = new String(stationDao.getPumpAttendantNames());
+	    this.shift = new String(stationDao.getShift());
+	    this.date = new Date(stationDao.getDate().getTime());
+	    this.tanks = new HashMap<String, Tank>(stationDao.getTanks());
+	    this.dispensers = orderDispensers(stationDao.getDispensers());
+	}
 	
+	public Map<String, Dispenser> orderDispensers(Map<String, Dispenser> dispensers) {
+		
+		Map<String, Dispenser> orderedDispensers = new LinkedHashMap<String, Dispenser>();
+		orderedDispensers.put("d2_1", dispensers.get("d2_1"));
+		orderedDispensers.put("g90_1", dispensers.get("g90_1"));
+		orderedDispensers.put("d2_2", dispensers.get("d2_2"));
+		orderedDispensers.put("d2_3", dispensers.get("d2_3"));
+		orderedDispensers.put("g90_2", dispensers.get("g90_2"));
+		orderedDispensers.put("d2_4", dispensers.get("d2_4"));
+		
+		orderedDispensers.put("g95_1", dispensers.get("g95_1"));
+		orderedDispensers.put("g90_3", dispensers.get("g90_3"));
+		orderedDispensers.put("d2_5", dispensers.get("d2_5"));
+		orderedDispensers.put("g95_2", dispensers.get("g95_2"));
+		orderedDispensers.put("g90_4", dispensers.get("g90_4"));
+		orderedDispensers.put("d2_6", dispensers.get("d2_6"));
+		
+		return orderedDispensers;
+	}
 	
 	@Override
 	public String toString() {
-		return "Station [id=" + id + ", \nname=" + name + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
+		return "Station [id=" + stationId + ", \nname=" + name + ", \npumpAttendantNames=" + pumpAttendantNames + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
 				+ ", \ndispensers=" + dispensers + "]";
 	}
 
-	private String getNextShift(String shift) {
-		
-		long shiftNumber = Long.valueOf(shift);
-		
-		if (shiftNumber == 2)  {
-			return "1";
-		} else {
-			return String.valueOf(shiftNumber + 1);
-		}
-		
+
+	public Long getStationId() {
+		return stationId;
 	}
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setStationId(Long stationId) {
+		this.stationId = stationId;
 	}
 	public String getName() {
 		return name;
@@ -84,6 +106,14 @@ public class Station {
 	}
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getPumpAttendantNames() {
+		return pumpAttendantNames;
+	}
+
+	public void setPumpAttendantNames(String pumpAttendantNames) {
+		this.pumpAttendantNames = pumpAttendantNames;
 	}
 	
 }
