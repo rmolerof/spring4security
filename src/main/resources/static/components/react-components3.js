@@ -3,6 +3,9 @@ class IncorporationForm extends React.Component {
   constructor() {
     super();
     this.state = {
+      errors: {},
+	  showError: false,
+	  showSuccess: false,
       name: '',
       pumpAttendantNames: '',
       date: '',
@@ -15,6 +18,12 @@ class IncorporationForm extends React.Component {
       totalExpensesAndCredits: ''
     };
   }
+  
+  _toggleError = () => {
+	  this.setState((prevState, props) => {
+		  return {showError: !prevState.showError}
+	  })
+  };
   
   _initExpensesAndCredits() {
 	  var temp = [];
@@ -75,6 +84,7 @@ class IncorporationForm extends React.Component {
   }
   
   handleNumEndChange1 = (idx) => (evt) => {
+	  
     const newShareholders = this.state.shareholders1.map((shareholder, sidx) => {
       if (idx !== sidx) return shareholder;
       return { ...shareholder, numEnd: evt.target.value };
@@ -112,7 +122,20 @@ class IncorporationForm extends React.Component {
   }
 
   handleSubmit = (evt) => {
-    const { pumpAttendantNames, date, shift, shareholders1, shareholders2 } = this.state;
+	
+	evt.preventDefault();
+    
+	const { pumpAttendantNames, date, shift, shareholders1, shareholders2, totalCash, expensesAndCredits} = this.state;
+    var self = this;
+    var errors = {
+    		numEnd: '',
+    		totalCash: '', 
+    		expenseOrCredit: '',
+    		submit: '',
+    		pumpAttendantNames: ''
+    };
+    var formIsValid = true;
+    this.setState({ showError: false, showSuccess: false });
     //alert(`Incorporated: ${name} with ${shareholders1.length} shareholders1 and ${shareholders2.length} shareholders2`);
     
     var shareholders = shareholders1.concat(shareholders2);
@@ -120,34 +143,94 @@ class IncorporationForm extends React.Component {
     	pumpAttendantNames: pumpAttendantNames,
     	date: date,
     	shift: shift,
-    	dayData: {}	
+    	dayData: {},
+    	totalCash: totalCash,
+    	expensesAndCredits: expensesAndCredits
     };
 
+    // Validation: Pump Attendant Names
+    if (pumpAttendantNames && pumpAttendantNames.trim().length >= 0) {
+    
+    } else {
+    	errors["pumpAttendantNames"] = "Falta nombre(s) de grifer@(s)";
+		formIsValid = false;
+    }
+    
     var shareholder = {};
 	for(var i = 0; i < shareholders.length; i++) {
 		shareholder = shareholders[i];
-		dayDataVO.dayData[shareholder.name] = shareholder.numEnd;
+		if (!isNaN(shareholder.numEnd) && shareholder.numEnd) {
+			dayDataVO.dayData[shareholder.name] = shareholder.numEnd;
+		} else {
+			// Validation Group 1 and 2
+			errors["numEnd"] = "número de máquina " + shareholder.name + " esta incompleto";
+			formIsValid = false;
+		}
 	}
 	
-    jQuery.ajax({
-		type: "POST",
-		contentType: "application/json", 
-		url:"/api/submitDayData",
-		data: JSON.stringify(dayDataVO),
-		datatype: 'json',
-		cache: false,
-		timeout: 600000,
-		success: (data) => {
-			console.log("submitDayData -> SUCCESS: ", data);
-			var json = "<h4>submitDayData Response</h4><pre>" + JSON.stringify(data, null, 4) + "</pre>";
-			var station = data.result[0];
-			
-		},
-		error: function(e){
-			var json = "<h4>Submit Error </h4><pre>" + e.responseText + "</pre>";
-			console.log("ERROR: ", e);
-		}	
-	});
+	// Validation: total cash
+	if (!isNaN(totalCash) && totalCash) {
+		
+	} else {
+		errors["totalCash"] = "Efectivo está incompleto";
+		formIsValid = false;
+	}
+	
+	// Validation: item and amount
+	var expenseOrCredit = {};
+	var expensesAndCreditsCleaned = [];
+	for(var i = 0; i < expensesAndCredits.length; i++) {
+		expenseOrCredit = expensesAndCredits[i];
+		if (!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt) {
+			if (expenseOrCredit.item && expenseOrCredit.item.trim().length >= 0) {
+				expensesAndCreditsCleaned.push(expenseOrCredit);
+			} else {
+				errors["expenseOrCredit"] = "Gasto o credito " + expenseOrCredit.item + " - " + expenseOrCredit.amt + " esta incompleto";
+				formIsValid = false;
+			}
+		} else {
+			if (expenseOrCredit.item && expenseOrCredit.item.trim().length >= 0) {
+				errors["expenseOrCredit"] = "Gasto o credito " + expenseOrCredit.item + " - " + expenseOrCredit.amt + " esta incompleto";
+				formIsValid = false;
+			} else {
+				
+			}
+		}
+	}
+	dayDataVO.expensesAndCredits = expensesAndCreditsCleaned;
+	
+	
+	this.setState({errors: errors}); 
+	
+	if (formIsValid) {
+		
+		jQuery.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/submitDayData",
+			data: JSON.stringify(dayDataVO),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				console.log("submitDayData -> SUCCESS: ", data);
+				var json = "<h4>submitDayData Response</h4><pre>" + JSON.stringify(data, null, 4) + "</pre>";
+				var station = data.result[0];
+				self.setState({ showSuccess: true });
+				
+			},
+			error: function(e){
+				var json = "<h4>Submit Error </h4><pre>" + e.responseText + "</pre>";
+				console.log("ERROR: ", e);
+				errors["submit"] = "Forma no aceptada. Intente otra vez";
+				self._toggleError();
+			}	
+		});
+	} else {
+		
+		this._toggleError();
+	}
+
   }
   
   handleAddItem = () => {
@@ -228,18 +311,36 @@ class IncorporationForm extends React.Component {
 	  this._initExpensesAndCredits();
   }
   
+  onKeyPress(event) {
+	if (event.which === 13 ) {
+		event.preventDefault();
+	}
+  }
+  
   render() {    
     return (
     
       <form onSubmit={this.handleSubmit}>
       	
+        {this.state.showError && 
+	        <div className="alert alert-danger">
+	      		<strong>¡Error!</strong>{" " + this.state.errors.pumpAttendantNames + " - " + this.state.errors.numEnd + " - " + this.state.errors.totalCash + " - " + this.state.errors.expenseOrCredit + " - " + this.state.errors.submit}  
+	      	</div>
+        }
+        
+        {this.state.showSuccess && 
+        	<div className="alert alert-success">
+        		<strong>Success!</strong> Tu forma has sido remitida. 
+        	</div>
+        }
+        
 	    <div className="form-body">
 	      <h3 className="form-section">Grifo {this.state.name}</h3>
 	      <div className="row">
 	          <div className="col-md-4">
 	              <div className="form-group">
 	                  <label className="control-label">Nombres de Grifero(s)</label>
-	                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
+	                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
 	              </div>
 	          </div>
 	          <div className="col-md-4">
@@ -428,7 +529,7 @@ class IncorporationForm extends React.Component {
 			      	        			<td>
 			      	        				<label className="control-label" key="cashLabel">Effectivo:</label>&nbsp;&nbsp;
 			      	        				{/*<MaskedInput style={{width:'80px', textAlign: 'right'}} mask="11111.11" key="totalCash" placeholder={`Effectivo`} value={''} onChange={this.handleTotalCashChange}/>*/}
-			      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
+			      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
 			      	        			</td>
 			      	        		</tr>
 			      	        		<tr>
@@ -463,10 +564,10 @@ class IncorporationForm extends React.Component {
 			  					            		{this.state.expensesAndCredits.map((expenseOrCredit, idx) => (	
 			  					            		<tr key={`trItem${idx}`}>
 			  						            		<td>
-			  						            			<input style={{width: '160px'}} type="text" key={`item${idx}`} placeholder={`Crédito o gasto`} value={expenseOrCredit.item}  onChange={this.handleItemChange(idx)}/>
+			  						            			<input style={{width: '160px'}} type="text" key={`item${idx}`} onKeyPress={this.onKeyPress} placeholder={`Crédito o gasto`} value={expenseOrCredit.item}  onChange={this.handleItemChange(idx)}/>
 		  						            			</td>
 			  						            		<td>
-			  						            			<input type="number" style={{size:10, width:'80px', textAlign: 'right'}} pattern="[0-9]*"  key={`amt${idx}`} placeholder={`Monto`} inputMode="numeric" value={expenseOrCredit.amt}  onChange={this.handleItemAmtChange(idx)}/>
+			  						            			<input type="number" style={{size:10, width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`amt${idx}`} placeholder={`Monto`} inputMode="numeric" value={expenseOrCredit.amt}  onChange={this.handleItemAmtChange(idx)}/>
 			  						            			{/* <MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask="1111.11" key={`amt${idx}`} placeholder={`Monto`} value={`${expenseOrCredit.amt}`} onChange={this.handleItemAmtChange(idx)}/>*/}
 			  						            		</td>
 			  						            		<td>

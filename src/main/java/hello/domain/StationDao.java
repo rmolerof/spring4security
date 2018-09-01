@@ -1,7 +1,9 @@
 package hello.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bson.types.ObjectId;
@@ -10,6 +12,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import hello.businessModel.Dispenser;
+import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
 
@@ -27,6 +30,8 @@ public class StationDao {
 	private Date date;
 	private Map<String, Tank> tanks;
 	private Map<String, Dispenser> dispensers;
+	private Double totalCash;
+	private List<ExpenseOrCredit> expensesAndCredits;
 	
 	public StationDao() {
 		super();
@@ -41,6 +46,8 @@ public class StationDao {
 	    this.date = new Date(original.getDate().getTime());
 	    this.tanks = new HashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
+	    this.totalCash = new Double(original.getTotalCash());
+	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());;
 	}
 	
 	@Override
@@ -111,6 +118,22 @@ public class StationDao {
 
 	public void setDispensers(Map<String, Dispenser> dispensers) {
 		this.dispensers = dispensers;
+	}
+
+	public Double getTotalCash() {
+		return totalCash;
+	}
+
+	public void setTotalCash(Double totalCash) {
+		this.totalCash = totalCash;
+	}
+
+	public List<ExpenseOrCredit> getExpensesAndCredits() {
+		return expensesAndCredits;
+	}
+
+	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
+		this.expensesAndCredits = expensesAndCredits;
 	}
 	
 }

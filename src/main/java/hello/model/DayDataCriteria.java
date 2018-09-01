@@ -1,13 +1,18 @@
 package hello.model;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import hello.businessModel.ExpenseOrCredit;
 
 public class DayDataCriteria {
 	private String pumpAttendantNames;
 	private Date date;
 	private String shift;
 	private Map<String, Double> dayData;
+	private Double totalCash;
+	private List<ExpenseOrCredit> expensesAndCredits;
 	
 	public Date getDate() {
 		return date;
@@ -32,6 +37,18 @@ public class DayDataCriteria {
 	}
 	public void setPumpAttendantNames(String pumpAttendantNames) {
 		this.pumpAttendantNames = pumpAttendantNames;
+	}
+	public Double getTotalCash() {
+		return totalCash;
+	}
+	public void setTotalCash(Double totalCash) {
+		this.totalCash = totalCash;
+	}
+	public List<ExpenseOrCredit> getExpensesAndCredits() {
+		return expensesAndCredits;
+	}
+	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
+		this.expensesAndCredits = expensesAndCredits;
 	}
 	
 }

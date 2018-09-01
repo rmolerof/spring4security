@@ -1,8 +1,10 @@
 package hello.businessModel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import hello.domain.StationDao;
@@ -16,6 +18,8 @@ public class Station {
 	private Date date;
 	private Map<String, Tank> tanks;
 	private Map<String, Dispenser> dispensers;
+	private Double totalCash;
+	private List<ExpenseOrCredit> expensesAndCredits;
 	
 	public Station() {
 		super();
@@ -32,6 +36,8 @@ public class Station {
 	    this.date = new Date(original.getDate().getTime());
 	    this.tanks = new HashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
+	    this.totalCash = new Double(original.getTotalCash());
+	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
 	}
 	
 	public Station(StationDao stationDao) {
@@ -42,6 +48,8 @@ public class Station {
 	    this.date = new Date(stationDao.getDate().getTime());
 	    this.tanks = new HashMap<String, Tank>(stationDao.getTanks());
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
+	    this.totalCash = new Double(stationDao.getTotalCash());
+	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(stationDao.getExpensesAndCredits());
 	}
 	
 	public Map<String, Dispenser> orderDispensers(Map<String, Dispenser> dispensers) {
@@ -114,6 +122,22 @@ public class Station {
 
 	public void setPumpAttendantNames(String pumpAttendantNames) {
 		this.pumpAttendantNames = pumpAttendantNames;
+	}
+
+	public Double getTotalCash() {
+		return totalCash;
+	}
+
+	public void setTotalCash(Double totalCash) {
+		this.totalCash = totalCash;
+	}
+
+	public List<ExpenseOrCredit> getExpensesAndCredits() {
+		return expensesAndCredits;
+	}
+
+	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
+		this.expensesAndCredits = expensesAndCredits;
 	}
 	
 }

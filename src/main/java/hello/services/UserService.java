@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import hello.Application;
 import hello.businessModel.Dispenser;
+import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TotalDay;
@@ -71,8 +72,8 @@ public class UserService {
 	
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
 		
-		Station laJoya = new Station();
-		/*laJoya.setStationId(101L);
+		/*Station laJoya = new Station();
+		laJoya.setStationId(101L);
 		laJoya.setName("La Joya");
 		laJoya.setShift("1");
 		laJoya.setPumpAttendantNames("miriam, sadit");
@@ -123,14 +124,24 @@ public class UserService {
 		
 		laJoya.setDispensers(dispensers);
 		
+		laJoya.setTotalCash(300.98D);
+		
+		laJoya.setExpensesAndCredits(new ExpenseOrCredit[] {
+				new ExpenseOrCredit("uno", 1.1D),
+				new ExpenseOrCredit("dos", 2.2D)});
+		
 		StationDao stationDao = stationRepository.save(new StationDao(laJoya));
-		logger.info(stationDao);*/
+		logger.info(stationDao);
+		return null;*/
+		
 		
 		/*StationDao s = new StationDao();
 		s.setId(new ObjectId("5b6b4c3c4ddd5a7f3c951838"));
 		Example<StationDao> example = Example.of(s);
 		StationDao stationDao = stationRepository.findOne(example);*/
 		
+		
+		Station laJoya = new Station();
 		StationDao stationDao = stationRepository.findLatest();
 		
 		laJoya = new Station(stationDao);
@@ -178,6 +189,8 @@ public class UserService {
 		String pumpAttendantNames = dayDataCriteria.getPumpAttendantNames();
 		Date date = dayDataCriteria.getDate();
 		String shift = dayDataCriteria.getShift();
+		Double totalCash = dayDataCriteria.getTotalCash();
+		List<ExpenseOrCredit> expensesAndCredits = dayDataCriteria.getExpensesAndCredits(); 
 		
 		TotalDay totalDay = new TotalDay();
 		
@@ -199,6 +212,8 @@ public class UserService {
 		newCurrentStation.setPumpAttendantNames(pumpAttendantNames);
 		newCurrentStation.setDate(date);
 		newCurrentStation.setShift(shift);
+		newCurrentStation.setTotalCash(totalCash);
+		newCurrentStation.setExpensesAndCredits(expensesAndCredits);
 		
 		
 		// Update gallons counter
