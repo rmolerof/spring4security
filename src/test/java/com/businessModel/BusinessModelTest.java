@@ -21,9 +21,9 @@ public class BusinessModelTest {
 		laJoya.setStationId(101L);
 		laJoya.setName("La Joya");
 		
-		Tank d2 = new Tank(1, "d2", 10000D);
-		Tank g90 = new Tank(2, "g90", 3000D);
-		Tank g95 = new Tank(3, "g95", 3000D);
+		Tank d2 = new Tank(1L, "d2", 10000D);
+		Tank g90 = new Tank(2L, "g90", 3000D);
+		Tank g95 = new Tank(3L, "g95", 3000D);
 		
 		Map<String, Tank> tanks = new HashMap<String, Tank>();
 		tanks.put(d2.getFuelType(), d2);

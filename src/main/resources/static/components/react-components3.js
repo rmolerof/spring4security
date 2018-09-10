@@ -15,7 +15,9 @@ class IncorporationForm extends React.Component {
       shareholders1: [],
       shareholders2: [],
       expensesAndCredits: [],
-      totalExpensesAndCredits: ''
+      totalExpensesAndCredits: '',
+      tanks: [],
+      gasPrices: []
     };
   }
   
@@ -262,16 +264,15 @@ class IncorporationForm extends React.Component {
 			cache: false,
 			timeout: 600000,
 			success: (data) => {
-				console.log("getStationStatusByDates -> SUCCESS: ", data);
 				var json = "<h4>Ajax Response</h4><pre>" + JSON.stringify(data, null, 4) + "</pre>";
 				var station = data.result[0];
 				var currentDate = new Date();
-				
 				var currentShift = station.shift == "1" ? "2": "1";
 				
 				// Iterate through Dispensers
 				var shareholdersResponse1 = [];
 				var shareholdersResponse2 = [];
+				var prices = {};
 				var i = 0;
 				for(var property in station.dispensers){
 					if (station.dispensers.hasOwnProperty(property)) {
@@ -286,6 +287,7 @@ class IncorporationForm extends React.Component {
 								numBeg: galsWithZeros,
 								numEnd: '',
 								pattern: dispenser.pattern == 8 ?  "11111.11": "111111.11"};
+						prices[dispenser.name] = {"price": dispenser.price, "cost": dispenser.cost, "name": dispenser.name};
 						if (i < 6) {
 							shareholdersResponse1.push(shareholder);
 						} else {
@@ -294,10 +296,22 @@ class IncorporationForm extends React.Component {
 						i++;
 					} 
 				}
+				
+				var gasPrices = [];
+				for(var property in prices) {
+					gasPrices.push({"price": prices[property].price, "cost": prices[property].cost, "name": prices[property].name});
+				}
+				var tanks = [];
+				for(var property in station.tanks) {
+					tanks.push(station.tanks[property]);
+				}
 				this.setState({shareholders1: this.state.shareholders1.concat(shareholdersResponse1)});
 				this.setState({shareholders2: this.state.shareholders2.concat(shareholdersResponse2)});
+				this.setState({name: station.name});
 				this.setState({date: currentDate});
 				this.setState({shift: currentShift});
+				this.setState({tanks: tanks});
+				this.setState({gasPrices: gasPrices});
 			},
 			error: function(e){
 				var json = "<h4>Ajax Response</h4><pre>" + e.responseText + "</pre>";
@@ -343,20 +357,56 @@ class IncorporationForm extends React.Component {
 	                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
 	              </div>
 	          </div>
-	          <div className="col-md-4">
+	          <div className="col-md-2">
 	              <div className="form-group">
 	                  <label className="control-label">Fecha</label>
-	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={this.state.date}  readOnly/>
+	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 	              </div>
 	          </div>
-	          <div className="col-md-4">
+	          <div className="col-md-2">
 	              <div className="form-group">
 	                  <label className="control-label">Turno</label>
 	                  <input type="text" id="lastName" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
 	              </div>
 	          </div>
-	      </div>	
-      	  
+	      </div>
+	      
+	      <div className="row">
+		  	<div className="col-md-3" >
+	              <div className="form-group">
+	              <table className="table table-hover table-light">
+	            	<tbody>
+          			<tr>
+          				{this.state.tanks.map((tank, idx) => (
+	            			<td key={`col${idx}`}>
+	            				<label className="control-label" key={`name${idx}`}>Inicio {tank.fuelType} (gal)</label>
+	            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={tank.gals.toFixed(2)} readOnly/>
+          				</td>
+          				))}
+	                    </tr>
+                  </tbody>
+	              </table>
+	              </div>
+	        </div>
+	      
+  		  	<div className="col-md-3" >
+	              <div className="form-group">
+	              <table className="table table-hover table-light">
+	            	<tbody>
+            			<tr>
+            				{this.state.gasPrices.map((gasPrice, idx) => (
+	            			<td key={`col${idx}`}>
+	            				<label className="control-label" key={`name${idx}`}>Precio {gasPrice.name}</label>
+	            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={`S/. ` + gasPrice.price.toFixed(2)} readOnly/>
+            				</td>
+            				))}
+	                    </tr>
+                    </tbody>
+	              </table>
+	              </div>
+	        </div>
+	      </div>
+	      
       	  <div className="row">
 		      <div className="col-md-3">
 		          <div className="portlet box red">
@@ -601,9 +651,9 @@ class IncorporationForm extends React.Component {
 		  
 		  <div className="form-actions">
 		      <button type="submit" className="btn blue">
-	          	<i className="fa fa-check"></i> Submit
+	          	<i className="fa fa-check"></i> Enviar
 	          </button>
-		      <button type="button" className="btn default">Cancel</button>
+		      <button type="button" className="btn default">Cancelar</button>
 		  </div>
 		</div>
       </form>

@@ -1,27 +1,30 @@
 package hello.businessModel;
 
 public class Tank {
-	public long id;
+	public Long tankId;
 	public String fuelType;
 	public Double gals;
 	
-	public Tank(long id, String fuelType, Double gals) {
+	public Tank() {
 		super();
-		this.id = id;
+	}
+	
+	public Tank(Long tankId, String fuelType, Double gals) {
+		this.tankId = tankId;
 		this.fuelType = fuelType;
 		this.gals = gals;
 	}
 	
 	@Override
 	public String toString() {
-		return "Tank [id=" + id + ", fuelType=" + fuelType + ", gals=" + gals + "]";
+		return "Tank [tankId=" + tankId + ", fuelType=" + fuelType + ", gals=" + gals + "]";
 	}
 
-	public long getId() {
-		return id;
+	public Long getTankId() {
+		return tankId;
 	}
-	public void setId(long id) {
-		this.id = id;
+	public void setTankId(Long tankId) {
+		this.tankId = tankId;
 	}
 	public String getFuelType() {
 		return fuelType;

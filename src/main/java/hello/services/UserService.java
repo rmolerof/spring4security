@@ -3,8 +3,6 @@ package hello.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,9 +13,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,11 +21,18 @@ import org.springframework.stereotype.Service;
 import hello.Application;
 import hello.businessModel.Dispenser;
 import hello.businessModel.ExpenseOrCredit;
+import hello.businessModel.GasPrice;
+import hello.businessModel.GasPricesVo;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
+import hello.businessModel.TanksVo;
 import hello.businessModel.TotalDay;
+import hello.domain.GasPricesDao;
+import hello.domain.GasPricesRepository;
 import hello.domain.StationDao;
 import hello.domain.StationRepository;
+import hello.domain.TanksDao;
+import hello.domain.TanksRepository;
 import hello.model.DayDataCriteria;
 import hello.model.User;
 
@@ -40,8 +43,15 @@ public class UserService {
 	
 	private List<User> users;
 	private Station currentStation;
+	private TanksVo currentTanksVo;
+	private GasPricesVo currentGasPricesVo;
+	
 	@Autowired
     private StationRepository stationRepository;
+	@Autowired
+    private TanksRepository tanksRepository;
+	@Autowired
+    private GasPricesRepository gasPricesRepository;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -144,12 +154,39 @@ public class UserService {
 		Station laJoya = new Station();
 		StationDao stationDao = stationRepository.findLatest();
 		
+		updateStatus(stationDao);
+		
 		laJoya = new Station(stationDao);
 		setCurrentStation(laJoya);
 		
 		return Stream.of(laJoya).collect(Collectors.toList());
 	}
 	
+	public void updateStatus(StationDao stationDao) {
+		// update prices
+		List<GasPrice> currentGasPrices = gasPricesRepository.findLatest().getGasPrices();
+		for (Entry<String, Dispenser> entry: stationDao.getDispensers().entrySet()) {
+			for (GasPrice gasPrice: currentGasPrices) {
+				if (entry.getKey().contains(gasPrice.getFuelType())) {
+					entry.getValue().setPrice(gasPrice.getPrice());
+					entry.getValue().setCost(gasPrice.getCost());
+				}
+			}
+		}
+		
+		// update Stock
+		List<Tank> currentTanks = tanksRepository.findLatest().getTanks();
+		for (Entry<String, Tank> entry: stationDao.getTanks().entrySet()) {
+			for (Tank tank: currentTanks) {
+				if (entry.getKey().contains(tank.getFuelType())) {
+					entry.getValue().setGals(tank.getGals());
+					entry.getValue().setTankId(tank.getTankId());
+				}
+			}
+			
+		}
+		
+	}
 	
 	public List<Station> submitDayData(DayDataCriteria dateDataCriteria) {
 		
@@ -175,14 +212,6 @@ public class UserService {
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
 	}
 
-	public Station getCurrentStation() {
-		return currentStation;
-	}
-
-	public void setCurrentStation(Station currentStation) {
-		this.currentStation = currentStation;
-	}
-	
 	private Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
 		
 		Map<String, Double> dayData = dayDataCriteria.getDayData();
@@ -257,5 +286,109 @@ public class UserService {
 		return newCurrentStation;
 	}
 	
+	public List<TanksVo> findStockByDates(String dateEnd, String dateBeg) {
+
+		TanksVo latestTankStatus = null;
+		TanksDao tanksDao = tanksRepository.findLatest();
+		
+		latestTankStatus = new TanksVo(tanksDao);
+		setCurrentTanksVo(latestTankStatus);
+		
+		return Stream.of(latestTankStatus).collect(Collectors.toList());
+		
+		/*Tank tank = new Tank();
+		tank.setTankId(1L);
+		tank.setFuelType("d2");
+		tank.setGals(0D);
+		
+		Tank tank2 = new Tank();
+		tank2.setTankId(2L);
+		tank2.setFuelType("g91");
+		tank2.setGals(10D);
+		
+		Tank tank3 = new Tank();
+		tank3.setTankId(3L);
+		tank3.setFuelType("g95");
+		tank3.setGals(20D);
+		
+		TanksVo tanksVo = new TanksVo(new Date(), new ArrayList<Tank>(Arrays.asList(tank, tank2, tank3)));
+		
+		TanksDao tanksDao = tanksRepository.save(new TanksDao(tanksVo));
+		return null;*/
+		
+	}
 	
+	public List<TanksVo> submitTanksVo(TanksVo tanksVoCriteria) {
+		
+		TanksDao tanksDao = tanksRepository.save(new TanksDao(tanksVoCriteria));
+		
+		TanksVo tanksVo = new TanksVo(tanksDao);
+		setCurrentTanksVo(tanksVo);
+		
+		return Stream.of(tanksVo).collect(Collectors.toList());
+	}
+	
+	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
+		GasPricesVo latestGasPricesVo = new GasPricesVo();
+		GasPricesDao gasPricesDao = gasPricesRepository.findLatest();
+		
+		latestGasPricesVo = new GasPricesVo(gasPricesDao);
+		setCurrentGasPricesVo(latestGasPricesVo);
+		
+		return Stream.of(latestGasPricesVo).collect(Collectors.toList());
+		
+		/*GasPrice gasPrice = new GasPrice();
+		gasPrice.setFuelType("d2");
+		gasPrice.setCost(11D);
+		gasPrice.setPrice(12D);
+		
+		GasPrice gasPrice1 = new GasPrice();
+		gasPrice1.setFuelType("d2");
+		gasPrice1.setCost(12D);
+		gasPrice1.setPrice(122D);
+		
+		GasPrice gasPrice2 = new GasPrice();
+		gasPrice2.setFuelType("d2");
+		gasPrice2.setCost(13D);
+		gasPrice2.setPrice(133D);
+		
+		GasPricesVo gasPricesVo = new GasPricesVo(new Date(), new ArrayList<GasPrice>(Arrays.asList(gasPrice, gasPrice1, gasPrice2)));
+		
+		GasPricesDao gasPriceDao = gasPricesRepository.save(new GasPricesDao(gasPricesVo));
+		return null;*/
+	}
+	
+	public List<GasPricesVo> submitGasPricesVo(GasPricesVo tanksVoCriteria) {
+		
+		GasPricesDao gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
+		
+		GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
+		setCurrentGasPricesVo(gasPricesVo);
+		
+		return Stream.of(gasPricesVo).collect(Collectors.toList());
+	}
+	
+	public TanksVo getCurrentTanksVo() {
+		return currentTanksVo;
+	}
+
+	public void setCurrentTanksVo(TanksVo currentTanksVo) {
+		this.currentTanksVo = currentTanksVo;
+	}
+
+	public GasPricesVo getCurrentGasPricesVo() {
+		return currentGasPricesVo;
+	}
+
+	public void setCurrentGasPricesVo(GasPricesVo currentGasPricesVo) {
+		this.currentGasPricesVo = currentGasPricesVo;
+	}
+
+	public Station getCurrentStation() {
+		return currentStation;
+	}
+
+	public void setCurrentStation(Station currentStation) {
+		this.currentStation = currentStation;
+	}
 }
