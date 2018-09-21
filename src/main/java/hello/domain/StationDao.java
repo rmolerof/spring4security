@@ -15,6 +15,7 @@ import hello.businessModel.Dispenser;
 import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
+import hello.businessModel.TotalDay;
 
 @Document(collection = "stations")
 public class StationDao {
@@ -32,6 +33,7 @@ public class StationDao {
 	private Map<String, Dispenser> dispensers;
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
+	private TotalDay totalDay;
 	
 	public StationDao() {
 		super();
@@ -47,7 +49,8 @@ public class StationDao {
 	    this.tanks = new HashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
-	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());;
+	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
+	    this.totalDay = new TotalDay(original.getTotalDay());
 	}
 	
 	@Override
@@ -134,6 +137,14 @@ public class StationDao {
 
 	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
 		this.expensesAndCredits = expensesAndCredits;
+	}
+
+	public TotalDay getTotalDay() {
+		return totalDay;
+	}
+
+	public void setTotalDay(TotalDay totalDay) {
+		this.totalDay = totalDay;
 	}
 	
 }

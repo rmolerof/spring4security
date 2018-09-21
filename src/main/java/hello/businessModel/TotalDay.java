@@ -17,6 +17,12 @@ public class TotalDay {
 		this.totalProfitDay = 0D;
 	}
 	
+	public TotalDay(TotalDay totalDay) {
+		this.totalDayUnits = new HashMap<String, TotalDayUnit>(totalDay.getTotalDayUnits());
+		this.totalSolesRevenueDay = new Double(totalDay.getTotalSolesRevenueDay());
+		this.totalProfitDay = new Double(totalDay.getTotalProfitDay());
+	}
+	
 	@Override
 	public String toString() {
 		return "TotalDay [totalDayUnits=" + totalDayUnits + ",\n totalSolesRevenueDay=" + totalSolesRevenueDay

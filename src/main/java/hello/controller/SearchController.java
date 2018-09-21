@@ -69,13 +69,36 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<Station> users = userService.findStationStatusByDates(search.getDateEnd(), search.getDateBeg());
+		List<Station> users = userService.findLatestStationStatus(search.getDateEnd(), search.getDateBeg());
 		if(users.isEmpty()) {
 			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
 		} else {
 			result.setMsg("Datos hallados");
 		}
 		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/submitDayData")
+	public ResponseEntity<?> submitDayData(@Valid @RequestBody DayDataCriteria dayDataCriteria, Errors errors){
+		AjaxGetStationResponse result = new AjaxGetStationResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<Station> stations = userService.submitDayData(dayDataCriteria);
+		if(stations.isEmpty()) {
+			result.setMsg("No hay datos para la fecha: " + dayDataCriteria.getDate());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(stations);
 		
 		return ResponseEntity.ok(result);
 		
@@ -173,29 +196,6 @@ public class SearchController {
 		
 	}
 	
-	@PostMapping("/api/submitDayData")
-	public ResponseEntity<?> submitDayData(@Valid @RequestBody DayDataCriteria dayDataCriteria, Errors errors){
-		AjaxGetStationResponse result = new AjaxGetStationResponse();
-		
-		if(errors.hasErrors()) {
-			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
-					.collect(Collectors.joining(",")));
-		
-			return ResponseEntity.badRequest().body(result);
-		}
-		
-		List<Station> stations = userService.submitDayData(dayDataCriteria);
-		if(stations.isEmpty()) {
-			result.setMsg("No hay datos para la fecha: " + dayDataCriteria.getDate());
-		} else {
-			result.setMsg("Datos hallados");
-		}
-		result.setResult(stations);
-		
-		return ResponseEntity.ok(result);
-		
-	}
-	
 	@PostMapping("/api/resetStatus")
 	public ResponseEntity<?> resetStatus(@Valid @RequestBody DayDataCriteria dayDataCriteria, Errors errors){
 		AjaxGetStationResponse result = new AjaxGetStationResponse();
@@ -214,6 +214,29 @@ public class SearchController {
 			result.setMsg("Datos hallados");
 		}
 		result.setResult(stations);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/getTableSummaryData")
+	public ResponseEntity<?> getTableSummaryData(@Valid @RequestBody SearchDateCriteria search, Errors errors){
+		AjaxGetStationResponse result = new AjaxGetStationResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<Station> users = userService.findStationStatusByDates(search.getDateEnd(), search.getDateBeg());
+		if(users.isEmpty()) {
+			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(users);
 		
 		return ResponseEntity.ok(result);
 		

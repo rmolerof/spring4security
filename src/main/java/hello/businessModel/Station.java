@@ -20,6 +20,7 @@ public class Station {
 	private Map<String, Dispenser> dispensers;
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
+	private TotalDay totalDay;
 	
 	public Station() {
 		super();
@@ -38,6 +39,7 @@ public class Station {
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
+	    this.totalDay = null;
 	}
 	
 	public Station(StationDao stationDao) {
@@ -50,6 +52,7 @@ public class Station {
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
 	    this.totalCash = new Double(stationDao.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(stationDao.getExpensesAndCredits());
+	    this.totalDay = null;
 	}
 	
 	public Map<String, Dispenser> orderDispensers(Map<String, Dispenser> dispensers) {
@@ -138,6 +141,14 @@ public class Station {
 
 	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
 		this.expensesAndCredits = expensesAndCredits;
+	}
+
+	public TotalDay getTotalDay() {
+		return totalDay;
+	}
+
+	public void setTotalDay(TotalDay totalDay) {
+		this.totalDay = totalDay;
 	}
 	
 }

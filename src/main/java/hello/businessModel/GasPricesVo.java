@@ -1,6 +1,7 @@
 package hello.businessModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +25,9 @@ public class GasPricesVo {
 	}
 	
 	public GasPricesVo(GasPricesDao gasPricesDao) {
-		this.pumpAttendantNames = new String(null == gasPricesDao.getPumpAttendantNames() ? "": gasPricesDao.getPumpAttendantNames());
-		this.date = new Date(gasPricesDao.getDate().getTime());
-		this.gasPrices = new ArrayList<GasPrice>(gasPricesDao.getGasPrices());
+		this.pumpAttendantNames = new String(null == gasPricesDao ? "": gasPricesDao.getPumpAttendantNames());
+		this.date = null == gasPricesDao ? new Date(): new Date(gasPricesDao.getDate().getTime());
+		this.gasPrices = new ArrayList<GasPrice>(null == gasPricesDao ? Arrays.asList(new GasPrice("d2", 0D, 0D), new GasPrice("g90", 0D, 0D), new GasPrice("g95", 0D, 0D)) : gasPricesDao.getGasPrices());
 	}
 
 	public Date getDate() {

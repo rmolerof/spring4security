@@ -40,6 +40,11 @@ public class DefaultController {
 		return "/reset-status-page";
 	}
 	
+	@GetMapping("/dashboard-table-summary-page")
+	public String dashboardTableSummaryPage(){
+		return "/dashboard-table-summary-page";
+	}
+	
 	@GetMapping("/login")
     public String login() {
         return "/login";

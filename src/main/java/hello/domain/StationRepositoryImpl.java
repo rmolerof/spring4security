@@ -22,6 +22,17 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 		List<StationDao> latestStationStatuses = mongoTemplate.find(query, StationDao.class);
 	    
 		
-		return latestStationStatuses.get(0);
+		return latestStationStatuses.size() == 0 ? null: latestStationStatuses.get(0);
+	}
+
+	@Override
+	public List<StationDao> findLatestMonth() {
+		Query query = new Query();
+		query.with(new Sort(Direction.DESC, "$natural"));
+		
+		List<StationDao> latestStationStatuses = mongoTemplate.find(query, StationDao.class);
+	    
+		
+		return latestStationStatuses;
 	}	
 }
