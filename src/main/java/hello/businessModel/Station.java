@@ -52,7 +52,7 @@ public class Station {
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
 	    this.totalCash = new Double(stationDao.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(stationDao.getExpensesAndCredits());
-	    this.totalDay = null;
+	    this.totalDay = new TotalDay(stationDao.getTotalDay());
 	}
 	
 	public Map<String, Dispenser> orderDispensers(Map<String, Dispenser> dispensers) {

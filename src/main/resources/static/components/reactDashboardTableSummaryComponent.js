@@ -8,7 +8,8 @@ class StockForm extends React.Component {
 	  showSuccess: false,
       pumpAttendantNames: '',
       date: '',
-      tanks: []
+      tanks: [],
+      summaryData: null
     };
   }
   
@@ -124,18 +125,56 @@ class StockForm extends React.Component {
 			datatype: 'json',
 			cache: false,
 			timeout: 600000,
-			success: (summaryData) => {
-				var tanksVo = summaryData.result[0];
-				var currentDate = new Date();
+			success: (data) => {
 				
-				var tank = {};
-				for(var i = 0; i < tanksVo.tanks.length; i++) {
-					tank = tanksVo.tanks[i];
-					tank["newGals"] = '';
+				var summaryData = data.result;
+				var tableData = [];
+				
+				for (var i = 0; i < summaryData.length - 1; i++) {
+					
+					var expenseOrCredit = {};
+					var visaCredits = 0.0;
+					var expensesOnly = 0.0;
+					var expensesAndCredits = 0.0;
+					for(var j = 0; j < summaryData[i].expensesAndCredits.length; j++) {
+						expenseOrCredit = summaryData[i].expensesAndCredits[j];
+						if (expenseOrCredit.item.toLowerCase().includes("visa")) {
+							visaCredits += expenseOrCredit.amt;
+						}
+						expensesAndCredits += expenseOrCredit.amt;
+					}
+					expensesOnly = expensesAndCredits - visaCredits;
+					
+					var row = [
+						moment(summaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
+						summaryData[i].pumpAttendantNames,
+						summaryData[i].shift,
+						summaryData[i].totalDay.totalDayUnits.d2.stockGals,
+						summaryData[i].totalDay.totalDayUnits.g90.stockGals,
+						summaryData[i].totalDay.totalDayUnits.g95.stockGals,
+						summaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay,
+						summaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay,
+						summaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay,
+						summaryData[i].totalDay.totalDayUnits.d2.totalSolesRevenueDay,
+						summaryData[i].totalDay.totalDayUnits.g90.totalSolesRevenueDay,
+						summaryData[i].totalDay.totalDayUnits.g95.totalSolesRevenueDay,
+						summaryData[i].totalDay.totalDayUnits.d2.totalProfitDay,
+						summaryData[i].totalDay.totalDayUnits.g90.totalProfitDay,
+						summaryData[i].totalDay.totalDayUnits.g95.totalProfitDay,
+						summaryData[i].totalDay.totalSolesRevenueDay,
+						summaryData[i].totalCash,
+						expensesOnly,
+						visaCredits,
+						expensesAndCredits,
+						(summaryData[i].totalDay.totalSolesRevenueDay - summaryData[i].totalCash - expensesAndCredits).toFixed(2),
+						summaryData[i].totalDay.totalProfitDay
+						];
+					
+					tableData[i] = row;
 				}
 				
-				this.setState({tanks: tanksVo.tanks});
-				this.setState({date: currentDate});
+				
+				this.setState({summaryData: tableData});
 			},
 			error: function(e){
 
@@ -152,8 +191,6 @@ class StockForm extends React.Component {
 		event.preventDefault();
 	}
   }
-  
-  tableData = [["airi"],["angelica"]];
   
   render() {    
     return (
@@ -180,7 +217,9 @@ class StockForm extends React.Component {
 	          </div>
 	      </div>
 	      
-	      <Tbl data={this.tableData}></Tbl>
+	      {this.state && this.state.summaryData &&
+	    	  <Tbl data={this.state.summaryData}></Tbl>
+		  } 
 	      
       </form>
     )
@@ -207,7 +246,28 @@ class Tbl extends React.Component {
 				{extend: 'csv', className: 'btn purple btn-outline'}
 			],
 			columns: [
-				{title: "test"}
+				 	{ title: "Fecha" },
+		            { title: "Autor" },
+		            { title: "Trno" },
+		            { title: "Stk D2" },
+		            { title: "Stk G90" },
+		            { title: "Stk G95" },
+		            { title: "Gals D2" },
+		            { title: "Gals G90" },
+		            { title: "Gals G95" },
+		            { title: "Vnts D2" },
+		            { title: "Vnts G90" },
+		            { title: "Vnts G95" },
+		            { title: "Util D2" },
+		            { title: "Util G90" },
+		            { title: "Util G95" },
+		            { title: "Ventas" },
+		            { title: "Efectivo" },
+		            { title: "Solo Gasto" },
+		            { title: "Visas" },
+		            { title: "Gsts y Crdts" },
+		            { title: "Falta" },
+		            { title: "Util Bruta" },
 			]
 		});
 	}
@@ -219,7 +279,7 @@ class Tbl extends React.Component {
 	render() {
 		return <div>
 					<div className="row">
-						<div className="col-md-6">
+						<div className="col-md-12">
 							<div className="portlet light bordered">
 								<div className="portlet-title">
 									<div className="caption font-green">

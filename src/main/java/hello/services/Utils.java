@@ -30,13 +30,14 @@ public class Utils {
 		
 		for (Entry<String, Dispenser> entry: currentStation.getDispensers().entrySet()) {
 			
-			double gallonsDiff = dayData.get(entry.getKey()) - entry.getValue().getGallons();
+			double gallonsDiff = roundTwo((dayData.get(entry.getKey()) - entry.getValue().getGallons()));
 			String name = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));
-			totalDay.setTotalGalsSoldDay(name, toFixedTwo(totalDay.getTotalGalsSoldDay(name) + dayData.get(entry.getKey()) - entry.getValue().getGallons()));
+			totalDay.setTotalGalsSoldDay(name, toFixedTwo(totalDay.getTotalGalsSoldDay(name) + roundTwo(dayData.get(entry.getKey()) - entry.getValue().getGallons())));
 			totalDay.setTotalSolesRevenueDay(name, toFixedTwo(totalDay.getTotalSolesRevenueDay(name) + toFixedTwo(gallonsDiff * entry.getValue().getPrice())));
-			totalDay.setTotalSolesRevenueDay(toFixedTwo(totalDay.getTotalSolesRevenueDay() + toFixedTwo(gallonsDiff * entry.getValue().getPrice())));
-			totalDay.setTotalProfitDay(name, toFixedTwo(totalDay.getTotalGalsSoldDay(name) * (entry.getValue().getPrice() - entry.getValue().getCost())));
-			totalDay.setTotalProfitDay(toFixedTwo(totalDay.getTotalProfitDay() + toFixedTwo(gallonsDiff * (entry.getValue().getPrice() - entry.getValue().getCost()))));
+			totalDay.setTotalSolesRevenueDay(roundTwo(totalDay.getTotalSolesRevenueDay() + toFixedTwo(gallonsDiff * entry.getValue().getPrice())));
+			double priceDiff = roundTwo(entry.getValue().getPrice() - entry.getValue().getCost());
+			totalDay.setTotalProfitDay(name, roundTwo(totalDay.getTotalProfitDay(name) + toFixedTwo(gallonsDiff * priceDiff)));
+			totalDay.setTotalProfitDay(roundTwo(totalDay.getTotalProfitDay() + toFixedTwo(gallonsDiff * priceDiff)));
 			totalDay.setStockGals(name, toFixedTwo(currentStation.getTanks().get(name).getGals() - totalDay.getTotalGalsSoldDay(name)));
 		}
 		
@@ -62,12 +63,16 @@ public class Utils {
 		}
 		
 		// Save updated station status
-		System.out.println(newCurrentStation);
+		//System.out.println(newCurrentStation);
 		
 		return newCurrentStation;
 	}
 	
 	public double toFixedTwo(double amt) {
-		return Math.floor(amt * 100) / 100;
+		return Math.floor(amt * 100) / 100.0;
+	}
+	
+	public double roundTwo(double amt) {
+		return Math.round(amt * 100) / 100.0;
 	}
 }

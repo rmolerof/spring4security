@@ -1,16 +1,17 @@
 package com.businessModel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import hello.businessModel.Company;
 import hello.businessModel.Dispenser;
+import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
-import hello.businessModel.TotalDay;
+import hello.model.DayDataCriteria;
+import hello.services.Utils;
 
 public class BusinessModelTest {
 
@@ -20,10 +21,14 @@ public class BusinessModelTest {
 		Station laJoya = new Station();
 		laJoya.setStationId(101L);
 		laJoya.setName("La Joya");
+		laJoya.setPumpAttendantNames("Rudy");
+		laJoya.setDate(new Date());
+		laJoya.setTotalCash(8000D);
+		laJoya.setExpensesAndCredits(new ArrayList<ExpenseOrCredit>());
 		
-		Tank d2 = new Tank(1L, "d2", 10000D);
-		Tank g90 = new Tank(2L, "g90", 3000D);
-		Tank g95 = new Tank(3L, "g95", 3000D);
+		Tank d2 = new Tank(1L, "d2", 9517.40D);
+		Tank g90 = new Tank(2L, "g90", 2831.86D);
+		Tank g95 = new Tank(3L, "g95", 2972.23D);
 		
 		Map<String, Tank> tanks = new HashMap<String, Tank>();
 		tanks.put(d2.getFuelType(), d2);
@@ -78,8 +83,14 @@ public class BusinessModelTest {
 		dayData.put("g95_1", 96795.94);
 		dayData.put("g95_2", 99017.05);
 
+		Utils utils = new Utils();
+		DayDataCriteria dayDataCriteria = new DayDataCriteria();
+		dayDataCriteria.setDate(new Date());
+		dayDataCriteria.setDayData(dayData);
+		dayDataCriteria.setShift("1");
 		
-		TotalDay totalDay = new TotalDay();
+		Station laJoyaCalculated = utils.updateStation(laJoya, dayDataCriteria);
+		/*TotalDay totalDay = new TotalDay();
 		
 		for (Entry<String, Dispenser> entry: laJoya.getDispensers().entrySet()) {
 			
@@ -93,10 +104,10 @@ public class BusinessModelTest {
 			totalDay.setStockGals(name, tanks.get(name).getGals() - totalDay.getTotalGalsSoldDay(name));
 		}
 		
-		com.setStations(new ArrayList<Station>(Arrays.asList(laJoya)));
+		com.setStations(new ArrayList<Station>(Arrays.asList(laJoya)));*/
 		
 		// Report
-		System.out.println(totalDay.toString());
+		System.out.println(laJoyaCalculated.getTotalDay().toString());
 		
 	}
 

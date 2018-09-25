@@ -1,9 +1,16 @@
 package hello.businessModel;
 
+import java.util.Date;
+
 public class Tank {
 	public Long tankId;
 	public String fuelType;
 	public Double gals;
+	public Date date;
+	public String supplierRUC;
+	public String truckDriverName;
+	public String truckPlateNumber;
+	public Double cost;
 	
 	public Tank() {
 		super();
