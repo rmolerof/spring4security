@@ -92,7 +92,13 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<Station> stations = userService.submitDayData(dayDataCriteria);
+		List<Station> stations = null;
+		if(dayDataCriteria.getSaveOrUpdate().equals("save")) {
+			stations = userService.submitDayData(dayDataCriteria);
+		} else {
+			stations = userService.updateLatestDayData(dayDataCriteria);
+		}
+		
 		if(stations.isEmpty()) {
 			result.setMsg("No hay datos para la fecha: " + dayDataCriteria.getDate());
 		} else {
@@ -161,7 +167,7 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria);
+		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria, "save");
 		if(TanksVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + tanksVoCriteria.getDate());
 		} else {

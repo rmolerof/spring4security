@@ -1,37 +1,15 @@
-import React from "react";
-import { findDOMNode } from "react-dom";
-import PropTypes from "prop-types";
-
 class ReactToPrint extends React.Component {
 
-  static propTypes = {
-    /** Copy styles over into print window. default: true */
-    copyStyles: PropTypes.bool, 
-    /** Trigger action used to open browser print */
-    trigger: PropTypes.func.isRequired,
-    /** Content to be printed */
-    content: PropTypes.func.isRequired,
-    /** Callback function to trigger before print */
-    onBeforePrint: PropTypes.func,
-    /** Callback function to trigger after print */
-    onAfterPrint: PropTypes.func,
-    /** Override default print window styling */    
-    pageStyle: PropTypes.string,
-    /** Optional class to pass to the print window body */
-    bodyClass: PropTypes.string,
-  };
-
-  static defaultProps = {
-    copyStyles: true,
-    closeAfterPrint: true,
-    bodyClass: '',
-  };
+	constructor(props) {
+		super(props);
+		self = this;
+	}
 
   triggerPrint(target) {
-    const { onBeforePrint, onAfterPrint } = this.props;
+    const { onBeforePrint, onAfterPrint } = self.props;
 
     if (onBeforePrint) {
-      onBeforePrint();
+      onBeforePrint;
     }
 
     setTimeout(() => {
@@ -40,7 +18,7 @@ class ReactToPrint extends React.Component {
       this.removeWindow(target);
 
       if (onAfterPrint) {
-        onAfterPrint();
+        onAfterPrint;
       }
 
     }, 500);
@@ -52,7 +30,7 @@ class ReactToPrint extends React.Component {
     }, 500);
   }
 
-  handlePrint = () => {
+  handlePrint(){
   
     const {
       bodyClass,
@@ -60,7 +38,7 @@ class ReactToPrint extends React.Component {
       copyStyles,
       pageStyle,
       onAfterPrint
-    } = this.props;
+    } = self.props;
 
     const contentEl = content();
 
@@ -74,18 +52,18 @@ class ReactToPrint extends React.Component {
     printWindow.style.top = '-1000px';
     printWindow.style.left = '-1000px';
 
-    const contentNodes = findDOMNode(contentEl);
+    const contentNodes = ReactDOM.findDOMNode(contentEl);
     const linkNodes = document.querySelectorAll('link[rel="stylesheet"]');
 
-    this.linkTotal = linkNodes.length || 0;
-    this.linkLoaded = 0;
+    self.linkTotal = linkNodes.length || 0;
+    self.linkLoaded = 0;
 
     const markLoaded = (type) => {
 
-      this.linkLoaded++;
+      self.linkLoaded++;
 
-      if (this.linkLoaded === this.linkTotal) {       
-        this.triggerPrint(printWindow);
+      if (self.linkLoaded === self.linkTotal) {       
+        self.triggerPrint(printWindow);
       }
 
     };
@@ -108,7 +86,7 @@ class ReactToPrint extends React.Component {
       styleEl.appendChild(domDoc.createTextNode(defaultPageStyle));
       domDoc.head.appendChild(styleEl);
 
-      if (bodyClass.length) {
+      if (self.props.bodyClass.length) {
         domDoc.body.classList.add(bodyClass);
       }
 
@@ -157,8 +135,8 @@ class ReactToPrint extends React.Component {
 
       }
 
-      if (this.linkTotal === 0 || copyStyles === false) {
-        this.triggerPrint(printWindow);
+      if (self.linkTotal === 0 || copyStyles === false) {
+        self.triggerPrint(printWindow);
       }
 
     };
@@ -178,4 +156,15 @@ class ReactToPrint extends React.Component {
 
 }
 
-export default ReactToPrint;
+ReactToPrint.defaultProps = {
+		copyStyles: PropTypes.bool,
+		trigger: PropTypes.func.isRequired,
+		content: PropTypes.func.isRequired,
+		onBeforePrint: PropTypes.func,
+		onAfterPrint: PropTypes.func,
+		pageStyle: PropTypes.string,
+		bodyClass: PropTypes.string,
+		copyStyles: true,
+		closeAfterPrint: true,
+		bodyClass: ''
+}

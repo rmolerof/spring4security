@@ -7,10 +7,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import hello.domain.StationDao;
 
 public class Station {
 
+	private ObjectId id;
 	private Long stationId;
 	private String name;
 	private String pumpAttendantNames;
@@ -30,6 +33,7 @@ public class Station {
 	    if (null == original.getShift()) {
 	    	original.setShift("1");
 	    }
+	    this.id = original.getId();
 		this.stationId = original.stationId;
 	    this.name = new String(original.name);
 	    this.pumpAttendantNames = new String(original.pumpAttendantNames);
@@ -43,6 +47,7 @@ public class Station {
 	}
 	
 	public Station(StationDao stationDao) {
+		this.id = stationDao.getId();
 		this.stationId = new Long(stationDao.getStationId());
 	    this.name = new String(stationDao.getName());
 	    this.pumpAttendantNames = new String(stationDao.getPumpAttendantNames());
@@ -149,6 +154,14 @@ public class Station {
 
 	public void setTotalDay(TotalDay totalDay) {
 		this.totalDay = totalDay;
+	}
+
+	public ObjectId getId() {
+		return id;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
 	
 }

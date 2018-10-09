@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface StationRepositoryCustom {
 	
-	 StationDao findLatest();
+	 List<StationDao> findLatest(String dateEnd, String dateBeg);
 	 
 	 List<StationDao> findLatestMonth();
 

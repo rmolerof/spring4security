@@ -134,11 +134,11 @@ class IncorporationForm extends React.Component {
     this.setState({ shareholders: this.state.shareholders.filter((s, sidx) => idx !== sidx) });
   }
   
-  _fetchData(){
+  _fetchData(timeframe){
 			
 		var search = {};
-		search["dateEnd"] = "today";
-		search["dateBeg"] = "yesterday";
+		search["dateEnd"] = timeframe.dateEnd;
+		search["dateBeg"] = timeframe.dateBeg;
 		
 		//jQuery("#btn-search").prop("disabled", true);
 		
@@ -225,7 +225,7 @@ class IncorporationForm extends React.Component {
   
   componentWillMount(){
 	  //this._fetchComments();
-	  this._fetchData();
+	  this._fetchData({dateEnd: "latest", dateBeg: ""});
   }
   
   render() {    

@@ -40,7 +40,7 @@ public class StationDao {
 	}
 	
 	public StationDao(Station original) {
-		this.id = new ObjectId();
+		this.id = null==original.getId() ? new ObjectId(): original.getId();
 		this.stationId = new Long(original.getStationId());
 	    this.name = new String(original.getName());
 	    this.pumpAttendantNames = new String(original.getPumpAttendantNames());

@@ -17,7 +17,8 @@ class IncorporationForm extends React.Component {
       expensesAndCredits: [],
       totalExpensesAndCredits: '',
       tanks: [],
-      gasPrices: []
+      gasPrices: [],
+      saveOrUpdate: 'save'
     };
   }
   
@@ -128,7 +129,7 @@ class IncorporationForm extends React.Component {
 	
 	evt.preventDefault();
     
-	const { pumpAttendantNames, date, shift, shareholders1, shareholders2, totalCash, expensesAndCredits} = this.state;
+	const { pumpAttendantNames, date, shift, shareholders1, shareholders2, totalCash, expensesAndCredits, saveOrUpdate} = this.state;
     var self = this;
     var errors = {
     		numEnd: '',
@@ -148,7 +149,8 @@ class IncorporationForm extends React.Component {
     	shift: shift,
     	dayData: {},
     	totalCash: totalCash,
-    	expensesAndCredits: expensesAndCredits
+    	expensesAndCredits: expensesAndCredits,
+    	saveOrUpdate: saveOrUpdate
     };
 
     // Validation: Pump Attendant Names
@@ -248,13 +250,16 @@ class IncorporationForm extends React.Component {
 	  this._getTotalExpensesAndCredits(newExpensesOrCredits);
   }
   
-  _fetchData(){
+  loadPrevious = () => {
+	  this.setState({saveOrUpdate:  'update'});
+	  this._fetchData({dateEnd: "latest", dateBeg: "previous"});
+  }
+  
+  _fetchData(timeframe){
 			
 		var search = {};
-		search["dateEnd"] = "today";
-		search["dateBeg"] = "yesterday";
-		
-		//jQuery("#btn-search").prop("disabled", true);
+		search["dateEnd"] = timeframe.dateEnd;
+		search["dateBeg"] = timeframe.dateBeg;
 		
 		jQuery.ajax({
 			type: "POST",
@@ -266,7 +271,135 @@ class IncorporationForm extends React.Component {
 			timeout: 600000,
 			success: (data) => {
 				var json = "<h4>Ajax Response</h4><pre>" + JSON.stringify(data, null, 4) + "</pre>";
-				var station = data.result[0];
+				
+				if (data.result.length == 1) {
+					var station = data.result[0];
+					var currentDate = new Date();
+					if (station.totalCash != 0) {
+						var currentShift = station.shift == "1" ? "2": "1";
+					} else {
+						var currentShift = station.shift;
+					}
+					
+					// Iterate through Dispensers
+					var shareholdersResponse1 = [];
+					var shareholdersResponse2 = [];
+					var prices = {};
+					var i = 0;
+					for(var property in station.dispensers){
+						if (station.dispensers.hasOwnProperty(property)) {
+							var dispenser = station.dispensers[property];
+							
+							var galsWithZeros = dispenser.gallons.toFixed(2) + "";
+							while (galsWithZeros.length < dispenser.pattern) galsWithZeros = "0" + galsWithZeros;
+							
+							const shareholder = {
+									name: dispenser.name + "_" + dispenser.id,
+									price: dispenser.price,
+									numBeg: galsWithZeros,
+									numEnd: '',
+									pattern: dispenser.pattern == 8 ?  "11111.11": "111111.11"};
+							prices[dispenser.name] = {"price": dispenser.price, "cost": dispenser.cost, "name": dispenser.name};
+							if (i < 6) {
+								shareholdersResponse1.push(shareholder);
+							} else {
+								shareholdersResponse2.push(shareholder);
+							}
+							i++;
+						} 
+					}
+					
+					var gasPrices = [];
+					for(var property in prices) {
+						gasPrices.push({"price": prices[property].price, "cost": prices[property].cost, "name": prices[property].name});
+					}
+					var tanks = [];
+					for(var property in station.tanks) {
+						tanks.push(station.tanks[property]);
+					}
+					this.setState({shareholders1: this.state.shareholders1.concat(shareholdersResponse1)});
+					this.setState({shareholders2: this.state.shareholders2.concat(shareholdersResponse2)});
+					this.setState({name: station.name});
+					this.setState({date: currentDate});
+					this.setState({shift: currentShift});
+					this.setState({tanks: tanks});
+					this.setState({gasPrices: gasPrices});
+					
+				} else {
+					var stationLatest = data.result[0];
+					var stationPrevious = data.result[1];
+					
+					// Iterate through Dispensers
+					var shareholdersResponse1 = [];
+					var shareholdersResponse2 = [];
+					var prices = {};
+					var i = 0;
+					
+					for(var property in stationLatest.dispensers){
+						if (stationLatest.dispensers.hasOwnProperty(property)) {
+							var dispenserLatest = stationLatest.dispensers[property];
+							var dispenserPrevious = stationPrevious.dispensers[property]; 
+							
+							var galsWithZerosLatest = dispenserLatest.gallons.toFixed(2) + "";
+							while (galsWithZerosLatest.length < dispenserLatest.pattern) galsWithZerosLatest = "0" + galsWithZerosLatest;
+							
+							var galsWithZerosPrevious = dispenserPrevious.gallons.toFixed(2) + "";
+							while (galsWithZerosPrevious.length < dispenserPrevious.pattern) galsWithZerosPrevious = "0" + galsWithZerosPrevious;
+							
+							const shareholder = {
+									name: dispenserLatest.name + "_" + dispenserLatest.id,
+									price: dispenserLatest.price,
+									numBeg: galsWithZerosPrevious,
+									numEnd: galsWithZerosLatest,
+									pattern: dispenserLatest.pattern == 8 ?  "11111.11": "111111.11"};
+							prices[dispenserLatest.name] = {"price": dispenserLatest.price, "cost": dispenserLatest.cost, "name": dispenserLatest.name};
+							if (i < 6) {
+								shareholdersResponse1.push(shareholder);
+							} else {
+								shareholdersResponse2.push(shareholder);
+							}
+							i++;
+						} 
+					}
+					
+					var gasPrices = [];
+					for(var property in prices) {
+						gasPrices.push({"price": prices[property].price, "cost": prices[property].cost, "name": prices[property].name});
+					}
+					var tanks = [];
+					for(var property in stationLatest.tanks) {
+						tanks.push(stationLatest.tanks[property]);
+					}
+					this.setState({shareholders1: []});
+					this.setState({shareholders2: []});
+					this.setState({shareholders1: this.state.shareholders1.concat(shareholdersResponse1)});
+					this.setState({shareholders2: this.state.shareholders2.concat(shareholdersResponse2)});
+					this.setState({name: stationLatest.name});
+					this.setState({pumpAttendantNames: stationLatest.pumpAttendantNames});
+					this.setState({date: stationLatest.date});
+					this.setState({shift: stationLatest.shift});
+					this.setState({tanks: tanks});
+					this.setState({gasPrices: gasPrices});
+					this.setState({expensesAndCredits: stationLatest.expensesAndCredits});
+					this.setState({totalCash: stationLatest.totalCash});
+					this.setState({totalRevenue: stationLatest.totalDay.totalSolesRevenueDay});
+					
+					// Total Expenses
+					var totalExpsAndCreds = 0.0;
+					var expenseOrCredit = {};
+					for(var i = 0; i < stationLatest.expensesAndCredits.length; i++) {
+						expenseOrCredit = stationLatest.expensesAndCredits[i];
+						if (!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt) {
+							totalExpsAndCreds = totalExpsAndCreds + expenseOrCredit.amt;
+						}
+					}
+					  
+					this.setState({totalExpensesAndCredits: totalExpsAndCreds.toFixed(2)});
+					
+					
+				}
+				
+				/*var station = data.result[0];
 				var currentDate = new Date();
 				if (station.totalCash != 0) {
 					var currentShift = station.shift == "1" ? "2": "1";
@@ -316,7 +449,7 @@ class IncorporationForm extends React.Component {
 				this.setState({date: currentDate});
 				this.setState({shift: currentShift});
 				this.setState({tanks: tanks});
-				this.setState({gasPrices: gasPrices});
+				this.setState({gasPrices: gasPrices});*/
 			},
 			error: function(e){
 				var json = "<h4>Ajax Response</h4><pre>" + e.responseText + "</pre>";
@@ -326,7 +459,7 @@ class IncorporationForm extends React.Component {
 	}
   
   componentWillMount(){
-	  this._fetchData();
+	  this._fetchData({dateEnd: "latest", dateBeg: ""});
 	  this._initExpensesAndCredits();
   }
   
@@ -352,6 +485,10 @@ class IncorporationForm extends React.Component {
         		<strong>Success!</strong> Tu forma has sido remitida. 
         	</div>
         }
+        
+        {/*<ReactToPrint trigger={() => <a href="#"> Print this out</a>} content={() => this.componentRef}></ReactToPrint>
+        ref={el => (this.componentRef = el)}*/}
+        
         <div className="row">
 	      <div className="col-md-12">
 	          <div className="portlet light form-fit ">
@@ -372,13 +509,21 @@ class IncorporationForm extends React.Component {
 				          <div className="col-md-2">
 				              <div className="form-group">
 				                  <label className="control-label">Fecha</label>
-				                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+				                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 				              </div>
 				          </div>
 				          <div className="col-md-2">
 				              <div className="form-group">
 				                  <label className="control-label">Turno</label>
 				                  <input type="text" id="lastName" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
+				              </div>
+				          </div>
+				          <div className="col-md-2">
+				              <div className="form-group">
+				              	  <label className="control-label">&nbsp;</label><br></br>
+						          <a onClick={this.loadPrevious} className="btn red">
+                                    <i className="fa fa-edit"></i> Editar Anterior
+                                </a>
 				              </div>
 				          </div>
 				      </div>
@@ -463,7 +608,7 @@ class IncorporationForm extends React.Component {
 								      						            				<tbody>
 								      						            					<tr>
 								      						            						<td>
-								      						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={''} onChange={this.handleNumEndChange1(idx)}/>
+								      						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange1(idx)}/>
 								      						            						</td>
 								      						            					</tr>
 								      						            					<tr>
@@ -536,7 +681,7 @@ class IncorporationForm extends React.Component {
 							  						            				<tbody>
 							  						            					<tr>
 							  						            						<td>
-							  						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={''} onChange={this.handleNumEndChange2(idx)}/>
+							  						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange2(idx)}/>
 							  					            							</td>
 							  						            					</tr>
 							  						            					<tr>
@@ -667,7 +812,85 @@ class IncorporationForm extends React.Component {
 				          </button>
 					      <button type="button" className="btn default">Cancelar</button>
 					  </div>
-				  </div>
+					  
+					  <div className="row">
+					      <div className="col-md-3">
+					          <div className="portlet box red">
+					              <div className="portlet-title">
+					                  <div className="caption">
+					                      <i className="fa fa-gift"></i>Print Current Form</div>
+					              </div>
+					              
+					              <div className="portlet-body form">
+						              <div className="portlet-body">
+						                  <div className="table-responsive">  
+							              	<table>
+								      	        <tbody>
+								      				<tr>
+								      					<td>
+								      						
+								      					          <div  className="shareholder">
+								      					            
+								      					            <table className="table table-bordered">
+								      					            	<tbody>
+								      					            		<tr>
+								      					            			<th>
+								      					            				Prod
+								      					            			</th>
+								      					            			<th>
+								      					            				Soles
+								      					            			</th>
+								      					            			<th>
+								      					            				Venta
+								      					            			</th>
+								      					            		</tr>
+								      					            		{this.state.shareholders1.map((shareholder, idx) => (
+								      					            		<tr key={`d1${idx}`}>
+								      						            		<td>
+								      						            			<input  style={{border: 'none', width: '40px'}} type="text" key={`prod${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.name} readOnly/>
+								      						            		</td>
+								      						            		<td>
+								      						            			<input style={{border: 'none', width: '80px'}} type="text" key={`price${idx}`} value={`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`} readOnly/>
+								      						            		</td>
+								      						            		<td>
+								      						            			<table>
+								      						            				<tbody>
+								      						            					<tr>
+								      						            						<td>
+								      						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={''} onChange={this.handleNumEndChange1(idx)}/>
+								      						            						</td>
+								      						            					</tr>
+								      						            					<tr>
+								      						            						<td>
+								      						            							<input style={{border: 'none', width: '80px', textAlign: 'right'}} type="text" key={`beg${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.numBeg} readOnly/>
+								      						            						</td>
+								      						            					</tr>
+								      						            					<tr>
+								      					            						<td>
+								      					            							<input style={{borderBottomWidth: '4px', width: '80px', textAlign: 'right'}} type="text" key={`dif${idx}`} placeholder={`Numero ${idx + 1}`} value={`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`} readOnly/>
+								      					            						</td>
+								      					            					</tr>
+								      						            				</tbody>
+								      						            			</table>
+								      						                    </td>
+								      						            	</tr>
+							      					            			))}
+								      					            	</tbody>
+								      					            </table>
+								      					          </div>
+									      				        
+									      					</td>
+									      				</tr>
+									      		</tbody>
+								              </table>
+							              </div>
+				                      </div>
+					              </div>
+					              
+					          </div>
+					      </div>
+					   </div>
+				      </div>
 			  </div>
 		  </div>
 		</div>

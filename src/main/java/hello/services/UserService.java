@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -87,9 +88,10 @@ public class UserService {
 	
 	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg) {
 		Station laJoya = new Station();
-		StationDao stationDao = stationRepository.findLatest();
+		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg);
+		StationDao stationDao = null;
 		
-		if (null == stationDao) {
+		if (null == stationDaos) {
 			stationDao = new StationDao();
 			
 			stationDao.setStationId(101L);
@@ -145,12 +147,28 @@ public class UserService {
 			stationDao.setDispensers(dispensers);
 		}
 		
-		updateStatus(stationDao);
+		List<Station> stations = null;
+		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
+			updateStatus(stationDaos.get(0));
+			laJoya = new Station(stationDaos.get(0));
+			setCurrentStation(laJoya);
+			
+			stations = Stream.of(laJoya).collect(Collectors.toList());
+			
+		}  else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
+			
+			stations = stationDaos.stream().map(stationdao -> {
+				Station station = new Station(stationdao);
+				return station;
+			}).collect(Collectors.toList());
+			
+			// Update ObjectId and date from latest station status
+			stations.get(1).setId(stations.get(0).getId());
+			stations.get(1).setDate(stations.get(0).getDate());
+			setCurrentStation(stations.get(1));
+		}
 		
-		laJoya = new Station(stationDao);
-		setCurrentStation(laJoya);
-		
-		return Stream.of(laJoya).collect(Collectors.toList());
+		return stations;
 	}
 	
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
@@ -272,10 +290,27 @@ public class UserService {
 		
 		Station updatedStation = utils.updateStation(getCurrentStation(), dateDataCriteria);
 		
+		StationDao stationdao = new StationDao(updatedStation);
+		stationdao.setId(new ObjectId());
 		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
 		
 		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
-		submitTanksVo(tanksVo);
+		submitTanksVo(tanksVo, "save");
+		
+		Station resetStationFromDB = new Station(stationDao);
+		setCurrentStation(resetStationFromDB);
+		
+		return Stream.of(resetStationFromDB).collect(Collectors.toList());
+	}
+	
+	public List<Station> updateLatestDayData(DayDataCriteria dateDataCriteria) {
+		
+		Station updatedStation = utils.updateStation(getCurrentStation(), dateDataCriteria);
+		
+		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
+		
+		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
+		submitTanksVo(tanksVo, "update");
 		
 		Station resetStationFromDB = new Station(stationDao);
 		setCurrentStation(resetStationFromDB);
@@ -287,7 +322,9 @@ public class UserService {
 		
 		Station resetStation = resetStation(getCurrentStation(), dateDataCriteria);
 		
-		StationDao stationDao = stationRepository.save(new StationDao(resetStation));
+		StationDao stationdao = new StationDao(resetStation);
+		stationdao.setId(new ObjectId());
+		StationDao stationDao = stationRepository.save(stationdao);
 		
 		Station resetStationFromDB = new Station(stationDao);
 		setCurrentStation(resetStationFromDB);
@@ -401,12 +438,23 @@ public class UserService {
 		
 	}
 	
-	public List<TanksVo> submitTanksVo(TanksVo tanksVoCriteria) {
+	public List<TanksVo> submitTanksVo(TanksVo tanksVoCriteria, String operation) {
 		
-		TanksDao tanksDao = tanksRepository.save(new TanksDao(tanksVoCriteria));
-		
-		TanksVo tanksVo = new TanksVo(tanksDao);
-		setCurrentTanksVo(tanksVo);
+		TanksVo tanksVo = null;
+		TanksDao tanksDao = null;
+		if (operation.equals("save")) {
+			tanksDao = tanksRepository.save(new TanksDao(tanksVoCriteria));
+			tanksVo = new TanksVo(tanksDao);
+			setCurrentTanksVo(tanksVo);
+		} else if (operation.equals("update"))  {
+			tanksDao = tanksRepository.findLatest();
+			tanksDao.setDate(tanksVoCriteria.getDate());
+			tanksDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+			tanksDao.setTanks(tanksVoCriteria.getTanks());
+			
+			tanksVo = new TanksVo(tanksRepository.save(tanksDao));
+			setCurrentTanksVo(tanksVo);
+		}
 		
 		return Stream.of(tanksVo).collect(Collectors.toList());
 	}

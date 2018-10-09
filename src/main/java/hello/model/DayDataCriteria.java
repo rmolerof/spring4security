@@ -13,6 +13,7 @@ public class DayDataCriteria {
 	private Map<String, Double> dayData;
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
+	private String saveOrUpdate;
 	
 	public Date getDate() {
 		return date;
@@ -49,6 +50,12 @@ public class DayDataCriteria {
 	}
 	public void setExpensesAndCredits(List<ExpenseOrCredit> expensesAndCredits) {
 		this.expensesAndCredits = expensesAndCredits;
+	}
+	public String getSaveOrUpdate() {
+		return saveOrUpdate;
+	}
+	public void setSaveOrUpdate(String saveOrUpdate) {
+		this.saveOrUpdate = saveOrUpdate;
 	}
 	
 }
