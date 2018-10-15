@@ -102,9 +102,9 @@ public class UserService {
 			stationDao.setTotalCash(0D);
 			stationDao.setExpensesAndCredits(Arrays.asList(new ExpenseOrCredit()));
 			
-			Tank d2 = new Tank(1L, "d2", 0D);
-			Tank g90 = new Tank(2L, "g90", 0D);
-			Tank g95 = new Tank(3L, "g95", 0D);
+			Tank d2 = new Tank(1L, "d2", 0D, 0D);
+			Tank g90 = new Tank(2L, "g90", 0D, 0D);
+			Tank g95 = new Tank(3L, "g95", 0D, 0D);
 			
 			Map<String, Tank> tanks = new HashMap<String, Tank>();
 			tanks.put(d2.getFuelType(), d2);
@@ -262,7 +262,7 @@ public class UserService {
 	
 	public void updateStatus(StationDao stationDao) {
 		// update prices
-		List<GasPrice> currentGasPrices = gasPricesRepository.findLatest().getGasPrices();
+		List<GasPrice> currentGasPrices = gasPricesRepository.findLatest("latest", "").get(0).getGasPrices();
 		for (Entry<String, Dispenser> entry: stationDao.getDispensers().entrySet()) {
 			for (GasPrice gasPrice: currentGasPrices) {
 				if (entry.getKey().contains(gasPrice.getFuelType())) {
@@ -273,7 +273,7 @@ public class UserService {
 		}
 		
 		// update Stock
-		List<Tank> currentTanks = tanksRepository.findLatest().getTanks();
+		List<Tank> currentTanks = tanksRepository.findLatest("latest", "").get(0).getTanks();
 		for (Entry<String, Tank> entry: stationDao.getTanks().entrySet()) {
 			for (Tank tank: currentTanks) {
 				if (entry.getKey().contains(tank.getFuelType())) {
@@ -408,13 +408,21 @@ public class UserService {
 	
 	public List<TanksVo> findStockByDates(String dateEnd, String dateBeg) {
 
-		TanksVo latestTankStatus = null;
-		TanksDao tanksDao = tanksRepository.findLatest();
+		//TanksVo latestTankStatus = null;
+		List<TanksDao> tanksDaos = tanksRepository.findLatest(dateEnd, dateBeg);
 		
-		latestTankStatus = new TanksVo(tanksDao);
+		/*latestTankStatus = new TanksVo(tanksDao);
 		setCurrentTanksVo(latestTankStatus);
 		
-		return Stream.of(latestTankStatus).collect(Collectors.toList());
+		return Stream.of(latestTankStatus).collect(Collectors.toList());*/
+		
+		
+		List<TanksVo> tanksVos = tanksDaos.stream().map(tanksDao -> {
+			TanksVo tanksVo = new TanksVo(tanksDao);
+			return tanksVo;
+		}).collect(Collectors.toList());
+		
+		return tanksVos;
 		
 		/*Tank tank = new Tank();
 		tank.setTankId(1L);
@@ -447,7 +455,7 @@ public class UserService {
 			tanksVo = new TanksVo(tanksDao);
 			setCurrentTanksVo(tanksVo);
 		} else if (operation.equals("update"))  {
-			tanksDao = tanksRepository.findLatest();
+			tanksDao = tanksRepository.findLatest("latest", "").get(0);
 			tanksDao.setDate(tanksVoCriteria.getDate());
 			tanksDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
 			tanksDao.setTanks(tanksVoCriteria.getTanks());
@@ -460,13 +468,22 @@ public class UserService {
 	}
 	
 	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
-		GasPricesVo latestGasPricesVo = new GasPricesVo();
-		GasPricesDao gasPricesDao = gasPricesRepository.findLatest();
+		//GasPricesVo latestGasPricesVo = new GasPricesVo();
+		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatest(dateEnd, dateBeg);
 		
-		latestGasPricesVo = new GasPricesVo(gasPricesDao);
+		/*latestGasPricesVo = new GasPricesVo(gasPricesDao);
 		setCurrentGasPricesVo(latestGasPricesVo);
 		
-		return Stream.of(latestGasPricesVo).collect(Collectors.toList());
+		return Stream.of(latestGasPricesVo).collect(Collectors.toList());*/
+		
+		List<GasPricesVo> gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
+			GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
+			return gasPricesVo;
+		}).collect(Collectors.toList());
+		
+		return gasPricesVos;
+		
+		
 		
 		/*GasPrice gasPrice = new GasPrice();
 		gasPrice.setFuelType("d2");
@@ -489,12 +506,30 @@ public class UserService {
 		return null;*/
 	}
 	
-	public List<GasPricesVo> submitGasPricesVo(GasPricesVo tanksVoCriteria) {
+	public List<GasPricesVo> submitGasPricesVo(GasPricesVo tanksVoCriteria, String saveOrUpdate) {
 		
-		GasPricesDao gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
+		/*GasPricesDao gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
 		
 		GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
 		setCurrentGasPricesVo(gasPricesVo);
+		
+		return Stream.of(gasPricesVo).collect(Collectors.toList());*/
+		
+		GasPricesVo gasPricesVo = null;
+		GasPricesDao gasPricesDao = null;
+		if (saveOrUpdate.equals("save")) {
+			gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
+			gasPricesVo = new GasPricesVo(gasPricesDao);
+			setCurrentGasPricesVo(gasPricesVo);
+		} else if (saveOrUpdate.equals("update"))  {
+			gasPricesDao = gasPricesRepository.findLatest("latest", "").get(0);
+			gasPricesDao.setDate(tanksVoCriteria.getDate());
+			gasPricesDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+			gasPricesDao.setGasPrices(tanksVoCriteria.getGasPrices());
+			
+			gasPricesVo = new GasPricesVo(gasPricesRepository.save(gasPricesDao));
+			setCurrentGasPricesVo(gasPricesVo);
+		}
 		
 		return Stream.of(gasPricesVo).collect(Collectors.toList());
 	}

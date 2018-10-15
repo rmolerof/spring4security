@@ -34,7 +34,7 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 	@Override
 	public List<StationDao> findLatestMonth() {
 		Query query = new Query();
-		query.with(new Sort(Direction.DESC, "$natural"));
+		query.with(new Sort(Direction.DESC, "date"));
 		
 		List<StationDao> latestStationStatuses = mongoTemplate.find(query, StationDao.class);
 	    

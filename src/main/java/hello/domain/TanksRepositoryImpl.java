@@ -14,14 +14,21 @@ public class TanksRepositoryImpl implements TanksRepositoryCustom {
 	MongoTemplate mongoTemplate;
 	
 	@Override
-	public TanksDao findLatest() {
+	public List<TanksDao> findLatest(String dateEnd, String dateBeg) {
 		Query query = new Query();
-		query.limit(1);
-		query.with(new Sort(Direction.DESC, "$natural"));
+		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
+			query.limit(1);
+		} else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
+			query.limit(2);
+		} else { 
+			query.limit(Math.abs(Integer.valueOf(dateBeg)));
+		}
+		
+		query.with(new Sort(Direction.DESC, "date"));
 		
 		List<TanksDao> latestTankStatuses = mongoTemplate.find(query, TanksDao.class);
 	    
 		
-		return latestTankStatuses.size() == 0 ? null: latestTankStatuses.get(0);
+		return latestTankStatuses.size() == 0 ? null: latestTankStatuses;
 	}	
 }

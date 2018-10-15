@@ -1,7 +1,9 @@
 package hello.domain;
 
+import java.util.List;
+
 public interface GasPricesRepositoryCustom {
 	
-	 GasPricesDao findLatest();
+	 List<GasPricesDao> findLatest(String dateEnd, String dateBeg);
 
 }

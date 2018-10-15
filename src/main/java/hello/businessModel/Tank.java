@@ -1,30 +1,25 @@
 package hello.businessModel;
 
-import java.util.Date;
-
 public class Tank {
 	public Long tankId;
 	public String fuelType;
 	public Double gals;
-	public Date date;
-	public String supplierRUC;
-	public String truckDriverName;
-	public String truckPlateNumber;
 	public Double cost;
 	
 	public Tank() {
 		super();
 	}
 	
-	public Tank(Long tankId, String fuelType, Double gals) {
+	public Tank(Long tankId, String fuelType, Double gals, Double cost) {
 		this.tankId = tankId;
 		this.fuelType = fuelType;
 		this.gals = gals;
+		this.cost = cost;
 	}
 	
 	@Override
 	public String toString() {
-		return "Tank [tankId=" + tankId + ", fuelType=" + fuelType + ", gals=" + gals + "]";
+		return "Tank [tankId=" + tankId + ", fuelType=" + fuelType + ", gals=" + gals + ", cost=" + cost + "]";
 	}
 
 	public Long getTankId() {
@@ -44,6 +39,12 @@ public class Tank {
 	}
 	public void setGals(Double gals) {
 		this.gals = gals;
+	}
+	public Double getCost() {
+		return cost;
+	}
+	public void setCost(Double cost) {
+		this.cost = cost;
 	}
 	
 }

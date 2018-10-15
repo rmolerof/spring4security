@@ -167,7 +167,7 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria, "save");
+		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria, tanksVoCriteria.getSaveOrUpdate());
 		if(TanksVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + tanksVoCriteria.getDate());
 		} else {
@@ -190,7 +190,7 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<GasPricesVo> gasPricesVos = userService.submitGasPricesVo(gasPricesVoCriteria);
+		List<GasPricesVo> gasPricesVos = userService.submitGasPricesVo(gasPricesVoCriteria, gasPricesVoCriteria.getSaveOrUpdate());
 		if(gasPricesVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + gasPricesVoCriteria.getDate());
 		} else {
@@ -225,8 +225,8 @@ public class SearchController {
 		
 	}
 	
-	@PostMapping("/api/getTableSummaryData")
-	public ResponseEntity<?> getTableSummaryData(@Valid @RequestBody SearchDateCriteria search, Errors errors){
+	@PostMapping("/api/getStationSummaryData")
+	public ResponseEntity<?> getStationSummaryData(@Valid @RequestBody SearchDateCriteria search, Errors errors){
 		AjaxGetStationResponse result = new AjaxGetStationResponse();
 		
 		if(errors.hasErrors()) {
@@ -247,4 +247,5 @@ public class SearchController {
 		return ResponseEntity.ok(result);
 		
 	}
+	
 }

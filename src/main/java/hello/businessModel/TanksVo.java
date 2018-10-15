@@ -11,6 +11,11 @@ public class TanksVo {
 	private String pumpAttendantNames;
 	private Date date;
 	private List<Tank> tanks;
+	private String saveOrUpdate;
+	public String supplierRUC;
+	public String truckDriverName;
+	public String truckPlateNumber;
+	public boolean delivery;
 	
 	public TanksVo() {
 		super();
@@ -25,7 +30,11 @@ public class TanksVo {
 	public TanksVo(TanksDao tanksDao) {
 		this.pumpAttendantNames = new String(null == tanksDao ? "": tanksDao.getPumpAttendantNames());
 		this.date = null == tanksDao ? new Date(): new Date(tanksDao.getDate().getTime());
-		this.tanks = new ArrayList<Tank>(null == tanksDao ? Arrays.asList(new Tank(1L, "d2", 0D), new Tank(2L, "g90", 0D), new Tank(3L, "g95", 0D)): tanksDao.getTanks());
+		this.tanks = new ArrayList<Tank>(null == tanksDao ? Arrays.asList(new Tank(1L, "d2", 0D, 0D), new Tank(2L, "g90", 0D, 0D), new Tank(3L, "g95", 0D, 0D)): tanksDao.getTanks());
+		this.supplierRUC = new String(null == tanksDao || null == tanksDao.getSupplierRUC() ? "": tanksDao.getSupplierRUC());
+		this.truckDriverName = new String(null == tanksDao || null == tanksDao.getTruckDriverName() ? "": tanksDao.getTruckDriverName());
+		this.truckPlateNumber = new String(null == tanksDao || null == tanksDao.getTruckPlateNumber() ? "": tanksDao.getTruckPlateNumber());
+		this.delivery = null == tanksDao ? true: tanksDao.isDelivery();
 	}
 	
 	public Date getDate() {
@@ -48,5 +57,45 @@ public class TanksVo {
 	public void setPumpAttendantNames(String pumpAttendantNames) {
 		this.pumpAttendantNames = pumpAttendantNames;
 	}
-		
+
+	public String getSaveOrUpdate() {
+		return saveOrUpdate;
+	}
+
+	public void setSaveOrUpdate(String saveOrUpdate) {
+		this.saveOrUpdate = saveOrUpdate;
+	}
+
+	public String getSupplierRUC() {
+		return supplierRUC;
+	}
+
+	public void setSupplierRUC(String supplierRUC) {
+		this.supplierRUC = supplierRUC;
+	}
+
+	public String getTruckDriverName() {
+		return truckDriverName;
+	}
+
+	public void setTruckDriverName(String truckDriverName) {
+		this.truckDriverName = truckDriverName;
+	}
+
+	public String getTruckPlateNumber() {
+		return truckPlateNumber;
+	}
+
+	public void setTruckPlateNumber(String truckPlateNumber) {
+		this.truckPlateNumber = truckPlateNumber;
+	}
+
+	public boolean isDelivery() {
+		return delivery;
+	}
+
+	public void setDelivery(boolean delivery) {
+		this.delivery = delivery;
+	}
+
 }

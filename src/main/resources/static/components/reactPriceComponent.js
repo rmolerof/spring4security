@@ -8,7 +8,8 @@ class PriceForm extends React.Component {
 	  showSuccess: false,
       pumpAttendantNames: '',
       date: '',
-      gasPrices: []
+      gasPrices: [],
+      saveOrUpdate: 'save'
     };
   }
   
@@ -50,7 +51,7 @@ class PriceForm extends React.Component {
 	
 	evt.preventDefault();
     
-	const { pumpAttendantNames, date, gasPrices} = this.state;
+	const { pumpAttendantNames, date, gasPrices, saveOrUpdate} = this.state;
     var self = this;
     var errors = {
     		submit: '',
@@ -63,7 +64,8 @@ class PriceForm extends React.Component {
     var gasPricesVo = {
     	pumpAttendantNames: pumpAttendantNames,
     	date: date,
-    	gasPrices: []
+    	gasPrices: [],
+    	saveOrUpdate: saveOrUpdate
     };
 
     // Validation: Pump Attendant Names
@@ -145,11 +147,16 @@ class PriceForm extends React.Component {
 
   }
   
-  _fetchData(){
+  loadPrevious = () => {
+	  this.setState({saveOrUpdate:  'update'});
+	  this._fetchData({dateEnd: "latest", dateBeg: "previous"});
+  }
+  
+  _fetchData(timeframe){
 			
-		var search = {};
-		search["dateEnd"] = "today";
-		search["dateBeg"] = "yesterday";
+	  	var search = {};
+		search["dateEnd"] = timeframe.dateEnd;
+		search["dateBeg"] = timeframe.dateBeg;
 		
 		jQuery.ajax({
 			type: "POST",
@@ -160,18 +167,39 @@ class PriceForm extends React.Component {
 			cache: false,
 			timeout: 600000,
 			success: (data) => {
-				var gasPricesVo = data.result[0];
-				var currentDate = new Date();
-				
-				var gasPrice = {};
-				for(var i = 0; i < gasPricesVo.gasPrices.length; i++) {
-					gasPrice = gasPricesVo.gasPrices[i];
-					gasPrice["newCost"] = '';
-					gasPrice["newPrice"] = '';
+				if (data.result.length == 1) {
+					var gasPricesVo = data.result[0];
+					var currentDate = new Date();
+					
+					var gasPrice = {};
+					for(var i = 0; i < gasPricesVo.gasPrices.length; i++) {
+						gasPrice = gasPricesVo.gasPrices[i];
+						gasPrice["newCost"] = '';
+						gasPrice["newPrice"] = '';
+					}
+					
+					this.setState({gasPrices: gasPricesVo.gasPrices});
+					this.setState({date: currentDate});
+				} else {
+					var gasPricesVoLatest = data.result[0];
+					var gasPricesVoPrevious = data.result[1];
+					
+					var gasPricesLatest = {};
+					var gasPricesPrevious = {};
+					for(var i = 0; i < gasPricesVoLatest.gasPrices.length; i++) {
+						gasPricesLatest = gasPricesVoLatest.tanks[i];
+						gasPricesPrevious = gasPricesVoPrevious.tanks[i];
+						
+						gasPricesLatest["newCost"] = gasPricesLatest["cost"];
+						gasPricesLatest["newPrice"] = gasPricesLatest["price"];
+						gasPricesLatest["cost"] = gasPricesPrevious["cost"];
+						gasPricesLatest["price"] = gasPricesPrevious["price"];
+					}
+					
+					this.setState({gasPrices: gasPricesVoLatest.gasPrices});
+					this.setState({date: gasPricesVoLatest.date});
+					this.setState({pumpAttendantNames: gasPricesVoLatest.pumpAttendantNames});
 				}
-				
-				this.setState({gasPrices: gasPricesVo.gasPrices});
-				this.setState({date: currentDate});
 			},
 			error: function(e){
 
@@ -180,7 +208,7 @@ class PriceForm extends React.Component {
 	}
   
   componentWillMount(){
-	  this._fetchData();
+	  this._fetchData({dateEnd: "latest", dateBeg: ""});
   }
   
   onKeyPress(event) {
@@ -224,18 +252,26 @@ class PriceForm extends React.Component {
 		              <div className="portlet-body form">
 		              		
 			    	      <div className="row">
-			    	          <div className="col-md-4">
+			    	          <div className="col-md-2">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Nombres de Grifero(s)</label>
 			    	                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
 			    	              </div>
 			    	          </div>
-			    	          <div className="col-md-4">
+			    	          <div className="col-md-2">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Fecha</label>
 			    	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 			    	              </div>
 			    	          </div>
+			    	          <div className="col-md-2">
+					              <div className="form-group">
+					              	  <label className="control-label">&nbsp;</label><br></br>
+							          <a onClick={this.loadPrevious} className="btn red">
+	                                    <i className="fa fa-edit"></i> Editar Anterior
+	                                </a>
+					              </div>
+					          </div>
 			    	      </div>	
 			          	  
 			          	  <div className="row">

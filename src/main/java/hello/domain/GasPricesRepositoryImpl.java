@@ -14,14 +14,21 @@ public class GasPricesRepositoryImpl implements GasPricesRepositoryCustom {
 	MongoTemplate mongoTemplate;
 	
 	@Override
-	public GasPricesDao findLatest() {
+	public List<GasPricesDao> findLatest(String dateEnd, String dateBeg) {
 		Query query = new Query();
-		query.limit(1);
-		query.with(new Sort(Direction.DESC, "$natural"));
+		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
+			query.limit(1);
+		} else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
+			query.limit(2);
+		} else { 
+			query.limit(Math.abs(Integer.valueOf(dateBeg)));
+		}
+		
+		query.with(new Sort(Direction.DESC, "date"));
 		
 		List<GasPricesDao> latestGasPrices = mongoTemplate.find(query, GasPricesDao.class);
 	    
 		
-		return latestGasPrices.size() == 0 ? null: latestGasPrices.get(0);
+		return latestGasPrices.size() == 0 ? null: latestGasPrices;
 	}	
 }

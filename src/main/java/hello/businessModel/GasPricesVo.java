@@ -12,6 +12,7 @@ public class GasPricesVo {
 	private String pumpAttendantNames;
 	private Date date;
 	private List<GasPrice> gasPrices;
+	private String saveOrUpdate;
 	
 	public GasPricesVo() {
 		super();
@@ -52,6 +53,14 @@ public class GasPricesVo {
 
 	public void setPumpAttendantNames(String pumpAttendantNames) {
 		this.pumpAttendantNames = pumpAttendantNames;
+	}
+
+	public String getSaveOrUpdate() {
+		return saveOrUpdate;
+	}
+
+	public void setSaveOrUpdate(String saveOrUpdate) {
+		this.saveOrUpdate = saveOrUpdate;
 	}
 	
 	

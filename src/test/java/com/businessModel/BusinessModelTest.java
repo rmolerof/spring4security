@@ -26,9 +26,9 @@ public class BusinessModelTest {
 		laJoya.setTotalCash(8000D);
 		laJoya.setExpensesAndCredits(new ArrayList<ExpenseOrCredit>());
 		
-		Tank d2 = new Tank(1L, "d2", 9517.40D);
-		Tank g90 = new Tank(2L, "g90", 2831.86D);
-		Tank g95 = new Tank(3L, "g95", 2972.23D);
+		Tank d2 = new Tank(1L, "d2", 9517.40D, 0D);
+		Tank g90 = new Tank(2L, "g90", 2831.86D, 0D);
+		Tank g95 = new Tank(3L, "g95", 2972.23D, 0D);
 		
 		Map<String, Tank> tanks = new HashMap<String, Tank>();
 		tanks.put(d2.getFuelType(), d2);
