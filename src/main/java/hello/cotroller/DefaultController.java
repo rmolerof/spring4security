@@ -1,42 +1,44 @@
 package hello.cotroller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class DefaultController {
-	@GetMapping("/")
+	
+	@RequestMapping("/")
+	public String home0(){
+		return "home";
+	}
+	
+	@RequestMapping("home")
 	public String home1(){
-		return "/home";
+		return "home";
 	}
 	
-	@GetMapping("/home")
-	public String home(){
-		return "/home";
-	}
-	
-	@GetMapping("/admin")
+	@RequestMapping("admin")
 	public String admin(){
-		return "/admin";
+		return "admin";
 	}
 	
-	@GetMapping("/user")
+	@RequestMapping("user")
 	public String user(){
-		return "/user";
+		return "user";
 	}
 	
-	@GetMapping("/about")
+	@RequestMapping("about")
 	public String about(){
-		return "/about";
+		return "about";
 	}
 	
-	@GetMapping("/login")
+	@RequestMapping("login")
     public String login() {
-        return "/login";
+        return "login";
     }
 	
-	@GetMapping("/403")
+	@RequestMapping("403")
 	public String error403(){
-		return "/error/403";
+		return "error/403";
 	}
+	
 }
