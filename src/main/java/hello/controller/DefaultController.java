@@ -2,61 +2,64 @@ package hello.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class DefaultController {
-	@GetMapping("/")
+	
+	@RequestMapping("/")
+	public String home0(){
+		return "home";
+	}
+	
+	@RequestMapping("home")
 	public String home1(){
-		return "/home";
+		return "home";
 	}
 	
-	@GetMapping("/home")
-	public String home(){
-		return "/home";
-	}
-	
-	@GetMapping("/admin")
+	@RequestMapping("admin")
 	public String admin(){
-		return "/admin";
+		return "admin";
 	}
 	
-	@GetMapping("/user")
+	@RequestMapping("user")
 	public String user(){
-		return "/user";
+		return "user";
 	}
 	
-	@GetMapping("/about")
+	@RequestMapping("about")
 	public String about(){
-		return "/about";
+		return "about";
 	}
 	
-	@GetMapping("/ajax")
-	public String ajax(){
-		return "/ajax";
-	}
-	
-	@GetMapping("/reset-status-page")
-	public String resetStatusPage(){
-		return "/reset-status-page";
-	}
-	
-	@GetMapping("/dashboard-table-summary-page")
-	public String dashboardTableSummaryPage(){
-		return "/dashboard-table-summary-page";
-	}
-	
-	@GetMapping("/invoicing-page")
-	public String invoicingPage(){
-		return "/invoicing-page";
-	}
-	
-	@GetMapping("/login")
+	@RequestMapping("login")
     public String login() {
-        return "/login";
+        return "login";
     }
 	
-	@GetMapping("/403")
+	@RequestMapping("403")
 	public String error403(){
-		return "/error/403";
+		return "error/403";
 	}
+	
+	@GetMapping("ajax")
+	public String ajax(){
+		return "ajax";
+	}
+	
+	@GetMapping("reset-status-page")
+	public String resetStatusPage(){
+		return "reset-status-page";
+	}
+	
+	@GetMapping("dashboard-table-summary-page")
+	public String dashboardTableSummaryPage(){
+		return "dashboard-table-summary-page";
+	}
+	
+	@GetMapping("invoicing-page")
+	public String invoicingPage(){
+		return "invoicing-page";
+	}
+	
 }

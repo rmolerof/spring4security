@@ -1,25 +1,33 @@
 package hello;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 
 import hello.domain.Domain;
 import hello.domain.DomainRepository;
 
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer {
 	
 	private static Logger logger = LogManager.getLogger(Application.class);
 	
 	public static void main(String[] args) throws Throwable {
 			SpringApplication.run(Application.class, args);
 	}
+	
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(Application.class);
+	}
+
 	
 	@Bean
 	CommandLineRunner init(DomainRepository domainRepository) {

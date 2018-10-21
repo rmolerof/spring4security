@@ -419,7 +419,7 @@ class TableDashboard extends React.Component {
 	              </div>
 	          </div>
 	          <div className="row">
-	              <div className="col-xs-8">
+	              <div className="col-xs-6">
 	                  <div className="well">
 	                      <address>
 	                          <strong>Código Hash:</strong>
@@ -436,17 +436,33 @@ class TableDashboard extends React.Component {
 	                      </address>
 	                  </div>
 	              </div>
-	              <div className="col-xs-4 invoice-block">
-	                  <ul className="list-unstyled amounts">
-	                      <li>
-	                          <strong>Sub-Total ventas:</strong> S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100 ).toFixed(2)} </li>
-	                      {/*<li>
-	                          <strong>Descuento:</strong> 12.9% </li>*/}
-	                      <li>
-	                          <strong>IGV (18%):</strong> {((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100} </li>
-	                      <li>
-	                          <strong>Importe Total:</strong> S/ {((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100} </li>
-	                  </ul>
+	              <div className="col-xs-6 invoice-block">
+	                  <div className="row invoice-subtotal">
+				          <div className="col-xs-12">
+					          <table className="table table-hover">
+					              <tbody>
+					                  <tr>
+					                      <td>
+					                      	<strong>Sub-Total ventas:</strong>
+					                      </td>
+					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100 ).toFixed(2)}</td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+					                      	<strong>IGV (18%):</strong>
+					                      </td>
+					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100).toFixed(2)} </td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong>Importe Total:</strong>
+					                      </td>
+					                      <td className="text-center sbold">S/ {((((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100)).toFixed(2)}</td>
+					                  </tr>
+					              </tbody>
+					          </table>	
+		          		  </div>
+			          </div>
 	                  <br/>
 	                  <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>&nbsp;
 	                  <button type="submit" className="btn btn-lg green hidden-print margin-bottom-5">
@@ -530,25 +546,25 @@ class TableDashboard extends React.Component {
 	                              <td>
 	                                  Diesel 2
 	                              </td>
-	                              <td className="text-center sbold">{this.state.galsD2}</td>
-	                              <td className="text-center sbold">{this.state.priceD2}</td>
-	                              <td className="text-center sbold">{this.state.solesD2}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
 	                              <td>
 	                                  Gas 90
 	                              </td>
-	                              <td className="text-center sbold">{this.state.galsG90}</td>
-	                              <td className="text-center sbold">{this.state.priceG90}</td>
-	                              <td className="text-center sbold">{this.state.solesG90}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
 	                              <td>
 	                                  Gas 95
 	                              </td>
-	                              <td className="text-center sbold">{this.state.galsG95}</td>
-	                              <td className="text-center sbold">{this.state.priceG95}</td>
-	                              <td className="text-center sbold">{this.state.solesG95}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold">{parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      </tbody>
 	                  </table>
@@ -568,20 +584,20 @@ class TableDashboard extends React.Component {
 			                      <td>
 			                      IGV (18%)
 			                      </td>
-			                      <td className="text-center sbold">S/ {((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100}</td>
+			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td>
 			                          Total
 			                      </td>
-			                      <td className="text-center sbold">S/ {((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100}</td>
+			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
           		  </div>
 	          </div>
-	          <div style={{width: '300px', height: '300px', textAlign: 'center', display: 'block'}}>
-	          	<div id="qrcode" className="col-xs-6"></div>
+	          <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+	          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode" className="col-xs-12 col-md-offset-3" ></div>
 	          </div>
 	      </div>
 	      
