@@ -4,6 +4,7 @@
 	<groupId>com.training</groupId>
 	<artifactId>spring4security</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>spring4security Maven Webapp</name>
 	<description>Spring Boot Web Thymeleaf Example</description>
 	<url>http://maven.apache.org</url>
@@ -36,7 +37,11 @@
 			<artifactId>bootstrap</artifactId>
 			<version>3.3.7</version>
 		</dependency>	
-		
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>jquery</artifactId>
+		    <version>3.2.1</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -46,6 +51,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<fork>true</fork>
+					<executable>C:\Program Files\Java\jdk1.8.0_161\bin\javac</executable>
+				</configuration>
+			</plugin>
         </plugins>
 	</build>
 </project>
