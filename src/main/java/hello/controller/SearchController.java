@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import hello.businessModel.GasPricesVo;
 import hello.businessModel.Station;
 import hello.businessModel.TanksVo;
+import hello.model.AjaxGetInvoiceResponse;
 import hello.model.AjaxGetPricesResponse;
 import hello.model.AjaxGetStationResponse;
 import hello.model.AjaxGetStockResponse;
 import hello.model.AjaxResponseBody;
 import hello.model.DayDataCriteria;
+import hello.model.InvoiceVo;
 import hello.model.SearchCriteria;
 import hello.model.SearchDateCriteria;
 import hello.model.User;
@@ -248,4 +250,26 @@ public class SearchController {
 		
 	}
 	
+	@PostMapping("/api/submitInvoiceVo")
+	public ResponseEntity<?> submitInvoiceVo(@Valid @RequestBody InvoiceVo invoiceVo, Errors errors){
+		AjaxGetInvoiceResponse result = new AjaxGetInvoiceResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<InvoiceVo> users = userService.submitInvoice(invoiceVo);
+		if(users.isEmpty()) {
+			result.setMsg("No se pudeo enviar recibo");
+		} else {
+			result.setMsg("Recibo enviado");
+		}
+		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
 }

@@ -45,6 +45,11 @@ public class DefaultController {
 		return "/dashboard-table-summary-page";
 	}
 	
+	@GetMapping("/invoicing-page")
+	public String invoicingPage(){
+		return "/invoicing-page";
+	}
+	
 	@GetMapping("/login")
     public String login() {
         return "/login";

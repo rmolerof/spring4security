@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,6 +37,7 @@ import hello.domain.StationRepository;
 import hello.domain.TanksDao;
 import hello.domain.TanksRepository;
 import hello.model.DayDataCriteria;
+import hello.model.InvoiceVo;
 import hello.model.User;
 
 @Service
@@ -532,6 +532,22 @@ public class UserService {
 		}
 		
 		return Stream.of(gasPricesVo).collect(Collectors.toList());
+	}
+	
+	public List<InvoiceVo> submitInvoice(InvoiceVo invoiceVo) {
+		
+		if (invoiceVo.getSaveOrUpdate().equals("save")) {
+			// generate xml
+			//XmlSunat xmlSunat = new XmlSunat(invoiceVo));
+			
+			// sign xml
+			
+			// send xml
+			
+		} else if (invoiceVo.getSaveOrUpdate().equals("update"))  {
+		}
+		
+		return Stream.of(invoiceVo).collect(Collectors.toList());
 	}
 	
 	public TanksVo getCurrentTanksVo() {
