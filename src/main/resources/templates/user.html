@@ -36,7 +36,7 @@
 		th:href="@{/assets/layouts/layout2/css/custom.min.css}"/>
 	<!-- END THEME LAYOUT STYLES -->
 	
-	<link rel="shortcut icon" type="image/x-icon" href="../../assets/global/plugins/owl-carousel/assets/ico/favicon.ico" />	
+	<link rel="shortcut icon" type="image/x-icon" href="../../assets/global/plugins/owl-carousel/assets/ico/faviconlajoya.ico" />	
 </head>
 
 <body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
@@ -46,8 +46,8 @@
             <div class="page-header-inner ">
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
-                    <a href="index.html">
-                        <img src="../assets/layouts/layout2/img/logo-default.png" alt="logo" class="logo-default" /> </a>
+                    <a href="/home">
+                        <img src="../assets/layouts/layout2/img/logo-default-lajoya.png" alt="logo" class="logo-default" /> </a>
                     <div class="menu-toggler sidebar-toggler">
                         <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
                     </div>
@@ -58,7 +58,7 @@
                 <!-- END RESPONSIVE MENU TOGGLER -->
                 <!-- BEGIN PAGE ACTIONS -->
                 <!-- DOC: Remove "hide" class to enable the page header actions -->
-                <div class="page-actions">
+                <!-- <div class="page-actions">
                     <div class="btn-group">
                         <button type="button" class="btn btn-circle btn-outline red dropdown-toggle" data-toggle="dropdown">
                             <i class="fa fa-plus"></i>&nbsp;
@@ -93,13 +93,13 @@
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div> -->
                 <!-- END PAGE ACTIONS -->
                 <!-- BEGIN PAGE TOP -->
                 <div class="page-top">
                     <!-- BEGIN HEADER SEARCH BOX -->
                     <!-- DOC: Apply "search-form-expanded" right after the "search-form" class to have half expanded search box -->
-                    <form class="search-form search-form-expanded" action="page_general_search_3.html" method="GET">
+                    <!-- <form class="search-form search-form-expanded" action="page_general_search_3.html" method="GET">
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Search..." name="query"/>
                             <span class="input-group-btn">
@@ -108,14 +108,14 @@
                                 </a>
                             </span>
                         </div>
-                    </form>
+                    </form> -->
                     <!-- END HEADER SEARCH BOX -->
                     <!-- BEGIN TOP NAVIGATION MENU -->
                     <div class="top-menu">
                         <ul class="nav navbar-nav pull-right">
                             <!-- BEGIN NOTIFICATION DROPDOWN -->
                             <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                            <li class="dropdown dropdown-extended dropdown-notification" id="header_notification_bar">
+                            <!-- <li class="dropdown dropdown-extended dropdown-notification" id="header_notification_bar">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <i class="icon-bell"></i>
                                     <span class="badge badge-default"> 7 </span>
@@ -213,9 +213,9 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!-- END NOTIFICATION DROPDOWN -->
-                            <!-- BEGIN INBOX DROPDOWN -->
-                            <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                            END NOTIFICATION DROPDOWN
+                            BEGIN INBOX DROPDOWN
+                            DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte
                             <li class="dropdown dropdown-extended dropdown-inbox" id="header_inbox_bar">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <i class="icon-envelope-open"></i>
@@ -288,9 +288,9 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!-- END INBOX DROPDOWN -->
-                            <!-- BEGIN TODO DROPDOWN -->
-                            <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                            END INBOX DROPDOWN
+                            BEGIN TODO DROPDOWN
+                            DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte
                             <li class="dropdown dropdown-extended dropdown-tasks" id="header_task_bar">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <i class="icon-calendar"></i>
@@ -398,18 +398,18 @@
                                         </ul>
                                     </li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <!-- END TODO DROPDOWN -->
                             <!-- BEGIN USER LOGIN DROPDOWN -->
                             <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                    <img alt="" class="img-circle" src="../assets/layouts/layout2/img/avatar3_small.jpg" />
-                                    <span class="username username-hide-on-mobile"> Nick </span>
+                                    <img alt="" class="img-circle" src="../assets/layouts/layout2/img/lajoya_small.jpg" />
+                                    <span class="username username-hide-on-mobile"> <span sec:authentication="name"></span> </span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
-                                    <li>
+                                    <!-- <li>
                                         <a href="page_user_profile_1.html">
                                             <i class="icon-user"></i> My Profile </a>
                                     </li>
@@ -433,20 +433,19 @@
                                     <li>
                                         <a href="page_user_lock_1.html">
                                             <i class="icon-lock"></i> Lock Screen </a>
-                                    </li>
+                                    </li> -->
                                     <li>
-                                        <a href="page_user_login_1.html">
-                                            <i class="icon-key"></i> Log Out </a>
+                                        <a th:href="@{/logout}"><i class="icon-key"></i> Salir</a>
                                     </li>
                                 </ul>
                             </li>
                             <!-- END USER LOGIN DROPDOWN -->
                             <!-- BEGIN QUICK SIDEBAR TOGGLER -->
                             <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                            <li class="dropdown dropdown-extended quick-sidebar-toggler">
+                           <!--  <li class="dropdown dropdown-extended quick-sidebar-toggler">
                                 <span class="sr-only">Toggle Quick Sidebar</span>
                                 <i class="icon-logout"></i>
-                            </li>
+                            </li> -->
                             <!-- END QUICK SIDEBAR TOGGLER -->
                         </ul>
                     </div>
@@ -476,31 +475,30 @@
                     <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
                     <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
                     <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-hover-submenu " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+                        <li class="nav-item">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="icon-diamond"></i>
+                                <span class="title">Facturación</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li class="nav-item">
+                                    <a href="/invoicing-page" class="nav-link ">
+                                        <span class="title"><i class="icon-pencil"></i> Facturas/Boletas</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="nav-item start ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
-                                <span class="title">Dashboard</span>
+                                <span class="title">Tablero</span>
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
                                 <li class="nav-item start ">
-                                    <a href="index.html" class="nav-link ">
-                                        <i class="icon-bar-chart"></i>
-                                        <span class="title">Dashboard 1</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item start ">
                                     <a href="/dashboard-table-summary-page" class="nav-link ">
                                         <i class="icon-bulb"></i>
                                         <span class="title">Resumen</span>
-                                        <span class="badge badge-success">1</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item start ">
-                                    <a href="dashboard_3.html" class="nav-link ">
-                                        <i class="icon-graph"></i>
-                                        <span class="title">Dashboard 3</span>
-                                        <span class="badge badge-danger">5</span>
                                     </a>
                                 </li>
                             </ul>
@@ -513,12 +511,6 @@
                                 <span class="arrow open"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item  ">
-                                    <a href="form_controls.html" class="nav-link ">
-                                        <span class="title">Bootstrap Form
-                                            <br/>Controls</span>
-                                    </a>
-                                </li>
                                 <li class="nav-item  active open">
                                     <a href="/user" class="nav-link ">
                                         <span class="title"><i class="icon-pencil"></i> Ingrese Números</span>
@@ -635,14 +627,14 @@
                         <ul class="page-breadcrumb">
                             <li>
                                 <i class="icon-home"></i>
-                                <a href="index.html">Home</a>
+                                <a href="/home">Inicio</a>
                                 <i class="fa fa-angle-right"></i>
                             </li>
                             <li>
                                 <span>Formas</span>
                             </li>
                         </ul>
-                        <div class="page-toolbar">
+                        <!-- <div class="page-toolbar">
                             <div class="btn-group pull-right">
                                 <button type="button" class="btn btn-fit-height grey-salt dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000" data-close-others="true"> Actions
                                     <i class="fa fa-angle-down"></i>
@@ -667,7 +659,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <!-- END PAGE HEADER-->
                                 
@@ -1243,9 +1235,7 @@
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-	        <div class="page-footer-inner"> 2016 &copy; Metronic Theme By
-	            <a target="_blank" href="http://keenthemes.com">Keenthemes</a> &nbsp;|&nbsp;
-	            <a href="http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes" title="Purchase Metronic just for 27$ and get lifetime updates for free" target="_blank">Purchase Metronic!</a>
+	        <div class="page-footer-inner"> 2018 &copy; construido por los Desarroladores de La Joya
             </div>
             <div class="scroll-to-top">
                 <i class="icon-arrow-up"></i>
