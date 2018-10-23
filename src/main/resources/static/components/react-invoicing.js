@@ -6,7 +6,8 @@ class TableDashboard extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
-      clientAddress: '',
+      
+	  clientAddress: '',
       rucNumber: '',
       clientName: '',
       truckPlateNumber: '',
@@ -20,7 +21,35 @@ class TableDashboard extends React.Component {
       solesG90: '',
       solesG95: '',
       gasPrices: [],
-      date: ''
+      date: '',
+      
+	  // customer
+      clientDocNumber: '',
+      clientName: '',
+      clientDocType;
+      clientAddress: '',
+      truckPlateNumber: '',
+	  // invoice breakdown
+      date: '',
+      invoiceType: '',
+	  // Break-down
+      galsD2: '',
+      galsG90: '',
+      galsG95: '',
+      priceD2: '',
+      priceG90: '',
+      priceG95: '',
+      solesD2: '',
+      solesG90: '',
+      solesG95: '',
+      // Totals
+      /*total: '',
+      subTotal: '',
+      totalIGV: '',
+      totalVerbiage: '',*/
+	  // Save or update in DB
+      gasPrices: [],
+      saveOrUpdate: 'save'
     };
   }
   
@@ -98,26 +127,7 @@ class TableDashboard extends React.Component {
 					this.setState({priceG95: gasPricesVo.gasPrices[2].price});
 					this.setState({gasPrices: gasPricesVo.gasPrices});
 					this.setState({date: currentDate});
-				} else {
-					var gasPricesVoLatest = data.result[0];
-					var gasPricesVoPrevious = data.result[1];
-					
-					var gasPricesLatest = {};
-					var gasPricesPrevious = {};
-					for(var i = 0; i < gasPricesVoLatest.gasPrices.length; i++) {
-						gasPricesLatest = gasPricesVoLatest.tanks[i];
-						gasPricesPrevious = gasPricesVoPrevious.tanks[i];
-						
-						gasPricesLatest["newCost"] = gasPricesLatest["cost"];
-						gasPricesLatest["newPrice"] = gasPricesLatest["price"];
-						gasPricesLatest["cost"] = gasPricesPrevious["cost"];
-						gasPricesLatest["price"] = gasPricesPrevious["price"];
-					}
-					
-					this.setState({gasPrices: gasPricesVoLatest.gasPrices});
-					this.setState({date: gasPricesVoLatest.date});
-					this.setState({pumpAttendantNames: gasPricesVoLatest.pumpAttendantNames});
-				}
+				} 
 			},
 			error: function(e){
 
@@ -305,7 +315,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12">
 	                  <ul className="list-unstyled">
 	                      <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
-	                      <li> Av. Miguel Grua Mza B Lote 1-2 </li>
+	                      <li> Av. Miguel Grau Mza B Lote 1-2 </li>
 	                      <li> Lima - Lima - Ate </li>
 	                      <li> +51 356 0345 </li>
 	                  </ul>
@@ -381,8 +391,7 @@ class TableDashboard extends React.Component {
 	                  <table className="table table-striped table-hover">
 	                      <thead>
 	                          <tr>
-	                              <th className="hidden-xs"> # </th>
-	                              <th className="hidden-xs"> Item </th>
+	                              <th className="hidden-xs"> Prod </th>
 	                              <th className="hidden-sm-up"> Descr </th>
 	                              <th className="hidden-sm-up"> Cantidad </th>
 	                              <th> Valor Unitario </th>
@@ -391,24 +400,21 @@ class TableDashboard extends React.Component {
 	                      </thead>
 	                      <tbody>
 	                          <tr>
-	                              <td className="hidden-xs"> 1 </td>
-	                              <td className="hidden-xs"> Diesel </td>
+	                              <td className="hidden-xs"> 01-Diesel </td>
 	                              <td className="hidden-sm-up"> D2 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
 	                          </tr>
 	                          <tr>
-	                              <td className="hidden-xs"> 2 </td>
-	                              <td className="hidden-xs"> Gas 90 </td>
+	                              <td className="hidden-xs"> 02-Gas 90 </td>
 	                              <td className="hidden-sm-up"> G90 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
 	                          </tr>
 	                          <tr>
-	                              <td className="hidden-xs"> 3 </td>
-	                              <td className="hidden-xs"> Gas 95 </td>
+	                              <td className="hidden-xs"> 03-Gas 95 </td>
 	                              <td className="hidden-sm-up"> G95 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
@@ -483,7 +489,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="company-address">
 	                      <span className="bold uppercase">La Joya de Santa Isabel EIRL</span>
-	                      <br/> Av. Miguel Grua Mza B Lote 1-2 
+	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
 	                      <br/> Lima - Lima - Ate 
 	                      <br/>
 	                      <span className="bold">T</span> +51 356 0345
@@ -535,7 +541,7 @@ class TableDashboard extends React.Component {
 	                  <table className="table table-hover">
 	                      <thead>
 	                          <tr>
-	                              <th className="invoice-title">Prod</th>
+                      			  <th className="invoice-title">Prod</th>
 	                              <th className="invoice-title text-center">Cantidad</th>
 	                              <th className="invoice-title text-center">Precio</th>
 	                              <th className="invoice-title text-center">Importe</th>
@@ -544,23 +550,23 @@ class TableDashboard extends React.Component {
 	                      <tbody>
 	                          <tr>
 	                              <td>
-	                                  Diesel 2
+	                                  01-Diesel 2
 	                              </td>
 	                              <td className="text-center sbold">{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
 	                              <td className="text-center sbold">{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
 	                              <td className="text-center sbold">{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
-	                              <td>
-	                                  Gas 90
+	                          	  <td>
+	                                  02-Gas 90
 	                              </td>
 	                              <td className="text-center sbold">{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
 	                              <td className="text-center sbold">{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
 	                              <td className="text-center sbold">{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
-	                              <td>
-	                                  Gas 95
+	                          	  <td>
+	                                  03-Gas 95
 	                              </td>
 	                              <td className="text-center sbold">{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
 	                              <td className="text-center sbold">{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>

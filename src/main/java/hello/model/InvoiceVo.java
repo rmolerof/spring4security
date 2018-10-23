@@ -3,37 +3,71 @@ package hello.model;
 import java.util.Date;
 
 public class InvoiceVo {
-	private String clientAddress;
-	private String rucNumber;
+	private String invoiceNumber;
+	// customer
+	private String clientDocNumber;
 	private String clientName;
+	private String clientDocType;
+	private String clientAddress;
 	private String truckPlateNumber;
-	private Double galsD2;
-	private Double galsG90;
-	private Double galsG95;
-	private Double priceD2;
-	private Double priceG90;
-	private Double priceG95;
-	private Double solesD2;
-	private Double solesG90;
-	private Double solesG95;
+	// invoice breakdown
 	private Date date;
-	private String billType;
-	private String saveOrUpdate;
+	private String invoiceType;
+	// Break-down
+	private Double galsD2 = 0D;
+	private Double galsG90 = 0D;
+	private Double galsG95 = 0D;
+	private Double priceD2 = 0D;
+	private Double priceG90 = 0D;
+	private Double priceG95 = 0D;
+	private Double solesD2 = 0D;
+	private Double solesG90 = 0D;
+	private Double solesG95 = 0D;
+	// Totals
 	private Double total;
 	private Double subTotal;
 	private Double totalIGV;
+	private String totalVerbiage;
+	// Save or update in DB
+	private String invoiceHash;
+	private String saveOrUpdate;
+	private String sunatErrorStr;
 	
+	public String getInvoiceHash() {
+		return invoiceHash;
+	}
+	public void setInvoiceHash(String invoiceHash) {
+		this.invoiceHash = invoiceHash;
+	}
+	public String getClientDocNumber() {
+		return clientDocNumber;
+	}
+	public void setClientDocNumber(String clientDocNumber) {
+		this.clientDocNumber = clientDocNumber;
+	}
+	public String getClientDocType() {
+		return clientDocType;
+	}
+	public void setClientDocType(String clientDocType) {
+		this.clientDocType = clientDocType;
+	}
+	public String getInvoiceType() {
+		return invoiceType;
+	}
+	public void setInvoiceType(String invoiceType) {
+		this.invoiceType = invoiceType;
+	}
+	public String getInvoiceNumber() {
+		return invoiceNumber;
+	}
+	public void setInvoiceNumber(String invoiceNumber) {
+		this.invoiceNumber = invoiceNumber;
+	}
 	public String getClientAddress() {
 		return clientAddress;
 	}
 	public void setClientAddress(String clientAddress) {
 		this.clientAddress = clientAddress;
-	}
-	public String getRucNumber() {
-		return rucNumber;
-	}
-	public void setRucNumber(String rucNumber) {
-		this.rucNumber = rucNumber;
 	}
 	public String getClientName() {
 		return clientName;
@@ -107,12 +141,6 @@ public class InvoiceVo {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-	public String getBillType() {
-		return billType;
-	}
-	public void setBillType(String billType) {
-		this.billType = billType;
-	}
 	public String getSaveOrUpdate() {
 		return saveOrUpdate;
 	}
@@ -136,6 +164,18 @@ public class InvoiceVo {
 	}
 	public void setTotalIGV(Double totalIGV) {
 		this.totalIGV = totalIGV;
+	}
+	public String getTotalVerbiage() {
+		return totalVerbiage;
+	}
+	public void setTotalVerbiage(String totalVerbiage) {
+		this.totalVerbiage = totalVerbiage;
+	}
+	public String getSunatErrorStr() {
+		return sunatErrorStr;
+	}
+	public void setSunatErrorStr(String sunatErrorStr) {
+		this.sunatErrorStr = sunatErrorStr;
 	}
 	
 }

@@ -39,6 +39,7 @@ import hello.domain.TanksRepository;
 import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
 import hello.model.User;
+import hello.sunat.XmlSunat;
 
 @Service
 public class UserService {
@@ -536,15 +537,19 @@ public class UserService {
 	
 	public List<InvoiceVo> submitInvoice(InvoiceVo invoiceVo) {
 		
-		if (invoiceVo.getSaveOrUpdate().equals("save")) {
-			// generate xml
-			//XmlSunat xmlSunat = new XmlSunat(invoiceVo));
-			
-			// sign xml
-			
-			// send xml
-			
-		} else if (invoiceVo.getSaveOrUpdate().equals("update"))  {
+		try {
+			if (invoiceVo.getSaveOrUpdate().equals("save")) {
+				// generate xml
+				XmlSunat.invokeSunat(invoiceVo);
+				XmlSunat.invokeSunat(invoiceVo);
+				XmlSunat.firma(invoiceVo);
+				XmlSunat.envio(invoiceVo);
+
+			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
+				
+			}
+		} catch (Exception e) {
+			invoiceVo.setSunatErrorStr(e.getMessage());
 		}
 		
 		return Stream.of(invoiceVo).collect(Collectors.toList());
