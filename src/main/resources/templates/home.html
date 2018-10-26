@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" 
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
-    	<title>Spring Security Example</title>
+    	<title>Spring Boot Thymelef + Spring Security</title>
+    	<!-- Copies all header-css from fragments/header below -->
+    	<div th:replace="fragments/header :: header-css"/>
 	</head>
 	<body>
-		<h1>Welcome!</h1>
-		<p>Click <a th:href="@{/hello}">here</a> to see a greeting</p>
+		<div th:replace="fragments/header :: header"/>
+		<div class="container">
+			<div class="starter-template">
+				<h1>CONTROL DE GRIFO Y FACTURACION ELECTRONICA</h1>
+				<h2>1. <a th:href="@{/admin}">ADMINISTRADOR</a></h2>
+	        	<h2>2. <a th:href="@{/invoicing-page}">USUARIO</a></h2>
+	        	<h2>3. <a th:href="@{/about}">ACERCA</a></h2>
+        	</div>
+		</div>
+		<div th:replace="fragments/footer :: footer"/>
 	</body>    
 </html>
