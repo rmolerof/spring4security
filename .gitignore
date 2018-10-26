@@ -1,6 +1,6 @@
 /target/
 /bin/*
-/src/main/resources/static/assets/*
+#/src/main/resources/static/assets/*
 /.settings
 .project
 .classpath
