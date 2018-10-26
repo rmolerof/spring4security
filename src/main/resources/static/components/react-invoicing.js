@@ -276,9 +276,11 @@ class TableDashboard extends React.Component {
 					self.setState({ showSuccess: true });
 					
 					var qrcode1 = new QRCode("qrcode1");
+					qrcode1.clear();
 					qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
 					
 					var qrcode2 = new QRCode("qrcode2");
+					qrcode2.clear();
 					qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
 				},
 				error: function(e){
@@ -405,7 +407,7 @@ class TableDashboard extends React.Component {
 	                              <th className="hidden-sm-up"> Descr </th>
 	                              <th className="hidden-sm-up"> Cantidad </th>
 	                              <th> Valor Unitario </th>
-	                              <th className="hidden-sm-up"> Total </th>
+	                              <th className="hidden-sm-up"> Importe </th>
 	                          </tr>
 	                      </thead>
 	                      <tbody>
@@ -500,21 +502,22 @@ class TableDashboard extends React.Component {
 	      
 	      <div className="invoice-content-2 " ref={el => (this.componentRef = el)} style={{fontFamily:"sans-serif", fontSize: 11}}>
 	          <div className="row invoice-head">
-	              <div className="col-md-12 col-xs-12">
+	              <div className="col-md-12 col-xs-12 text-center">
 	                  <div className="invoice-logo">
-	                      <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" />
-	                      <h1 className="uppercase text-center">Factura</h1>
+	                      <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" style={{display: 'block', margin: 'auto'}} alt="" />
+	                      <span className="uppercase" >Factura Electrónica</span><br/>
+	                      <span className="uppercase" >{this.state.invoiceNumber}</span>
+	                    	  
 	                  </div>
 	              </div>
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="company-address text-center">
-	                      <span className="bold uppercase">La Joya de Santa Isabel EIRL</span>
+	                      <span className="bold uppercase" style={{fontSize: 13}}>La Joya de Santa Isabel EIRL</span>
 	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
 	                      <br/> Lima - Lima - Ate 
-	                      <br/>
-	                      <span className="bold">T</span> +51 356 0345
-	                      <br/>
-	                      <span className="bold">W</span> www.grifolajoya.com </div>
+	                      <br/> Teléfono: +51 356 0345
+	                      <br/> www.grifoslajoya.com 
+                      </div>
 	              </div>
 	          </div>
 	          <div className="row invoice-cust-add">
@@ -523,31 +526,31 @@ class TableDashboard extends React.Component {
 			              <tbody>
 				              <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      RUC
+			                      RUC:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientDocNumber}</td>
 			                  </tr>
 			              	  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      Razon Social
+			                      Razón Social:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientName}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      Fecha
+			                      Fecha:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      Direccion
+			                      Dirección:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientAddress}</td>
 			                  </tr>
 			                  <tr>
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-		                      	  Placa de Vehiculo
+		                      	  Placa de Vehículo:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
@@ -561,7 +564,7 @@ class TableDashboard extends React.Component {
 	                  <table className="table table-hover">
 	                      <thead>
 	                          <tr>
-                      			  <th className="invoice-title" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Prod</th>
+                      			  <th className="invoice-title" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Producto</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Cantidad</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Precio</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Importe</th>
@@ -572,25 +575,25 @@ class TableDashboard extends React.Component {
 	                              <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  01-Diesel 2
 	                              </td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  02-Gas 90
 	                              </td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  03-Gas 95
 	                              </td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      </tbody>
 	                  </table>
@@ -604,19 +607,19 @@ class TableDashboard extends React.Component {
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Subtotal
 			                      </td>
-			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      IGV (18%)
 			                      </td>
-			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Total
 			                      </td>
-			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
@@ -624,16 +627,16 @@ class TableDashboard extends React.Component {
 	          </div>
 	          <div className="col-xs-12">
 	                  <address>
-	                      <strong>Código Hash:</strong>
+		                  <strong>SON:</strong>
+	                      <br/> {this.state.totalVerbiage}
+	                      <br/>
+	                  	  <strong>Código Hash:</strong>
 	                      <br/> {this.state.invoiceHash}
 	                	  <br/>
-	                      <strong>Nro de Factura:</strong>
-	                      <br/> {this.state.invoiceNumber}
-	                      <br/>  
 	                  </address>
 	                  <address>
 	                      <strong>Consulte su documento en:</strong>
-	                      <a> www.grifolajoya.com </a>
+	                      <a> www.grifoslajoya.com </a>
 	                  </address>
 	          </div>
 	          <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >

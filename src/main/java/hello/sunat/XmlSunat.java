@@ -112,14 +112,14 @@ public class XmlSunat {
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsD2());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceD2() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesD2() / 1.18D));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesD2() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesD2() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");// 10: grabado (01 tipo codigo), 31 (gratuito), 20 (exonerado), inefectas 30
 		    cpe_Detalle.setCODIGO("01");//codigo interno
 		    cpe_Detalle.setDESCRIPCION("Diesel 2");//nombre interno
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG90() != 0D) {
@@ -129,14 +129,14 @@ public class XmlSunat {
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG90());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG90() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG90() / 1.18));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
 		    cpe_Detalle.setCODIGO("0001");
 		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG95() != 0D) {
@@ -146,14 +146,14 @@ public class XmlSunat {
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG95());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG95() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG95() / 1.18D));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
 		    cpe_Detalle.setCODIGO("0001");
 		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
