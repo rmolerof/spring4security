@@ -1,5 +1,6 @@
 package hello.sunat;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -38,7 +39,8 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
-	private static final String userHomeDir = System.getProperty("user.home");
+//	private static final String userHomeDir = System.getProperty("user.home");
+	private static final String userHomeDir = "/home/ec2-user"; 
 	
 	// OBLIGATORIO
 	public static int invokeSunat(InvoiceVo invoiceVo) {
@@ -155,7 +157,13 @@ public class XmlSunat {
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = "C:\\sunat\\" + cpe.getNRO_DOCUMENTO_EMPRESA() + "-" + cpe.getCOD_TIPO_DOCUMENTO() + "-" + cpe.getNRO_COMPROBANTE() + ".XML";
+	    String rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + cpe.getCOD_TIPO_DOCUMENTO() + "-" + cpe.getNRO_COMPROBANTE() + ".XML";
+	    boolean alreadyExists = new File(rutaXMLCPE).exists();
+	    
+	    // Create path if basePath doesn't exist
+	    if(!alreadyExists){
+			(new File(rutaXMLCPE)).getParentFile().mkdirs();
+		}
 	    
 	    return CPESunat.GenerarXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
 	}
@@ -166,8 +174,14 @@ public class XmlSunat {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = "C:\\sunat\\" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = "C:\\sunat\\signatureSunat\\FIRMABETA.pfx";
+		String rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String rutaFirma = userHomeDir + "/xmlsSunat/signatureSunat/FIRMABETA.pfx";
+		boolean alreadyExists = new File(rutaFirma).exists();
+	    
+	    // Create path if basePath doesn't exist
+	    if(!alreadyExists){
+			(new File(rutaFirma)).getParentFile().mkdirs();
+		}
 		String passFirma = "123456";
 
 		// String nomArchivo = "20100078792-20-R002-41372";
@@ -184,7 +198,7 @@ public class XmlSunat {
 		String PassSol = "moddatos";// password de prueba de sunat
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber(); // xml firmado
 		String NombreCDR = "R-" + NombreCPE; // respuesta
-		String RutaArchivo = "C:\\sunat\\";
+		String RutaArchivo = userHomeDir + "/xmlsSunat/";
 		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, RutaWS);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));

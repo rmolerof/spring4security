@@ -498,16 +498,16 @@ class TableDashboard extends React.Component {
 	          </div>
 	      </div>
 	      
-	      <div className="invoice-content-2 " ref={el => (this.componentRef = el)}>
+	      <div className="invoice-content-2 " ref={el => (this.componentRef = el)} style={{fontFamily:"sans-serif", fontSize: 11}}>
 	          <div className="row invoice-head">
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="invoice-logo">
 	                      <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" />
-	                      <h1 className="uppercase">Factura</h1>
+	                      <h1 className="uppercase text-center">Factura</h1>
 	                  </div>
 	              </div>
 	              <div className="col-md-12 col-xs-12">
-	                  <div className="company-address">
+	                  <div className="company-address text-center">
 	                      <span className="bold uppercase">La Joya de Santa Isabel EIRL</span>
 	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
 	                      <br/> Lima - Lima - Ate 
@@ -519,78 +519,78 @@ class TableDashboard extends React.Component {
 	          </div>
 	          <div className="row invoice-cust-add">
 	              <div className="col-xs-12">
-		              <table className="table table-hover">
+		              <table className="table table-hover table-borderless" >
 			              <tbody>
 				              <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      RUC
 			                      </td>
-			                      <td className="text-center sbold">{this.state.clientDocNumber}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientDocNumber}</td>
 			                  </tr>
 			              	  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Razon Social
 			                      </td>
-			                      <td className="text-center sbold">{this.state.clientName}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientName}</td>
 			                  </tr>
 			                  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Fecha
 			                      </td>
-			                      <td className="text-center sbold">{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</td>
 			                  </tr>
 			                  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Direccion
 			                      </td>
-			                      <td className="text-center sbold">{this.state.clientAddress}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientAddress}</td>
 			                  </tr>
 			                  <tr>
-		                      <td>
-			                      Placa de Vehiculo
+		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		                      	  Placa de Vehiculo
 			                      </td>
-			                      <td className="text-center sbold">{this.state.truckPlateNumber}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
 			              </tbody>
 			          </table>
 	              </div>
 	          	  
 	          </div>
-	          <div className="row invoice-body">
+	          <div className="row invoice-body" >
 	              <div className="col-xs-12 table-responsive">
 	                  <table className="table table-hover">
 	                      <thead>
 	                          <tr>
-                      			  <th className="invoice-title">Prod</th>
-	                              <th className="invoice-title text-center">Cantidad</th>
-	                              <th className="invoice-title text-center">Precio</th>
-	                              <th className="invoice-title text-center">Importe</th>
+                      			  <th className="invoice-title" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Prod</th>
+	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Cantidad</th>
+	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Precio</th>
+	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Importe</th>
 	                          </tr>
 	                      </thead>
 	                      <tbody>
 	                          <tr>
-	                              <td>
+	                              <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  01-Diesel 2
 	                              </td>
-	                              <td className="text-center sbold">{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
-	                          	  <td>
+	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  02-Gas 90
 	                              </td>
-	                              <td className="text-center sbold">{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
 	                          <tr>
-	                          	  <td>
+	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  03-Gas 95
 	                              </td>
-	                              <td className="text-center sbold">{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
-	                              <td className="text-center sbold">{parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      </tbody>
 	                  </table>
@@ -601,22 +601,22 @@ class TableDashboard extends React.Component {
 			          <table className="table table-hover">
 			              <tbody>
 			                  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Subtotal
 			                      </td>
-			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      IGV (18%)
 			                      </td>
-			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
-			                      <td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Total
 			                      </td>
-			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
