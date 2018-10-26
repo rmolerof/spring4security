@@ -540,7 +540,7 @@ public class UserService {
 		try {
 			if (invoiceVo.getSaveOrUpdate().equals("save")) {
 				// generate xml
-				XmlSunat.invokeSunat(invoiceVo);
+				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 				XmlSunat.invokeSunat(invoiceVo);
 				XmlSunat.firma(invoiceVo);
 				XmlSunat.envio(invoiceVo);

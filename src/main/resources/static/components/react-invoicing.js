@@ -7,7 +7,7 @@ class TableDashboard extends React.Component {
 	  showError: false,
 	  showSuccess: false,
       
-	  clientAddress: '',
+	  /*clientAddress: '',
       rucNumber: '',
       clientName: '',
       truckPlateNumber: '',
@@ -21,12 +21,13 @@ class TableDashboard extends React.Component {
       solesG90: '',
       solesG95: '',
       gasPrices: [],
-      date: '',
+      date: '',*/
       
+	  invoiceNumber: 'F001-00000001',
 	  // customer
       clientDocNumber: '',
       clientName: '',
-      clientDocType;
+      clientDocType: '',
       clientAddress: '',
       truckPlateNumber: '',
 	  // invoice breakdown
@@ -49,7 +50,10 @@ class TableDashboard extends React.Component {
       totalVerbiage: '',*/
 	  // Save or update in DB
       gasPrices: [],
-      saveOrUpdate: 'save'
+      totalVerbiage: '',
+      invoiceHash: '',
+      saveOrUpdate: 'save',
+      sunatErrorStr: ''
     };
   }
   
@@ -77,7 +81,6 @@ class TableDashboard extends React.Component {
 	  this.setState({ solesG95: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	  this.setState({ galsG95: evt.target.value == '' ? '': ((evt.target.value / this.state.priceG95 * 100).toFixed() / 100) });
   }
-  
   clientAddressChange = (evt) => {
 	    this.setState({ clientAddress: evt.target.value });
   }
@@ -86,9 +89,9 @@ class TableDashboard extends React.Component {
 	    this.setState({ clientName: evt.target.value });
   }
   
-  rucNumberChange = (evt) => {
-    this.setState({ rucNumber: evt.target.value });
-    this.setState({ rucNumber: evt.target.value == '' ? '': Math.floor(evt.target.value) });
+  clientDocNumberChange = (evt) => {
+    this.setState({ clientDocNumber: evt.target.value });
+    this.setState({ clientDocNumber: evt.target.value == '' ? '': Math.floor(evt.target.value) });
   }
   
   truckPlateNumberChange = (evt) => {
@@ -116,8 +119,6 @@ class TableDashboard extends React.Component {
 			cache: false,
 			timeout: 600000,
 			success: (data) => {
-				var qrcode = new QRCode("qrcode");
-				qrcode.makeCode("www.google.com");
 				if (data.result.length == 1) {
 					var gasPricesVo = data.result[0];
 					var currentDate = new Date();
@@ -174,7 +175,7 @@ class TableDashboard extends React.Component {
 		
 		evt.preventDefault();
 		
-		const {clientAddress, rucNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
+		const {invoiceNumber, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
 	    var self = this;
 	    var errors = {
 	    		submit: '',
@@ -185,11 +186,14 @@ class TableDashboard extends React.Component {
 	    this.setState({ showError: false, showSuccess: false });
 	    
 	    var invoiceVo = {
-			   
-	    	clientAddress: clientAddress,
-		    rucNumber: rucNumber,
+	    	invoiceNumber: invoiceNumber,  
+		    clientDocNumber: clientDocNumber,
 		    clientName: clientName,
+		    clientDocType: '6', // RUC
+		    clientAddress: clientAddress,
 		    truckPlateNumber: truckPlateNumber,
+		    date: date,
+	    	invoiceType: '01', // factura
 		    galsD2: galsD2,
 		    galsG90: galsG90,
 		    galsG95: galsG95,
@@ -199,8 +203,7 @@ class TableDashboard extends React.Component {
 		    solesD2: solesD2,
 		    solesG90: solesG90,
 		    solesG95: solesG95,
-		    date: date,
-	    	billType: 'factura',
+		    
 	    	saveOrUpdate: 'save'
 	    };
 
@@ -265,11 +268,18 @@ class TableDashboard extends React.Component {
 				cache: false,
 				timeout: 600000,
 				success: (data) => {
-					var InvoiceVoResp = data.result[0];
+					var invoiceVoResp = data.result[0];
+					
+					self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
+					self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
+					self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
 					self.setState({ showSuccess: true });
 					
-					var qrcode = new QRCode("qrcode");
-					qrcode.makeCode("www.google.com");
+					var qrcode1 = new QRCode("qrcode1");
+					qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+					
+					var qrcode2 = new QRCode("qrcode2");
+					qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
 				},
 				error: function(e){
 					var json = "<h4>Submit Error </h4><pre>" + e.responseText + "</pre>";
@@ -307,7 +317,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-xs-6">
 	                  <p> <strong>FACTURA ELECTRÓNICA</strong> <br/>
 	                      <span className="muted"> RUC: 20501568776  </span><br/>
-	                      <span className="muted"> F001-338  </span>
+	                      <span className="muted"> {this.state.invoiceNumber}  </span>
 	                  </p>
 	              </div>
 	          </div>
@@ -333,7 +343,7 @@ class TableDashboard extends React.Component {
 	    	      	  <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">RUC</label>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder="RUC" onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.rucNumber} onChange={this.rucNumberChange}/>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder="RUC" onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	    	              </div>
 	    	          </div>
 	    	          <div className="col-md-2">
@@ -425,21 +435,31 @@ class TableDashboard extends React.Component {
 	              </div>
 	          </div>
 	          <div className="row">
-	              <div className="col-xs-6">
+	              <div className="col-xs-3">
 	                  <div className="well">
 	                      <address>
 	                          <strong>Código Hash:</strong>
-	                          <br/> HFXKvckrdfhzmrou%yntb7
+	                          <br/> {this.state.invoiceHash}
                         	  <br/>
-	                          <strong>Nro de Ticket:</strong>
-	                          <br/> 503-9024410180828
-	                          <br/> <strong>Código QR:</strong>
+	                          <strong>Nro de Factura:</strong>
+	                          <br/> {this.state.invoiceNumber}
 	                          <br/>  
                           </address>
 	                      <address>
 	                          <strong>Consulte su documento en:</strong>
 	                          <a> www.grifolajoya.com </a>
 	                      </address>
+	                  </div>
+	              </div>
+		          <div className="col-xs-3">
+	                  <div className="well">
+		                  <address>
+		                      <strong>Código QR:</strong>
+		                      <br/>  
+		                  </address>
+		                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+				          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode1" className="col-xs-12 col-md-offset-3" ></div>
+				          </div>
 	                  </div>
 	              </div>
 	              <div className="col-xs-6 invoice-block">
@@ -451,13 +471,13 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	<strong>Sub-Total ventas:</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100 ).toFixed(2)}</td>
+					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 					                  </tr>
 					                  <tr>
 					                      <td>
 					                      	<strong>IGV (18%):</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100).toFixed(2)} </td>
+					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)} </td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -505,7 +525,7 @@ class TableDashboard extends React.Component {
 			                      <td>
 			                      RUC
 			                      </td>
-			                      <td className="text-center sbold">{this.state.rucNumber}</td>
+			                      <td className="text-center sbold">{this.state.clientDocNumber}</td>
 			                  </tr>
 			              	  <tr>
 			                      <td>
@@ -584,13 +604,13 @@ class TableDashboard extends React.Component {
 			                      <td>
 			                          Subtotal
 			                      </td>
-			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100 ).toFixed(2)}</td>
+			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td>
 			                      IGV (18%)
 			                      </td>
-			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18).toFixed() / 100).toFixed(2)}</td>
+			                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td>
@@ -602,8 +622,22 @@ class TableDashboard extends React.Component {
 			          </table>	
           		  </div>
 	          </div>
+	          <div className="col-xs-12">
+	                  <address>
+	                      <strong>Código Hash:</strong>
+	                      <br/> {this.state.invoiceHash}
+	                	  <br/>
+	                      <strong>Nro de Factura:</strong>
+	                      <br/> {this.state.invoiceNumber}
+	                      <br/>  
+	                  </address>
+	                  <address>
+	                      <strong>Consulte su documento en:</strong>
+	                      <a> www.grifolajoya.com </a>
+	                  </address>
+	          </div>
 	          <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
-	          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode" className="col-xs-12 col-md-offset-3" ></div>
+	          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode2" className="col-xs-12 col-md-offset-3" ></div>
 	          </div>
 	      </div>
 	      

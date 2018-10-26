@@ -38,6 +38,7 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
+	private static final String userHomeDir = System.getProperty("user.home");
 	
 	// OBLIGATORIO
 	public static int invokeSunat(InvoiceVo invoiceVo) {
@@ -52,7 +53,7 @@ public class XmlSunat {
 	    cpe.setTOTAL_DETRACCIONES(0);
 	    cpe.setTOTAL_BONIFICACIONES(0);
 	    cpe.setTOTAL_DESCUENTO(0);
-	    cpe.setSUB_TOTAL(invoiceVo.getTotal());// OBLIGATORIO
+	    cpe.setSUB_TOTAL(invoiceVo.getSubTotal());// OBLIGATORIO
 	    cpe.setPOR_IGV(18);//UBL2.1 // OBLIGATORIO
 	    cpe.setTOTAL_IGV(invoiceVo.getTotalIGV());// OBLIGATORIO
 	    cpe.setTOTAL_ISC(0);// NO 
@@ -108,15 +109,15 @@ public class XmlSunat {
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsD2());//hasta 5 decimales
-		    cpe_Detalle.setPRECIO(invoiceVo.getPriceD2());
-		    cpe_Detalle.setIMPORTE(invoiceVo.getPriceD2() * invoiceVo.getGalsD2());//PRECIO X CANTIDAD
+		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceD2() / 1.18D));
+		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(invoiceVo.getSolesD2() - invoiceVo.getPriceD2() * invoiceVo.getGalsD2());
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesD2() - cpe_Detalle.getIMPORTE()));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");// 10: grabado (01 tipo codigo), 31 (gratuito), 20 (exonerado), inefectas 30
 		    cpe_Detalle.setCODIGO("01");//codigo interno
 		    cpe_Detalle.setDESCRIPCION("Diesel 2");//nombre interno
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(invoiceVo.getPriceD2() * invoiceVo.getGalsD2());
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG90() != 0D) {
@@ -124,16 +125,16 @@ public class XmlSunat {
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
-		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG90());
-		    cpe_Detalle.setPRECIO(invoiceVo.getPriceG90());
-		    cpe_Detalle.setIMPORTE(invoiceVo.getPriceG90() * invoiceVo.getGalsG90());//PRECIO X CANTIDAD
-		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");
-		    cpe_Detalle.setIGV(invoiceVo.getSolesG90() - invoiceVo.getPriceG90() * invoiceVo.getGalsG90());
+		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG90());//hasta 5 decimales
+		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG90() / 1.18D));
+		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() - cpe_Detalle.getIMPORTE()));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
 		    cpe_Detalle.setCODIGO("0001");
 		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(invoiceVo.getPriceG90() * invoiceVo.getGalsG90());
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG95() != 0D) {
@@ -141,16 +142,16 @@ public class XmlSunat {
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
 		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
-		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG95());
-		    cpe_Detalle.setPRECIO(invoiceVo.getPriceG95());
-		    cpe_Detalle.setIMPORTE(invoiceVo.getPriceG95() * invoiceVo.getGalsG95());//PRECIO X CANTIDAD
-		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");
-		    cpe_Detalle.setIGV(invoiceVo.getSolesG95() - invoiceVo.getPriceG95() * invoiceVo.getGalsG95());
+		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG95());//hasta 5 decimales
+		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG95() / 1.18D));
+		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() - cpe_Detalle.getIMPORTE()));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
 		    cpe_Detalle.setCODIGO("0001");
 		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(invoiceVo.getPriceG95() * invoiceVo.getGalsG95());
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
@@ -166,7 +167,7 @@ public class XmlSunat {
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
 		String rutaXML = "C:\\sunat\\" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = "C:\\Users\\mecam\\.m2\\repository\\sunat\\FIRMABETA.pfx";
+		String rutaFirma = "C:\\sunat\\signatureSunat\\FIRMABETA.pfx";
 		String passFirma = "123456";
 
 		// String nomArchivo = "20100078792-20-R002-41372";
@@ -199,7 +200,7 @@ public class XmlSunat {
 	}
 	
     public static String Convertir(String numero, boolean mayusculas, String moneda) {
-        moneda = moneda.replace("PEN", "SOL");
+        moneda = moneda.replace("PEN", "SOLES");
         moneda = moneda.replace("USD", "DOLARES AMERICANOS");
         moneda = moneda.replace("EUR", "EUROS");
         String literal = "";
@@ -215,7 +216,7 @@ public class XmlSunat {
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
-            parte_decimal = Num[1] + "/100 " + moneda + ".";
+            parte_decimal = "CON " + Num[1] + "/100 " + moneda + ".";
             //se convierte el numero a literal
             if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";
@@ -232,9 +233,9 @@ public class XmlSunat {
             }
             //devuelve el resultado en mayusculas o minusculas
             if (mayusculas) {
-                return (literal + parte_decimal).toUpperCase();
+                return (literal + parte_decimal).toUpperCase().trim();
             } else {
-                return (literal + parte_decimal);
+                return (literal + parte_decimal).trim();
             }
         } else {//error, no se puede convertir
             return literal = null;
@@ -306,6 +307,10 @@ public class XmlSunat {
         }
         return n + getMiles(miles);
     }
+    
+    public static double roundTwo(double amt) {
+		return Math.round(amt * 100.0) / 100.0;
+	}
 }
 
 /*private ApiComprobantSunat cpeSunat = new ApiComprobanteSunat;

@@ -27,11 +27,15 @@ public class InvoiceVo {
 	private Double total;
 	private Double subTotal;
 	private Double totalIGV;
+	
 	private String totalVerbiage;
-	// Save or update in DB
 	private String invoiceHash;
 	private String saveOrUpdate;
 	private String sunatErrorStr;
+	
+	public static double roundTwo(double amt) {
+		return Math.round(amt * 100.0) / 100.0;
+	}
 	
 	public String getInvoiceHash() {
 		return invoiceHash;
@@ -148,19 +152,19 @@ public class InvoiceVo {
 		this.saveOrUpdate = saveOrUpdate;
 	}
 	public Double getTotal() {
-		return getSolesD2() + getSolesG90() + getSolesG95();
+		return roundTwo(getSolesD2() + getSolesG90() + getSolesG95());
 	}
 	public void setTotal(Double total) {
 		this.total = total;
 	}
 	public Double getSubTotal() {
-		return Math.round(getTotal() / 1.18D * 100) / 100D;
+		return roundTwo(getTotal() /  1.18D);
 	}
 	public void setSubTotal(Double subTotal) {
 		this.subTotal = subTotal;
 	}
 	public Double getTotalIGV() {
-		return getTotal() - getSubTotal();
+		return roundTwo(getTotal() - getSubTotal());
 	}
 	public void setTotalIGV(Double totalIGV) {
 		this.totalIGV = totalIGV;

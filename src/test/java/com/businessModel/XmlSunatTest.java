@@ -41,11 +41,11 @@ public class XmlSunatTest {
 		invoiceVo2.setClientDocType("6"); //RUC
 		invoiceVo2.setClientDocNumber("10203040501"); // RUC NUMBER
 		invoiceVo2.setGalsD2(20D);
-		invoiceVo2.setPriceD2(10D);
-		invoiceVo2.setSolesD2(236D);
+		invoiceVo2.setPriceD2(10D); // includes IGV
+		invoiceVo2.setSolesD2(200D);
 		invoiceVo2.setGalsG90(10D);
 		invoiceVo2.setPriceG90(10D);
-		invoiceVo2.setSolesG90(118D);
+		invoiceVo2.setSolesG90(100D);
 		invoiceVo2.setTotalVerbiage(XmlSunat.Convertir(invoiceVo2.getTotal().toString(), true, "PEN"));
 		//invoiceVo2.setTotalVerbiage("TRESCIENTOS CICUENTA Y CUATRO CON 00/100 SOLES");
 		/*invoiceVo.setGalsG95(0D);
@@ -62,8 +62,8 @@ public class XmlSunatTest {
 		invoiceVo.setClientDocType("1");//DNI
 		invoiceVo.setClientDocNumber("43664470"); // DNI NUMBER
 		invoiceVo.setGalsD2(10D);
-		invoiceVo.setPriceD2(10D);
-		invoiceVo.setSolesD2(118D);
+		invoiceVo.setPriceD2(10D);// Includes IGuserHomeDir
+		invoiceVo.setSolesD2(100D);
 		invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 		/*invoiceVo.setGalsG90(0D);
 		invoiceVo.setPriceG90(10D);
