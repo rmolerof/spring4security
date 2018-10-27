@@ -6,28 +6,11 @@ class TableDashboard extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
-      
-	  /*clientAddress: '',
-      rucNumber: '',
-      clientName: '',
-      truckPlateNumber: '',
-      galsD2: '',
-      galsG90: '',
-      galsG95: '',
-      priceD2: '',
-      priceG90: '',
-      priceG95: '',
-      solesD2: '',
-      solesG90: '',
-      solesG95: '',
-      gasPrices: [],
-      date: '',*/
-      
 	  invoiceNumber: 'F001-00000001',
 	  // customer
       clientDocNumber: '',
       clientName: '',
-      clientDocType: '',
+      clientDocType: '6',
       clientAddress: '',
       truckPlateNumber: '',
 	  // invoice breakdown
@@ -43,11 +26,6 @@ class TableDashboard extends React.Component {
       solesD2: '',
       solesG90: '',
       solesG95: '',
-      // Totals
-      /*total: '',
-      subTotal: '',
-      totalIGV: '',
-      totalVerbiage: '',*/
 	  // Save or update in DB
       gasPrices: [],
       totalVerbiage: '',
@@ -159,7 +137,6 @@ class TableDashboard extends React.Component {
 		cache: false,
 		timeout: 600000,
 		success: (data) => {
-			console.log(data);
 		    self.setState({clientAddress: data.domicilio_fiscal});
 			self.setState({clientName: data.razon_social});
 		      
@@ -175,12 +152,14 @@ class TableDashboard extends React.Component {
 		
 		evt.preventDefault();
 		
-		const {invoiceNumber, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
+		const {invoiceNumber, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
 	    var self = this;
 	    var errors = {
 	    		submit: '',
-	    		pumpAttendantNames: '',
-	    		price: '',
+	    		clientDocNumber: '',
+	    		clientName: '',
+	    		clientAddress: '',
+	    		truckPlateNumber: ''
 	    };
 	    var formIsValid = true;
 	    this.setState({ showError: false, showSuccess: false });
@@ -189,7 +168,7 @@ class TableDashboard extends React.Component {
 	    	invoiceNumber: invoiceNumber,  
 		    clientDocNumber: clientDocNumber,
 		    clientName: clientName,
-		    clientDocType: '6', // RUC
+		    clientDocType: clientDocType, // RUC
 		    clientAddress: clientAddress,
 		    truckPlateNumber: truckPlateNumber,
 		    date: date,
@@ -207,55 +186,66 @@ class TableDashboard extends React.Component {
 	    	saveOrUpdate: 'save'
 	    };
 
-	    // Validation: Pump Attendant Names
-	    /*if (pumpAttendantNames && pumpAttendantNames.trim().length >= 0) {
-	    
+	    // RUC Validation
+	    if (clientDocNumber && clientDocNumber >= 0) {
+	    	if (clientDocType == '6') {
+	    		if (clientDocNumber.toString().length  != 11) {
+	    			errors["clientDocNumber"] = "RUC debe tener 11 digitos";
+	    			formIsValid = false;
+	    		}
+	    	} else if (clientDocType == '1') {
+	    		if (clientDocNumber.trim().length  != 8 && (clientDocNumber != '0')) {
+	    			errors["clientDocNumber"] = "DNI debe tener 8 digitos";
+	    			formIsValid = false;
+	    		} else if (clientDocNumber == '0' && (solesD2 + solesG90 + solesG95) > 700) {
+	    			errors["clientDocNumber"] = "DNI no puede ser 0, proveer DNI para compras mayores a S/ 700.00 ";
+	    			formIsValid = false;
+	    		} 
+	    	}
 	    } else {
-	    	errors["pumpAttendantNames"] = "Falta nombre(s) de grifer@(s)";
+	    	errors["clientDocNumber"] = "Falta RUC o DNI";
 			formIsValid = false;
 	    }
 	    
-	    var gasPrice = {};
-	    var validCostCount = 0;
-	    var validPriceCount = 0;
-		for(var i = 0; i < gasPrices.length; i++) {
-			gasPrice = gasPrices[i];
-			if (!isNaN(gasPrice.newCost) && gasPrice.newCost) {
-				validCostCount++;
-			}
-			if (!isNaN(gasPrice.newPrice) && gasPrice.newPrice) {
-				validPriceCount++
-			}
-		}
-		
-		if ((0 < validCostCount && validCostCount < gasPrices.length) || (0 < validPriceCount && validPriceCount < gasPrices.length) || (validCostCount == 0 && validPriceCount == 0)) {
-			errors["price"] = "List precios o costos está incompleto";
-			formIsValid = false;
-		} else {
-			
-			var gasPrice = {};
-			for(var i = 0; i < gasPrices.length; i++) {
-				gasPrice = gasPrices[i];
-				var gasPriceVo = {};
-				gasPriceVo["fuelType"] = gasPrice.fuelType;
-				
-				if (validCostCount == 0 && validPriceCount == gasPrices.length) {
-					gasPriceVo["price"] = gasPrice.newPrice;
-					gasPriceVo["cost"] = gasPrice.cost;
-				} else if (validPriceCount == 0 && validCostCount == gasPrices.length) {
-					gasPriceVo["price"] = gasPrice.price;
-					gasPriceVo["cost"] = gasPrice.newCost;
-				} else if (validCostCount == gasPrices.length && validPriceCount == gasPrices.length) {
-					gasPriceVo["price"] = gasPrice.newPrice;
-					gasPriceVo["cost"] = gasPrice.newCost;
-				}		
-				
-				gasPricesVo.gasPrices.push(gasPriceVo);
-			}
-		
-		}
-		
-		this.setState({errors: errors}); */
+	    // Validation of Razon Social, Direccion, Nro de Placa 
+	    if (clientDocType == '6') {
+	    	if (clientName && clientName.trim().length >= 0) {
+	    		
+	    	} else {
+	    		errors["clientName"] = "Falta razon social asociado al RUC " + clientDocNumber;
+				formIsValid = false;
+	    	}
+
+	    	if (clientAddress && clientAddress.trim().length >= 0) {
+	    		
+	    	} else {
+	    		errors["clientAddress"] = "Falta direccion asociado al RUC " + clientDocNumber;
+				formIsValid = false;
+	    	}
+	    	if (truckPlateNumber && truckPlateNumber.trim().length >= 0) {
+	    		
+	    	} else {
+	    		errors["truckPlateNumber"] = "Falta placa de vehículo asociado al RUC " + clientDocNumber;
+				formIsValid = false;
+	    	}
+	    } else if (clientDocType == '1') {
+	    	
+	    }
+	    
+	    // Validation of product list
+	    if (!galsD2) {
+	    	invoiceVo.galsD2 = 0;
+	    	invoiceVo.solesD2 = 0;
+	    }
+	    if (!galsG90) {
+	    	invoiceVo.galsG90 = 0;
+	    	invoiceVo.solesG90 = 0;
+	    }
+	    if (!galsG95) {
+	    	invoiceVo.galsG95 = 0;
+	    	invoiceVo.solesG95 = 0;
+	    }
+		this.setState({errors: errors}); 
 		
 		if (formIsValid) {
 			
@@ -285,6 +275,7 @@ class TableDashboard extends React.Component {
 				},
 				error: function(e){
 					var json = "<h4>Submit Error </h4><pre>" + e.responseText + "</pre>";
+					errors["submit"] = "Recibo no aceptada. Intente otra vez";
 					self._toggleError();
 				}	
 			});
@@ -302,13 +293,13 @@ class TableDashboard extends React.Component {
       	  
 	      {this.state.showError && 
 		        <div className="alert alert-danger">
-	      <strong>¡Error!</strong>{" " + this.state.errors.pumpAttendantNames + " - " + this.state.errors.newGals + " - " + this.state.errors.submit}  
+	      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
 		      	</div>
 	      }
-	      
+
 	      {this.state.showSuccess && 
 	      	<div className="alert alert-success">
-	      		<strong>Success!</strong> Tu forma has sido remitida. 
+	      		<strong>Success!</strong> Tu recibo has sido remitido. 
 	      	</div>
 	      }
 	      
@@ -411,7 +402,7 @@ class TableDashboard extends React.Component {
 	                          </tr>
 	                      </thead>
 	                      <tbody>
-	                          <tr>
+	                      	  <tr>
 	                              <td className="hidden-xs"> 01-Diesel </td>
 	                              <td className="hidden-sm-up"> D2 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
@@ -449,7 +440,7 @@ class TableDashboard extends React.Component {
                           </address>
 	                      <address>
 	                          <strong>Consulte su documento en:</strong>
-	                          <a> www.grifolajoya.com </a>
+	                          <a> www.grifoslajoya.com </a>
 	                      </address>
 	                  </div>
 	              </div>
@@ -473,26 +464,27 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	<strong>Sub-Total ventas:</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+					                      <td className="text-center sbold">S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100 - (((this.state.solesD2  || 0) + (this.state.solesG90  || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 					                  </tr>
 					                  <tr>
 					                      <td>
 					                      	<strong>IGV (18%):</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)} </td>
+					                      <td className="text-center sbold">S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100).toFixed(2)} </td>
 					                  </tr>
 					                  <tr>
 					                      <td>
 				                      		<strong>Importe Total:</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {((((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100)).toFixed(2)}</td>
+					                      <td className="text-center sbold">S/ {(((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100)).toFixed(2)}</td>
 					                  </tr>
 					              </tbody>
 					          </table>	
 		          		  </div>
 			          </div>
 	                  <br/>
-	                  <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>&nbsp;
+	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {!this.state.invoiceHash && <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
 	                  <button type="submit" className="btn btn-lg green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar Recibo
 	    	          </button>
@@ -571,7 +563,8 @@ class TableDashboard extends React.Component {
 	                          </tr>
 	                      </thead>
 	                      <tbody>
-	                          <tr>
+	                      	  {this.state.galsD2 > 0 && 
+	                      	  <tr>
 	                              <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  01-Diesel 2
 	                              </td>
@@ -579,7 +572,9 @@ class TableDashboard extends React.Component {
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
-	                          <tr>
+	                      	  }
+	                      	  {this.state.galsG90 > 0 && 
+	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  02-Gas 90
 	                              </td>
@@ -587,7 +582,9 @@ class TableDashboard extends React.Component {
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
-	                          <tr>
+	                      	  }
+	                      	  {this.state.galsG95 > 0 && 
+	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  03-Gas 95
 	                              </td>
@@ -595,6 +592,7 @@ class TableDashboard extends React.Component {
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
 	                          </tr>
+	                      	  }
 	                      </tbody>
 	                  </table>
 	              </div>
@@ -607,25 +605,25 @@ class TableDashboard extends React.Component {
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Subtotal
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed() / 100 - ((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100 - (((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      IGV (18%)
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Total
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {(((this.state.solesD2 + this.state.solesG90 + this.state.solesG95) * 100).toFixed(2) / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed(2) / 100).toFixed(2)}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
           		  </div>
 	          </div>
-	          <div className="col-xs-12">
+	          <div className="row col-xs-12">
 	                  <address>
 		                  <strong>SON:</strong>
 	                      <br/> {this.state.totalVerbiage}
@@ -639,7 +637,8 @@ class TableDashboard extends React.Component {
 	                      <a> www.grifoslajoya.com </a>
 	                  </address>
 	          </div>
-	          <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+	          
+	          <div style={{width: '300px', height: '500px', display: 'block', margin: 'auto', zoom: 0.5}} >
 	          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode2" className="col-xs-12 col-md-offset-3" ></div>
 	          </div>
 	      </div>
