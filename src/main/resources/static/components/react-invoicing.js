@@ -6,16 +6,16 @@ class TableDashboard extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
-	  invoiceNumber: 'F001-00000001',
+	  invoiceNumber: 'B001-00000001',
 	  // customer
       clientDocNumber: '',
       clientName: '',
-      clientDocType: '6',
+      clientDocType: '1',
       clientAddress: '',
       truckPlateNumber: '',
 	  // invoice breakdown
       date: '',
-      invoiceType: '',
+      invoiceType: '03',
 	  // Break-down
       galsD2: '',
       galsG90: '',
@@ -31,7 +31,17 @@ class TableDashboard extends React.Component {
       totalVerbiage: '',
       invoiceHash: '',
       saveOrUpdate: 'save',
-      sunatErrorStr: ''
+      sunatErrorStr: '',
+      selectedOption: 'boleta',
+      showBoletaRadioButton: 'btn blue active',
+      showFacturaRadioButton: 'btn btn-default',
+      showNotaDeCreditoRadioButton: 'btn btn-default',
+      docLabelObj: {
+    	  clientDocType: 'DNI',
+    	  clientDocTypePH: 'Ingrese DNI',
+    	  clientName: 'Señor(es)',
+    	  clientNamePH: 'Nombre(s)',
+      }	  
     };
   }
   
@@ -70,6 +80,10 @@ class TableDashboard extends React.Component {
   clientDocNumberChange = (evt) => {
     this.setState({ clientDocNumber: evt.target.value });
     this.setState({ clientDocNumber: evt.target.value == '' ? '': Math.floor(evt.target.value) });
+    
+    if (evt.target.value == '0' && this.state.selectedOption == 'boleta') {
+    	this.setState({ clientName: 'CLIENTES VARIOS' });
+    }
   }
   
   truckPlateNumberChange = (evt) => {
@@ -80,7 +94,53 @@ class TableDashboard extends React.Component {
 	  this.setState((prevState, props) => {
 		  return {showError: !prevState.showError}
 	  })
-  };
+  }
+  
+  handleOptionChange = (changeEvent) => {
+	  this.setState({selectedOption: changeEvent.target.value});
+	  
+	  var cssB = (this.state.showBoletaRadioButton === "btn btn-default" && changeEvent.target.value == 'boleta') ? "btn blue active" : "btn btn-default";
+	  this.setState({showBoletaRadioButton: cssB});
+	  var cssF = (this.state.showFacturaRadioButton === "btn btn-default" && changeEvent.target.value == 'factura') ? "btn blue active" : "btn btn-default";
+	  this.setState({showFacturaRadioButton: cssF});
+	  var cssNV = (this.state.showNotaDeCreditoRadioButton === "btn btn-default" && changeEvent.target.value == 'nota de credito') ? "btn blue active" : "btn btn-default";
+	  this.setState({showNotaDeCreditoRadioButton: cssNV});
+	  
+	  if (changeEvent.target.value == 'boleta') {
+		  var docLabelObj = {
+	    	  clientDocType: 'DNI',
+	    	  clientDocTypePH: 'Ingrese DNI',
+	    	  clientName: 'Señor(es)',
+	    	  clientNamePH: 'Nombre(s)',
+	      }
+	  	this.setState({docLabelObj: docLabelObj});
+		this.setState({clientDocType: '1'});
+		this.setState({invoiceType: '03'});
+		this.setState({invoiceNumber: 'B001-00000001'});
+	  } else if (changeEvent.target.value == 'factura') {
+		  var docLabelObj = {
+	    	  clientDocType: 'RUC',
+	    	  clientDocTypePH: 'Ingrese RUC',
+	    	  clientName: 'Razón Social',
+	    	  clientNamePH: 'Nombre(s)',
+	      }
+	  	this.setState({docLabelObj: docLabelObj});
+		this.setState({clientDocType: '6'});
+		this.setState({invoiceType: '01'});
+		this.setState({invoiceNumber: 'F001-00000001'});
+	  } else if (changeEvent.target.value == 'nota de credito') {
+		  var docLabelObj = {
+	    	  clientDocType: 'RUC',
+	    	  clientDocTypePH: 'Ingrese Doc',
+	    	  clientName: 'Señor(es)',
+	    	  clientNamePH: 'Nombre(s)',
+	      }
+	  	this.setState({docLabelObj: docLabelObj});
+		this.setState({clientDocType: '6'});
+		this.setState({invoiceType: '07'});
+		this.setState({invoiceNumber: 'F001-00000002'});
+	  }
+  }
   
   _fetchGasPrices(timeframe){
 		
@@ -125,26 +185,28 @@ class TableDashboard extends React.Component {
   }
   
   onTabPress(event) {
-	// validation
 	
-	var self = this;  
-	var search = "https://api.sunat.cloud/ruc/" + event.target.value;
+	// Search RUC only for facturas
+	if (this.state.selectedOption != 'boleta') {
+		var self = this;  
+		var search = "https://api.sunat.cloud/ruc/" + event.target.value;
+		
+		jQuery.ajax({
+			type: "GET",
+			contentType: "application/json", 
+			url:search,
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+			    self.setState({clientAddress: data.domicilio_fiscal});
+				self.setState({clientName: data.razon_social});
+			      
+			},
+			error: function(e){
 	
-	jQuery.ajax({
-		type: "GET",
-		contentType: "application/json", 
-		url:search,
-		cache: false,
-		timeout: 600000,
-		success: (data) => {
-		    self.setState({clientAddress: data.domicilio_fiscal});
-			self.setState({clientName: data.razon_social});
-		      
-		},
-		error: function(e){
-
-		}	
-	});
+			}	
+		});
+	}
 	
   }
   
@@ -152,7 +214,7 @@ class TableDashboard extends React.Component {
 		
 		evt.preventDefault();
 		
-		const {invoiceNumber, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
+		const {invoiceNumber, invoiceType, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
 	    var self = this;
 	    var errors = {
 	    		submit: '',
@@ -172,7 +234,7 @@ class TableDashboard extends React.Component {
 		    clientAddress: clientAddress,
 		    truckPlateNumber: truckPlateNumber,
 		    date: date,
-	    	invoiceType: '01', // factura
+	    	invoiceType: invoiceType, // factura
 		    galsD2: galsD2,
 		    galsG90: galsG90,
 		    galsG95: galsG95,
@@ -186,64 +248,83 @@ class TableDashboard extends React.Component {
 	    	saveOrUpdate: 'save'
 	    };
 
-	    // RUC Validation
-	    if (clientDocNumber && clientDocNumber >= 0) {
-	    	if (clientDocType == '6') {
-	    		if (clientDocNumber.toString().length  != 11) {
-	    			errors["clientDocNumber"] = "RUC debe tener 11 digitos";
-	    			formIsValid = false;
-	    		}
-	    	} else if (clientDocType == '1') {
-	    		if (clientDocNumber.trim().length  != 8 && (clientDocNumber != '0')) {
-	    			errors["clientDocNumber"] = "DNI debe tener 8 digitos";
-	    			formIsValid = false;
-	    		} else if (clientDocNumber == '0' && (solesD2 + solesG90 + solesG95) > 700) {
-	    			errors["clientDocNumber"] = "DNI no puede ser 0, proveer DNI para compras mayores a S/ 700.00 ";
-	    			formIsValid = false;
-	    		} 
-	    	}
-	    } else {
-	    	errors["clientDocNumber"] = "Falta RUC o DNI";
+	    if (solesD2 || solesG90 || solesG95) {
+	    	
+    	} else {
+	    	errors["submit"] = "Cantidades no pueden ser nulas";
 			formIsValid = false;
 	    }
 	    
-	    // Validation of Razon Social, Direccion, Nro de Placa 
-	    if (clientDocType == '6') {
-	    	if (clientName && clientName.trim().length >= 0) {
-	    		
-	    	} else {
-	    		errors["clientName"] = "Falta razon social asociado al RUC " + clientDocNumber;
-				formIsValid = false;
-	    	}
-
-	    	if (clientAddress && clientAddress.trim().length >= 0) {
-	    		
-	    	} else {
-	    		errors["clientAddress"] = "Falta direccion asociado al RUC " + clientDocNumber;
-				formIsValid = false;
-	    	}
-	    	if (truckPlateNumber && truckPlateNumber.trim().length >= 0) {
-	    		
-	    	} else {
-	    		errors["truckPlateNumber"] = "Falta placa de vehículo asociado al RUC " + clientDocNumber;
-				formIsValid = false;
-	    	}
-	    } else if (clientDocType == '1') {
-	    	
-	    }
-	    
-	    // Validation of product list
-	    if (!galsD2) {
-	    	invoiceVo.galsD2 = 0;
-	    	invoiceVo.solesD2 = 0;
-	    }
-	    if (!galsG90) {
-	    	invoiceVo.galsG90 = 0;
-	    	invoiceVo.solesG90 = 0;
-	    }
-	    if (!galsG95) {
-	    	invoiceVo.galsG95 = 0;
-	    	invoiceVo.solesG95 = 0;
+	    if (formIsValid){
+		    // RUC Validation
+		    if (clientDocType == '6') {
+			    if (clientDocNumber && clientDocNumber >= 0) {
+		    		if (clientDocNumber.toString().length  != 11) {
+		    			errors["clientDocNumber"] = "RUC debe tener 11 digitos";
+		    			formIsValid = false;
+		    		}
+			    } else {
+			    	errors["clientDocNumber"] = "Falta RUC o DNI";
+					formIsValid = false;
+			    }
+		    }
+		    
+		    // DNI Validation
+		    if (clientDocType == '1') {
+			    if (clientDocNumber == '0') {
+			    	if (((solesD2 || 0) + (solesG90 || 0) + (solesG95 || 0)) >= 700.00) {
+		    			errors["clientDocNumber"] = "DNI no puede ser 0, proveer DNI para compras mayores a S/ 700.00 ";
+		    			formIsValid = false;
+		    		} 
+			    } else {
+			    	if (clientDocNumber && clientDocNumber >= 0) {
+			    		if (clientDocNumber.toString().length  != 8) {
+			    			errors["clientDocNumber"] = "DNI debe tener 8 digitos";
+			    			formIsValid = false;
+			    		} 
+				    } else {
+				    	errors["clientDocNumber"] = "Numero de DNI incompleto";
+						formIsValid = false;
+				    }
+			    }
+		    }
+		    
+		    // Validation of Razon Social, Direccion, Nro de Placa 
+		    if (clientDocType == '6') {
+		    	if (clientName && clientName.trim().length >= 0) {
+		    		
+		    	} else {
+		    		errors["clientName"] = "Falta razon social asociado al RUC " + clientDocNumber;
+					formIsValid = false;
+		    	}
+	
+		    	if (clientAddress && clientAddress.trim().length >= 0) {
+		    		
+		    	} else {
+		    		errors["clientAddress"] = "Falta direccion asociado al RUC " + clientDocNumber;
+					formIsValid = false;
+		    	}
+		    	if (truckPlateNumber && truckPlateNumber.trim().length >= 0) {
+		    		
+		    	} else {
+		    		errors["truckPlateNumber"] = "Falta placa de vehículo asociado al RUC " + clientDocNumber;
+					formIsValid = false;
+		    	}
+		    } 
+		    
+		    // Validation of product list
+		    if (!galsD2) {
+		    	invoiceVo.galsD2 = 0;
+		    	invoiceVo.solesD2 = 0;
+		    }
+		    if (!galsG90) {
+		    	invoiceVo.galsG90 = 0;
+		    	invoiceVo.solesG90 = 0;
+		    }
+		    if (!galsG95) {
+		    	invoiceVo.galsG95 = 0;
+		    	invoiceVo.solesG95 = 0;
+		    }
 	    }
 		this.setState({errors: errors}); 
 		
@@ -263,19 +344,22 @@ class TableDashboard extends React.Component {
 					self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
 					self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
 					self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
-					self.setState({ showSuccess: true });
-					
-					var qrcode1 = new QRCode("qrcode1");
-					qrcode1.clear();
-					qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
-					
-					var qrcode2 = new QRCode("qrcode2");
-					qrcode2.clear();
-					qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+					if (invoiceVoResp.sunatErrorStr.charAt(0) == "1") {
+						self.setState({ showSuccess: true });
+						var qrcode1 = new QRCode("qrcode1");
+						qrcode1.clear();
+						qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+						
+						var qrcode2 = new QRCode("qrcode2");
+						qrcode2.clear();
+						qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+					} else {
+						errors["submit"] = "Recibo rechazador por Sunat. " + invoiceVoResp.sunatErrorStr;
+						self._toggleError();
+					}
 				},
 				error: function(e){
-					var json = "<h4>Submit Error </h4><pre>" + e.responseText + "</pre>";
-					errors["submit"] = "Recibo no aceptada. Intente otra vez";
+					errors["submit"] = "Recibo no aceptada. Intente otra vez"  + e.responseText;
 					self._toggleError();
 				}	
 			});
@@ -299,7 +383,7 @@ class TableDashboard extends React.Component {
 
 	      {this.state.showSuccess && 
 	      	<div className="alert alert-success">
-	      		<strong>Success!</strong> Tu recibo has sido remitido. 
+	      		<strong>Success!</strong> Tu recibo has sido remitido. {this.state.sunatErrorStr}
 	      	</div>
 	      }
 	      
@@ -308,9 +392,9 @@ class TableDashboard extends React.Component {
 	              <div className="col-xs-6 invoice-logo-space">
 	                  <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> </div>
 	              <div className="col-xs-6">
-	                  <p> <strong>FACTURA ELECTRÓNICA</strong> <br/>
+	                  <p> <strong className="uppercase ">{this.state.selectedOption} ELECTRÓNICA</strong> <br/>
 	                      <span className="muted"> RUC: 20501568776  </span><br/>
-	                      <span className="muted"> {this.state.invoiceNumber}  </span>
+	                      <span className="muted bold"> {this.state.invoiceNumber}  </span>
 	                  </p>
 	              </div>
 	          </div>
@@ -335,16 +419,54 @@ class TableDashboard extends React.Component {
 			          </div>
 	    	      	  <div className="col-md-2">
 	    	              <div className="form-group">
-	    	                  <label className="control-label">RUC</label>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder="RUC" onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	    	                  <label className="control-label">{this.state.docLabelObj.clientDocType}</label>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	    	              </div>
 	    	          </div>
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
-	    	                  <label className="control-label">Razón Social</label>
-	    	                  <input type="text" className="form-control" placeholder="Nombre(s)" onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
+	    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
+	    	                  <input type="text" className="form-control" placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
 	    	              </div>
 	    	          </div>
+	    	          {/*<div className="clearfix">
+	    	          <div className="btn-group" >
+		    	          <div className="radio">
+			    	          <label className={this.state.showBoletaRadioButton}>
+			    	            <input type="radio" value="boleta" className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange} />
+			    	            Boleta
+			    	          </label>
+			    	      </div>
+			    	      <div className="radio">
+			    	          <label className={this.state.showFacturaRadioButton} >
+			    	            <input type="radio" value="factura" className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange} />
+			    	            Factura
+			    	          </label>
+			    	      </div>
+			    	      <div className="radio">
+			    	          <label className={this.state.showNotaDeCreditoRadioButton}>
+			    	            <input type="radio" value="notaDeCredito" className="toggle" checked={this.state.selectedOption === 'notaDeCredito'} onChange={this.handleOptionChange} />
+			    	            Nota de Crédito
+			    	          </label>
+			    	      </div>
+		    	      </div>
+		    	      </div>*/}
+		    	      
+	    	          <div className="col-md-4">
+	    	              <div className="form-group">
+	    	                  <label className="control-label">Tipo de Recibo</label>
+		    	              <div className="clearfix">
+					    	      <div className="btn-group">
+			                      <label className={this.state.showBoletaRadioButton}>
+			                          <input type="radio" value="boleta" className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
+			                      <label className={this.state.showFacturaRadioButton}>
+			                          <input type="radio" value="factura" className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange}/> FACTURA </label>
+			                      <label className={this.state.showNotaDeCreditoRadioButton}>
+			                          <input type="radio" value="nota de credito" className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
+			                      </div>
+		                      </div>
+	                      </div>
+        	          </div>
 	              </div>
 	              <div className="row">
 	    	          <div className="col-md-4">
@@ -353,12 +475,14 @@ class TableDashboard extends React.Component {
 	    	                  <input type="text" className="form-control" placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
 	    	              </div>
 	    	          </div>
+	    	          {this.state.selectedOption != 'boleta' &&
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Nro de Placa: </label>
 	    	                  <input type="text" className="form-control" placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
 	    	              </div>
 	    	          </div>
+	    	          }
 		          </div>
               </div>
              {/* <div className="row">
@@ -434,9 +558,12 @@ class TableDashboard extends React.Component {
 	                          <strong>Código Hash:</strong>
 	                          <br/> {this.state.invoiceHash}
                         	  <br/>
-	                          <strong>Nro de Factura:</strong>
+	                          {/*<strong>Nro de <span className="uppercase" >{this.state.selectedOption}</span>:</strong>
 	                          <br/> {this.state.invoiceNumber}
-	                          <br/>  
+	                          <br/>*/}
+	                          <strong>SON:</strong>
+		                      <br/> {this.state.totalVerbiage}
+		                      <br/>
                           </address>
 	                      <address>
 	                          <strong>Consulte su documento en:</strong>
@@ -497,7 +624,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12 col-xs-12 text-center">
 	                  <div className="invoice-logo">
 	                      <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" style={{display: 'block', margin: 'auto'}} alt="" />
-	                      <span className="uppercase" >Factura Electrónica</span><br/>
+	                      <span className="uppercase" >{this.state.selectedOption} Electrónica</span><br/>
 	                      <span className="uppercase" >{this.state.invoiceNumber}</span>
 	                    	  
 	                  </div>
@@ -518,13 +645,13 @@ class TableDashboard extends React.Component {
 			              <tbody>
 				              <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      RUC:
+			                      {this.state.docLabelObj.clientDocType}
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientDocNumber}</td>
 			                  </tr>
-			              	  <tr>
+			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      Razón Social:
+			                      {this.state.docLabelObj.clientName}:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientName}</td>
 			                  </tr>
@@ -540,12 +667,14 @@ class TableDashboard extends React.Component {
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientAddress}</td>
 			                  </tr>
+			                  {this.state.selectedOption != 'boleta' && 
 			                  <tr>
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 		                      	  Placa de Vehículo:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
+			                  }
 			              </tbody>
 			          </table>
 	              </div>

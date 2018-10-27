@@ -39,8 +39,8 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
-//	private static final String userHomeDir = System.getProperty("user.home");
-	private static final String userHomeDir = "/home/ec2-user"; 
+	private static final String userHomeDir = System.getProperty("user.home");
+//	private static final String userHomeDir = "/home/ec2-user"; 
 	
 	// OBLIGATORIO
 	public static int invokeSunat(InvoiceVo invoiceVo) {
@@ -202,6 +202,7 @@ public class XmlSunat {
 		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, RutaWS);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
+		invoiceVo.setSunatErrorStr(sunatResponse);
 		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
 		System.out.println("hash: " + invoiceVo.getInvoiceHash());
 	}
