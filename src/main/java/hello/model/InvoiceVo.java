@@ -2,7 +2,12 @@ package hello.model;
 
 import java.util.Date;
 
+import org.bson.types.ObjectId;
+
+import hello.domain.InvoiceDao;
+
 public class InvoiceVo {
+	private ObjectId id;
 	private String invoiceNumber;
 	// customer
 	private String clientDocNumber;
@@ -34,10 +39,41 @@ public class InvoiceVo {
 	private String status;
 	private String sunatErrorStr;
 	
+	public InvoiceVo() {
+		super();
+	}
+	
+	public InvoiceVo(InvoiceDao invoiceDao) {
+		this.id = invoiceDao.getId();
+		this.invoiceNumber = new String(invoiceDao.getInvoiceNumber());
+		this.clientDocNumber = new String(invoiceDao.getClientDocNumber());
+		this.clientName = new String(invoiceDao.getClientName());
+		this.clientDocType = new String(invoiceDao.getClientDocType());
+		this.clientAddress = new String(invoiceDao.getClientAddress());
+		this.truckPlateNumber = new String(invoiceDao.getTruckPlateNumber());
+		this.date = new Date(invoiceDao.getDate().getTime());
+		this.invoiceType = new String(invoiceDao.getInvoiceType());
+		this.galsD2 = new Double(invoiceDao.getGalsD2());
+		this.galsG90 = new Double(invoiceDao.getGalsD2());
+		this.galsG90 = new Double(invoiceDao.getGalsG90());
+		this.priceD2 = new Double(invoiceDao.getPriceD2());
+		this.priceG90 = new Double(invoiceDao.getPriceG90());
+		this.priceG95 = new Double(invoiceDao.getPriceG95());
+		this.solesD2 = new Double(invoiceDao.getSolesD2());
+		this.solesG90 = new Double(invoiceDao.getSolesG90());
+		this.solesG95 = new Double(invoiceDao.getSolesG95());
+		this.subTotal = new Double(invoiceDao.getSubTotal());
+		this.totalIGV = new Double(invoiceDao.getTotalIGV());
+		this.total = new Double(invoiceDao.getTotal());
+		this.totalVerbiage = new String(invoiceDao.getTotalVerbiage());
+		this.invoiceHash = new String(invoiceDao.getInvoiceHash());
+		this.saveOrUpdate = new String(invoiceDao.getSaveOrUpdate());
+		
+	}
+	
 	public static double roundTwo(double amt) {
 		return Math.round(amt * 100.0) / 100.0;
 	}
-	
 	public String getInvoiceHash() {
 		return invoiceHash;
 	}
@@ -189,6 +225,14 @@ public class InvoiceVo {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public ObjectId getId() {
+		return id;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
 	
 }

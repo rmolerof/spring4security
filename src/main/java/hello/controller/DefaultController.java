@@ -62,4 +62,14 @@ public class DefaultController {
 		return "invoicing-page";
 	}
 	
+	@GetMapping("invoice-table-page")
+	public String invoiceTablePage(){
+		return "invoice-table-page";
+	}
+	
+	@GetMapping("invoice-viewer-page")
+	public String invoiceViewerPage(){
+		return "invoice-viewer-page";
+	}
+	
 }

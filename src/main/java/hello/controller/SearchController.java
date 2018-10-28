@@ -16,6 +16,7 @@ import hello.businessModel.GasPricesVo;
 import hello.businessModel.Station;
 import hello.businessModel.TanksVo;
 import hello.model.AjaxGetInvoiceResponse;
+import hello.model.AjaxGetInvoicesResponse;
 import hello.model.AjaxGetPricesResponse;
 import hello.model.AjaxGetStationResponse;
 import hello.model.AjaxGetStockResponse;
@@ -266,6 +267,29 @@ public class SearchController {
 			result.setMsg("No se pudeo enviar recibo");
 		} else {
 			result.setMsg("Recibo enviado");
+		}
+		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/getInvoicesSummaryData")
+	public ResponseEntity<?> getInvoicesSummaryData(@Valid @RequestBody SearchDateCriteria search, Errors errors){
+		AjaxGetInvoicesResponse result = new AjaxGetInvoicesResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<InvoiceVo> users = userService.findInvoicesSummaryData(search.getDateEnd(), search.getDateBeg());
+		if(users.isEmpty()) {
+			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
+		} else {
+			result.setMsg("Datos hallados");
 		}
 		result.setResult(users);
 		

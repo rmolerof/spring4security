@@ -180,84 +180,7 @@ public class UserService {
 	
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
 		
-		/*Station laJoya = new Station();
-		laJoya.setStationId(101L);
-		laJoya.setName("La Joya");
-		laJoya.setShift("1");
-		laJoya.setPumpAttendantNames("miriam, sadit");
-		//laJoya.setDate(new Date(1533441600000L));
-		laJoya.setDate(new Date());
-		
-		Tank d2 = new Tank(1, "d2", 10000D);
-		Tank g90 = new Tank(2, "g90", 3000D);
-		Tank g95 = new Tank(3, "g95", 3000D);
-		
-		Map<String, Tank> tanks = new HashMap<String, Tank>();
-		tanks.put(d2.getFuelType(), d2);
-		tanks.put(g90.getFuelType(), g90);
-		tanks.put(g95.getFuelType(), g95);
-		
-		laJoya.setTanks(tanks);
-		
-		Dispenser d2_1 = new Dispenser(1, "d2", 288934.73,	12.39,	11.01, 9);
-		Dispenser d2_2 = new Dispenser(2, "d2", 144360.82,	12.39,	11.01, 9);
-		Dispenser d2_3 = new Dispenser(3, "d2", 73147.96,	12.39,	11.01, 8);
-		Dispenser d2_4 = new Dispenser(4, "d2", 211896.21,	12.39,	11.01, 9);
-		Dispenser d2_5 = new Dispenser(5, "d2", 723954.62,	12.39,	11.01, 9);
-		Dispenser d2_6 = new Dispenser(6, "d2", 83166.11,	12.39,	11.01, 8);
-		Dispenser g90_1 = new Dispenser(1, "g90", 39150.31,	12.89,	10.48, 8);
-		Dispenser g90_2 = new Dispenser(2, "g90", 32190.28,	12.89,	10.48, 8);
-		Dispenser g90_3 = new Dispenser(3, "g90", 64742.82,	12.89,	10.48, 8);
-		Dispenser g90_4 = new Dispenser(4, "g90", 174792.25, 12.89,	10.48, 9);
-		Dispenser g95_1 = new Dispenser(1, "g95", 96791.69,	13.99,	11.45, 8);
-		Dispenser g95_2 = new Dispenser(2, "g95", 98998.05,	13.99,	11.45, 8);
-
-		
-		
-		Map<String, Dispenser> dispensers = new LinkedHashMap<String, Dispenser>();
-		dispensers.put(d2_1.getName() + "_" + Long.toString(d2_1.getId()), d2_1);
-		dispensers.put(g90_1.getName() + "_" + Long.toString(g90_1.getId()), g90_1);
-		dispensers.put(d2_2.getName() + "_" + Long.toString(d2_2.getId()), d2_2);
-		dispensers.put(d2_3.getName() + "_" + Long.toString(d2_3.getId()), d2_3);
-		dispensers.put(g90_2.getName() + "_" + Long.toString(g90_2.getId()), g90_2);
-		dispensers.put(d2_4.getName() + "_" + Long.toString(d2_4.getId()), d2_4);
-		
-		dispensers.put(g95_1.getName() + "_" + Long.toString(g95_1.getId()), g95_1);
-		dispensers.put(g90_3.getName() + "_" + Long.toString(g90_3.getId()), g90_3);
-		dispensers.put(d2_5.getName() + "_" + Long.toString(d2_5.getId()), d2_5);
-		dispensers.put(g95_2.getName() + "_" + Long.toString(g95_2.getId()), g95_2);
-		dispensers.put(g90_4.getName() + "_" + Long.toString(g90_4.getId()), g90_4);
-		dispensers.put(d2_6.getName() + "_" + Long.toString(d2_6.getId()), d2_6);
-		
-		
-		laJoya.setDispensers(dispensers);
-		
-		laJoya.setTotalCash(300.98D);
-		
-		laJoya.setExpensesAndCredits(new ExpenseOrCredit[] {
-				new ExpenseOrCredit("uno", 1.1D),
-				new ExpenseOrCredit("dos", 2.2D)});
-		
-		StationDao stationDao = stationRepository.save(new StationDao(laJoya));
-		logger.info(stationDao);
-		return null;*/
-		
-		
-		/*StationDao s = new StationDao();
-		s.setId(new ObjectId("5b6b4c3c4ddd5a7f3c951838"));
-		Example<StationDao> example = Example.of(s);
-		StationDao stationDao = stationRepository.findOne(example);*/
-		
-		
-		//List<Station> laJoya = new Station();
 		List<StationDao> stationDaos = stationRepository.findLatestMonth();
-		/*List<Station> stations = new LinkedList<Station>();
-		stations.add(new Station(stationDaos.get(0)));
-		for (int i = 1; i < stationDaos.size(); i++) {
-			Station station = new Station(stationDaos.get(i));
-			stations.add(station);
-			stations.get(i - 1).setPriorStation(station);
-		}*/
 		
 		List<Station> stations = stationDaos.stream().map(stationDao -> {
 			Station station = new Station(stationDao);
@@ -415,14 +338,7 @@ public class UserService {
 	
 	public List<TanksVo> findStockByDates(String dateEnd, String dateBeg) {
 
-		//TanksVo latestTankStatus = null;
 		List<TanksDao> tanksDaos = tanksRepository.findLatest(dateEnd, dateBeg);
-		
-		/*latestTankStatus = new TanksVo(tanksDao);
-		setCurrentTanksVo(latestTankStatus);
-		
-		return Stream.of(latestTankStatus).collect(Collectors.toList());*/
-		
 		
 		List<TanksVo> tanksVos = tanksDaos.stream().map(tanksDao -> {
 			TanksVo tanksVo = new TanksVo(tanksDao);
@@ -430,26 +346,6 @@ public class UserService {
 		}).collect(Collectors.toList());
 		
 		return tanksVos;
-		
-		/*Tank tank = new Tank();
-		tank.setTankId(1L);
-		tank.setFuelType("d2");
-		tank.setGals(0D);
-		
-		Tank tank2 = new Tank();
-		tank2.setTankId(2L);
-		tank2.setFuelType("g91");
-		tank2.setGals(10D);
-		
-		Tank tank3 = new Tank();
-		tank3.setTankId(3L);
-		tank3.setFuelType("g95");
-		tank3.setGals(20D);
-		
-		TanksVo tanksVo = new TanksVo(new Date(), new ArrayList<Tank>(Arrays.asList(tank, tank2, tank3)));
-		
-		TanksDao tanksDao = tanksRepository.save(new TanksDao(tanksVo));
-		return null;*/
 		
 	}
 	
@@ -475,13 +371,7 @@ public class UserService {
 	}
 	
 	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
-		//GasPricesVo latestGasPricesVo = new GasPricesVo();
 		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatest(dateEnd, dateBeg);
-		
-		/*latestGasPricesVo = new GasPricesVo(gasPricesDao);
-		setCurrentGasPricesVo(latestGasPricesVo);
-		
-		return Stream.of(latestGasPricesVo).collect(Collectors.toList());*/
 		
 		List<GasPricesVo> gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
 			GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
@@ -489,38 +379,9 @@ public class UserService {
 		}).collect(Collectors.toList());
 		
 		return gasPricesVos;
-		
-		
-		
-		/*GasPrice gasPrice = new GasPrice();
-		gasPrice.setFuelType("d2");
-		gasPrice.setCost(11D);
-		gasPrice.setPrice(12D);
-		
-		GasPrice gasPrice1 = new GasPrice();
-		gasPrice1.setFuelType("d2");
-		gasPrice1.setCost(12D);
-		gasPrice1.setPrice(122D);
-		
-		GasPrice gasPrice2 = new GasPrice();
-		gasPrice2.setFuelType("d2");
-		gasPrice2.setCost(13D);
-		gasPrice2.setPrice(133D);
-		
-		GasPricesVo gasPricesVo = new GasPricesVo(new Date(), new ArrayList<GasPrice>(Arrays.asList(gasPrice, gasPrice1, gasPrice2)));
-		
-		GasPricesDao gasPriceDao = gasPricesRepository.save(new GasPricesDao(gasPricesVo));
-		return null;*/
 	}
 	
 	public List<GasPricesVo> submitGasPricesVo(GasPricesVo tanksVoCriteria, String saveOrUpdate) {
-		
-		/*GasPricesDao gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
-		
-		GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
-		setCurrentGasPricesVo(gasPricesVo);
-		
-		return Stream.of(gasPricesVo).collect(Collectors.toList());*/
 		
 		GasPricesVo gasPricesVo = null;
 		GasPricesDao gasPricesDao = null;
@@ -586,6 +447,18 @@ public class UserService {
 		}
 		
 		return Stream.of(invoiceVo).collect(Collectors.toList());
+	}
+	
+	public List<InvoiceVo> findInvoicesSummaryData(String dateEnd, String dateBeg) {
+
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatest(dateEnd, dateBeg);
+		
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
 	}
 	
 	public TanksVo getCurrentTanksVo() {

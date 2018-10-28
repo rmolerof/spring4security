@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8" />
-	<title>Control de Grifo</title>
+	<title>Resumen de Facturas, Boletas, Notas de Crédito</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 	<meta content="width=device-width, initial-scale=1" name="viewport" />
 	<meta content="" name="description" />
@@ -481,7 +481,7 @@
                     <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
                     <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
                     <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-hover-submenu " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
-                        <li class="nav-item">
+                        <li class="nav-item start active open">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-diamond"></i>
                                 <span class="title">Facturación</span>
@@ -490,31 +490,31 @@
                             </a>
                             <ul class="sub-menu">
                                 <li class="nav-item start">
-		                            <a href="/invoicing-page" class="nav-link ">
-		                                <span class="title"><i class="icon-pencil"></i> Hacer Factura/Boleta/
-		                                	<br/>Nota de Crédito</span>
-		                            </a>
-		                        </li>
-		                        <li class="nav-item start">
-		                            <a href="/invoice-table-page" class="nav-link ">
-		                                <span class="title"><i class="icon-pencil"></i> Resumen de Facturas/Boletas/
-		                                	<br/>Notas de Crédito</span>
-		                            </a>
-		                        </li>
+                                    <a href="/invoicing-page" class="nav-link ">
+                                        <span class="title"><i class="icon-pencil"></i> Hacer Factura/Boleta/
+                                        	<br/>Nota de Crédito</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item start active open">
+                                    <a href="/invoice-table-page" class="nav-link ">
+                                        <span class="title"><i class="icon-pencil"></i> Resumen de Facturas/Boletas/
+                                        	<br/>Notas de Crédito</span>
+                                        <span class="selected"></span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
-                        <li class="nav-item start active open">
+                        <li class="nav-item">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
                                 <span class="title">Tablero</span>
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item start active open">
+                                <li class="nav-item">
                                     <a href="/dashboard-table-summary-page" class="nav-link ">
                                         <i class="icon-bulb"></i>
                                         <span class="title">Resumen</span>
-                                        <span class="selected"></span>
                                     </a>
                                 </li>
                             </ul>
@@ -636,7 +636,7 @@
                     </div>
                     <!-- END THEME PANEL -->
                     <h1 class="page-title"> Resumen
-                    	<small>Tabla de Ganancias y Pérdidas</small>
+                    	<small>Tabla de Boletas/Facturas/Notas de Crédito</small>
                     </h1>
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
@@ -646,7 +646,7 @@
                                 <i class="fa fa-angle-right"></i>
                             </li>
                             <li>
-                                <span>Tablero</span>
+                                <span>Facturación</span>
                             </li>
                         </ul>
                        <!--  <div class="page-toolbar">
@@ -677,7 +677,7 @@
                         </div> -->
                     </div>
                     <!-- END PAGE HEADER-->
-                    <div th:replace="fragments/react-dashboard-table-summary :: react-dashboard-table-summary"/>
+                    <div th:replace="fragments/react-invoice-table :: react-invoice-table"/>
                     
                 </div>
                 <!-- END CONTENT BODY -->

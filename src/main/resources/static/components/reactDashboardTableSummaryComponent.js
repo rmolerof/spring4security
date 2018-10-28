@@ -236,7 +236,7 @@ class TableDashboard extends React.Component {
 	      <div className="row">
 	          <div className="col-md-4">
 	              <div className="form-group">
-	                  <label className="control-label">Today</label>
+	                  <label className="control-label">Hoy es</label>
 	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 	              </div>
 	          </div>
