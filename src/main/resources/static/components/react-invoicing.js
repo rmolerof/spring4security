@@ -6,7 +6,7 @@ class TableDashboard extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
-	  invoiceNumber: 'B001-00000001',
+	  invoiceNumber: 'B001-XXXXXXXX',
 	  // customer
       clientDocNumber: '',
       clientName: '',
@@ -32,7 +32,12 @@ class TableDashboard extends React.Component {
       invoiceHash: '',
       saveOrUpdate: 'save',
       sunatErrorStr: '',
+      status: '',
       selectedOption: 'boleta',
+      boletaDisabled: false,
+      facturaDisabled: false,
+      notaDeCreditoDisabled: false,
+      submitDisabled: false,
       showBoletaRadioButton: 'btn blue active',
       showFacturaRadioButton: 'btn btn-default',
       showNotaDeCreditoRadioButton: 'btn btn-default',
@@ -116,7 +121,7 @@ class TableDashboard extends React.Component {
 	  	this.setState({docLabelObj: docLabelObj});
 		this.setState({clientDocType: '1'});
 		this.setState({invoiceType: '03'});
-		this.setState({invoiceNumber: 'B001-00000001'});
+		this.setState({invoiceNumber: 'B001-XXXXXXXX'});
 	  } else if (changeEvent.target.value == 'factura') {
 		  var docLabelObj = {
 	    	  clientDocType: 'RUC',
@@ -127,7 +132,7 @@ class TableDashboard extends React.Component {
 	  	this.setState({docLabelObj: docLabelObj});
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '01'});
-		this.setState({invoiceNumber: 'F001-00000001'});
+		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
 	  } else if (changeEvent.target.value == 'nota de credito') {
 		  var docLabelObj = {
 	    	  clientDocType: 'RUC',
@@ -138,7 +143,7 @@ class TableDashboard extends React.Component {
 	  	this.setState({docLabelObj: docLabelObj});
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '07'});
-		this.setState({invoiceNumber: 'F001-00000002'});
+		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
 	  }
   }
   
@@ -344,8 +349,24 @@ class TableDashboard extends React.Component {
 					self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
 					self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
 					self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
-					if (invoiceVoResp.sunatErrorStr.charAt(0) == "1") {
+					self.setState({ status: invoiceVoResp.status });
+					self.setState({ invoiceNumber: invoiceVoResp.invoiceNumber });
+					
+					// Prevent user from changing invoice type after submission
+					if (this.state.selectedOption == 'boleta') {
+						self.setState({ notaDeCreditoDisabled: true });
+						self.setState({ facturaDisabled: true });
+					} else if (this.state.selectedOption == 'factura') {
+						self.setState({ notaDeCreditoDisabled: true });
+						self.setState({ boletaDisabled: true });
+					} else if (this.state.selectedOption == 'nota de credito') {
+						self.setState({ facturaDisabled: true });
+						self.setState({ boletaDisabled: true });
+					}
+					
+					if (invoiceVoResp.sunatErrorStr.charAt(0) == "1" && invoiceVoResp.status == '1') {
 						self.setState({ showSuccess: true });
+						self.setState({submitDisabled: true});
 						var qrcode1 = new QRCode("qrcode1");
 						qrcode1.clear();
 						qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
@@ -354,7 +375,7 @@ class TableDashboard extends React.Component {
 						qrcode2.clear();
 						qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
 					} else {
-						errors["submit"] = "Recibo rechazador por Sunat. " + invoiceVoResp.sunatErrorStr;
+						errors["submit"] = "Recibo rechazado por Sunat. " + invoiceVoResp.sunatErrorStr;
 						self._toggleError();
 					}
 				},
@@ -429,40 +450,17 @@ class TableDashboard extends React.Component {
 	    	                  <input type="text" className="form-control" placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
 	    	              </div>
 	    	          </div>
-	    	          {/*<div className="clearfix">
-	    	          <div className="btn-group" >
-		    	          <div className="radio">
-			    	          <label className={this.state.showBoletaRadioButton}>
-			    	            <input type="radio" value="boleta" className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange} />
-			    	            Boleta
-			    	          </label>
-			    	      </div>
-			    	      <div className="radio">
-			    	          <label className={this.state.showFacturaRadioButton} >
-			    	            <input type="radio" value="factura" className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange} />
-			    	            Factura
-			    	          </label>
-			    	      </div>
-			    	      <div className="radio">
-			    	          <label className={this.state.showNotaDeCreditoRadioButton}>
-			    	            <input type="radio" value="notaDeCredito" className="toggle" checked={this.state.selectedOption === 'notaDeCredito'} onChange={this.handleOptionChange} />
-			    	            Nota de Crédito
-			    	          </label>
-			    	      </div>
-		    	      </div>
-		    	      </div>*/}
-		    	      
 	    	          <div className="col-md-4">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Tipo de Recibo</label>
 		    	              <div className="clearfix">
 					    	      <div className="btn-group">
 			                      <label className={this.state.showBoletaRadioButton}>
-			                          <input type="radio" value="boleta" className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
+			                          <input type="radio" value="boleta" disabled={this.state.boletaDisabled} className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
 			                      <label className={this.state.showFacturaRadioButton}>
-			                          <input type="radio" value="factura" className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange}/> FACTURA </label>
+			                          <input type="radio" value="factura" disabled={this.state.facturaDisabled} className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange}/> FACTURA </label>
 			                      <label className={this.state.showNotaDeCreditoRadioButton}>
-			                          <input type="radio" value="nota de credito" className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
+			                          <input type="radio" value="nota de credito" disabled={this.state.notaDeCreditoDisabled} className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
 			                      </div>
 		                      </div>
 	                      </div>
@@ -612,7 +610,7 @@ class TableDashboard extends React.Component {
 	                  <br/>
 	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
 	                  {!this.state.invoiceHash && <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
-	                  <button type="submit" className="btn btn-lg green hidden-print margin-bottom-5">
+	                  <button type="submit" disabled={this.state.submitDisabled} className="btn btn-lg green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar Recibo
 	    	          </button>
 	              </div>

@@ -193,7 +193,7 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static void envio(InvoiceVo invoiceVo) {
+	public static String envio(InvoiceVo invoiceVo) {
 		String UsuSol = "MODDATOS";// pruebas de sunat
 		String PassSol = "moddatos";// password de prueba de sunat
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber(); // xml firmado
@@ -205,6 +205,8 @@ public class XmlSunat {
 		invoiceVo.setSunatErrorStr(sunatResponse);
 		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
 		System.out.println("hash: " + invoiceVo.getInvoiceHash());
+		
+		return sunatResponse;
 	}
 	
 	private static String formatDate(Date date) {

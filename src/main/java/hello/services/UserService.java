@@ -32,6 +32,8 @@ import hello.businessModel.TanksVo;
 import hello.businessModel.TotalDay;
 import hello.domain.GasPricesDao;
 import hello.domain.GasPricesRepository;
+import hello.domain.InvoiceDao;
+import hello.domain.InvoicesRepository;
 import hello.domain.StationDao;
 import hello.domain.StationRepository;
 import hello.domain.TanksDao;
@@ -59,6 +61,10 @@ public class UserService {
     private GasPricesRepository gasPricesRepository;
 	@Autowired
 	private Utils utils;
+	@Autowired
+	private InvoicesRepository invoicesRepository;
+	@Autowired
+	private NextSequenceInvoiceService nextSequenceInvoiceService;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -539,16 +545,43 @@ public class UserService {
 		
 		try {
 			if (invoiceVo.getSaveOrUpdate().equals("save")) {
-				// generate xml
+				
+				if (invoiceVo.getInvoiceType().equalsIgnoreCase("03")) {
+					// Boleta
+					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
+					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+					invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+				} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("01")) {
+					// Factura
+					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+					invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+				} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+					// Nota de credito
+					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+					invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+				}
+				
 				invoiceVo.setTotalVerbiage(invoiceVo.getTotal() < 0D ? XmlSunat.Convertir(new Double(Math.abs(invoiceVo.getTotal())).toString(), true, "PEN"): XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
+				
+				// Sunat 
 				XmlSunat.invokeSunat(invoiceVo);
 				XmlSunat.firma(invoiceVo);
-				XmlSunat.envio(invoiceVo);
+				String deliveryResponse = XmlSunat.envio(invoiceVo);
+				
+				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 
+				if (deliveryResponse.charAt(0) == '1') {
+					invoicesRepository.save(invoiceDao);
+				}
+
+				invoiceVo.setStatus("1");
 			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
 				
 			}
 		} catch (Exception e) {
+			invoiceVo.setStatus("0");
 			invoiceVo.setSunatErrorStr(e.getMessage());
 		}
 		

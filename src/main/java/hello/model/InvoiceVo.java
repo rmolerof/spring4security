@@ -31,6 +31,7 @@ public class InvoiceVo {
 	private String totalVerbiage;
 	private String invoiceHash;
 	private String saveOrUpdate;
+	private String status;
 	private String sunatErrorStr;
 	
 	public static double roundTwo(double amt) {
@@ -180,6 +181,14 @@ public class InvoiceVo {
 	}
 	public void setSunatErrorStr(String sunatErrorStr) {
 		this.sunatErrorStr = sunatErrorStr;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }
