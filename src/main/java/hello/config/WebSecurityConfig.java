@@ -2,6 +2,7 @@ package hello.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,7 +23,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 			.authorizeRequests()
-				.antMatchers("/", "/home", "/about").permitAll() // if request is for /home or /about->permit
+				.antMatchers("/", "/home", "/about", "/invoice-viewer-page").permitAll() // if request is for /home or /about->permit
+				.antMatchers(HttpMethod.POST,"/api/findInvoice").permitAll()
+				.antMatchers(HttpMethod.GET,"/assets/**").permitAll()
 				.antMatchers("/admin/**").hasAnyRole("ADMIN") // if request path is /admin/** -> verify it has at least role ADMIN 
 				.antMatchers("/user/**").hasAnyRole("USER")
 				.anyRequest().authenticated() // any request needs to be authenticated

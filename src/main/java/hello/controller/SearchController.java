@@ -25,6 +25,7 @@ import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
 import hello.model.SearchCriteria;
 import hello.model.SearchDateCriteria;
+import hello.model.SearchInvoiceCriteria;
 import hello.model.User;
 import hello.services.UserService;
 
@@ -296,4 +297,28 @@ public class SearchController {
 		return ResponseEntity.ok(result);
 		
 	}
+	
+	@PostMapping("/api/findInvoice")
+	public ResponseEntity<?> findInvoice(@Valid @RequestBody SearchInvoiceCriteria search, Errors errors){
+		AjaxGetInvoicesResponse result = new AjaxGetInvoicesResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<InvoiceVo> users = userService.findInvoice(search.getInvoiceNumber());
+		if(users.isEmpty()) {
+			result.setMsg("No hay datos para la recibo Nro: " + search.getInvoiceNumber());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
 }

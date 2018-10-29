@@ -61,8 +61,8 @@ public class InvoiceDao {
 		this.date = new Date(invoiceVo.getDate().getTime());
 		this.invoiceType = new String(invoiceVo.getInvoiceType());
 		this.galsD2 = new Double(invoiceVo.getGalsD2());
-		this.galsG90 = new Double(invoiceVo.getGalsD2());
 		this.galsG90 = new Double(invoiceVo.getGalsG90());
+		this.galsG95 = new Double(invoiceVo.getGalsG95());
 		this.priceD2 = new Double(invoiceVo.getPriceD2());
 		this.priceG90 = new Double(invoiceVo.getPriceG90());
 		this.priceG95 = new Double(invoiceVo.getPriceG95());

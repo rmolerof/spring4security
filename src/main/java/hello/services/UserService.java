@@ -461,6 +461,18 @@ public class UserService {
 		return invoiceVos;
 	}
 	
+	public List<InvoiceVo> findInvoice(String invoiceNbr) {
+
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		if (null != invoiceDao) {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+		
+			return Stream.of(invoiceVo).collect(Collectors.toList());
+		} else {
+			return Stream.of(new InvoiceVo()).collect(Collectors.toList());
+		}
+	}
+	
 	public TanksVo getCurrentTanksVo() {
 		return currentTanksVo;
 	}
