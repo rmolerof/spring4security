@@ -11,6 +11,10 @@ function fire_ajax_submit() {
 	
 	$("#btn-search").prop("disabled", true);
 	
+	$("#d2Row").show();
+	$("#g90Row").show();
+	$("#g95Row").show();
+	
 	$.ajax({
 		type: "POST",
 		contentType: "application/json", 
