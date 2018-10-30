@@ -39,6 +39,11 @@ public class InvoiceVo {
 	private String status;
 	private String sunatErrorStr;
 	
+	private String invoiceTypeModified = "";
+	private String invoiceNumberModified  = "";
+	private String motiveCd = "";
+	private String motiveCdDescription = "";
+	
 	public InvoiceVo() {
 		super();
 	}
@@ -233,6 +238,38 @@ public class InvoiceVo {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+	public String getInvoiceTypeModified() {
+		return invoiceTypeModified;
+	}
+
+	public void setInvoiceTypeModified(String invoiceTypeModified) {
+		this.invoiceTypeModified = invoiceTypeModified;
+	}
+
+	public String getInvoiceNumberModified() {
+		return invoiceNumberModified;
+	}
+
+	public void setInvoiceNumberModified(String invoiceNumberModified) {
+		this.invoiceNumberModified = invoiceNumberModified;
+	}
+
+	public String getMotiveCd() {
+		return motiveCd;
+	}
+
+	public void setMotiveCd(String motiveCd) {
+		this.motiveCd = motiveCd;
+	}
+
+	public String getMotiveCdDescription() {
+		return motiveCdDescription;
+	}
+
+	public void setMotiveCdDescription(String motiveCdDescription) {
+		this.motiveCdDescription = motiveCdDescription;
 	}
 	
 }

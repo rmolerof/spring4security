@@ -72,7 +72,28 @@ public class XmlSunatTest {
 		invoiceVo.setPriceG95(11D);
 		invoiceVo.setSolesG95(0D);*/
 		
-		// Factura
+		// Nota de Crédito
+		InvoiceVo invoiceVo3 = new InvoiceVo();
+		invoiceVo3.setInvoiceNumber("F020-80000001");
+		invoiceVo3.setDate(new Date());
+		invoiceVo3.setClientAddress("319 Oakmont Dr");
+		invoiceVo3.setClientName("Molfer Technologies EIRL");
+		invoiceVo3.setInvoiceType("07");// Factura
+		invoiceVo3.setClientDocType("6"); //RUC
+		invoiceVo3.setClientDocNumber("10203040501"); // RUC NUMBER
+		invoiceVo3.setGalsD2(20D);
+		invoiceVo3.setPriceD2(10D); // includes IGV
+		invoiceVo3.setSolesD2(200D);
+		invoiceVo3.setGalsG90(10D);
+		invoiceVo3.setPriceG90(10D);
+		invoiceVo3.setSolesG90(100D);
+		invoiceVo3.setTotalVerbiage(XmlSunat.Convertir(invoiceVo3.getTotal().toString(), true, "PEN"));
+		invoiceVo3.setInvoiceNumberModified("F020-80000009");
+		invoiceVo3.setInvoiceTypeModified("01");
+		invoiceVo3.setMotiveCd("01");
+		invoiceVo3.setMotiveCdDescription("ANULACION DE LA OPERACION");
+		
+	/*	// Factura
 		XmlSunat.invokeSunat(invoiceVo2);
 		XmlSunat.firma(invoiceVo2);
 		XmlSunat.envio(invoiceVo2);
@@ -80,8 +101,12 @@ public class XmlSunatTest {
 		// Boleta
 		XmlSunat.invokeSunat(invoiceVo);
 		XmlSunat.firma(invoiceVo);
-		XmlSunat.envio(invoiceVo);
+		XmlSunat.envio(invoiceVo);*/
 		
+		// Nota de credito
+		XmlSunat.invokeSunat(invoiceVo3);
+		XmlSunat.firma(invoiceVo3);
+		XmlSunat.envio(invoiceVo3);
 	}
 	
 	public static void firma() throws FileNotFoundException, NoSuchAlgorithmException,

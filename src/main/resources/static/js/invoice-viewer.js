@@ -56,9 +56,11 @@ function fire_ajax_submit() {
             
             if (data.result[0].galsD2 == "0") {
             	$("#d2Row").hide();
-            } else if (data.result[0].galsG90 == "0") {
+            } 
+            if (data.result[0].galsG90 == "0") {
             	$("#g90Row").hide();
-            } else if (data.result[0].galsG95 == "0") {
+            } 
+            if (data.result[0].galsG95 == "0") {
             	$("#g95Row").hide();
             }
             	
@@ -90,7 +92,16 @@ function fire_ajax_submit() {
             
             var qrcode1 = new QRCode("qrcode1");
 			qrcode1.clear();
-			qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + data.result[0].invoiceNumber);
+			qrcode1.makeCode("20501568776|" + 
+					data.result[0].invoiceType + "|" + 
+					data.result[0].invoiceNumber.substring(0, 4) + "|" + 
+					data.result[0].invoiceNumber.substring(5, data.result[0].invoiceNumber.length) + "|" +
+					data.result[0].totalIGV + "|" +
+					data.result[0].total + "|" +
+					moment(data.result[0].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A') + "|" + 
+					data.result[0].clientDocType + "|" +
+					data.result[0].clientDocNumber
+			);
             
             console.log("SUCCESS : ", data);
             $("#btn-search").prop("disabled", false);

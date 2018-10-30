@@ -53,7 +53,9 @@ class InvoiceTableSummary extends React.Component {
 					count++;
 					var row = [
 						count,
-						moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
+						/*moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),*/
+						moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY'),
+						moment(invoicesSummaryData[i].date).tz('America/Lima').format('hh:mm:ss A'),
 						invoiceType,
 						invoicesSummaryData[i].invoiceNumber,
 						clientDocType,
@@ -142,6 +144,7 @@ class InvoicesTbl extends React.Component {
 			columns: [
 					{ title: "Nro" },
 				 	{ title: "Fecha" },
+				 	{ title: "Hora" },
 				 	{ title: "Recibo Tipo" },
 				 	{ title: "Nro" },
 		            { title: "Tipo Doc" },

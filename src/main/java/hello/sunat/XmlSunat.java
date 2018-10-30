@@ -39,8 +39,8 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
-	private static final String userHomeDir = System.getProperty("user.home");
-//	private static final String userHomeDir = "/home/ec2-user"; 
+//	private static final String userHomeDir = System.getProperty("user.home");
+	private static final String userHomeDir = "/home/ec2-user"; 
 	
 	// OBLIGATORIO
 	public static int invokeSunat(InvoiceVo invoiceVo) {
@@ -71,6 +71,13 @@ public class XmlSunat {
 	    cpe.setFECHA_VTO(formatDate(invoiceVo.getDate()));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
 	    cpe.setCOD_TIPO_DOCUMENTO(invoiceVo.getInvoiceType());//01=factura, 03=boleta, 07=nota credito, 08=nota debito
 	    cpe.setCOD_MONEDA("PEN");
+	    
+	  //=================REFERENCIA DE LA NOTA DE CREDITO================
+        cpe.setTIPO_COMPROBANTE_MODIFICA(invoiceVo.getInvoiceTypeModified());//01=FACTURA, 03=BOLETA
+		cpe.setNRO_DOCUMENTO_MODIFICA(invoiceVo.getInvoiceNumberModified());
+		cpe.setCOD_TIPO_MOTIVO(invoiceVo.getMotiveCd());//CATALOGO 09 SEGUN SUNAT
+		cpe.setDESCRIPCION_MOTIVO(invoiceVo.getMotiveCdDescription());//CATALOGO 09 SEGUN SUNAT
+        //==============FIN DE LA REFERENCIA NOTA 
 	    
 	    cpe.setNRO_DOCUMENTO_CLIENTE(invoiceVo.getClientDocNumber()); // OBLIGATORIO PARA CLIENTES CON COMPRAS >= 700 CASO CONTRARIO "00000000", RUC PARA FACTURA
 	    cpe.setRAZON_SOCIAL_CLIENTE(invoiceVo.getClientName()); // PARA COMPRAS < 700 "CLIENTES VARIOS"
@@ -157,7 +164,12 @@ public class XmlSunat {
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + cpe.getCOD_TIPO_DOCUMENTO() + "-" + cpe.getNRO_COMPROBANTE() + ".XML";
+	    String rutaXMLCPE = "";
+	    if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+	    	rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+	    } else {
+	    	rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+	    }
 	    boolean alreadyExists = new File(rutaXMLCPE).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -174,7 +186,12 @@ public class XmlSunat {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String rutaXML = "";
+		if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+			rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+	    } else {
+	    	rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+	    }
 		String rutaFirma = userHomeDir + "/xmlsSunat/signatureSunat/FIRMABETA.pfx";
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    
@@ -196,7 +213,12 @@ public class XmlSunat {
 	public static String envio(InvoiceVo invoiceVo) {
 		String UsuSol = "MODDATOS";// pruebas de sunat
 		String PassSol = "moddatos";// password de prueba de sunat
-		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber(); // xml firmado
+		String NombreCPE = "";
+		if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+			NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+	    } else {
+	    	NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+	    }
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = userHomeDir + "/xmlsSunat/";
 		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
@@ -216,6 +238,10 @@ public class XmlSunat {
 		return simpleDateFormat.format(date);
 	}
 	
+	public static String rightPadZeros(String str, int num) {
+		return String.format("%1$-" + num + "s", str).replace(' ', '0');
+	}
+	
     public static String Convertir(String numero, boolean mayusculas, String moneda) {
         moneda = moneda.replace("PEN", "SOLES");
         moneda = moneda.replace("USD", "DOLARES AMERICANOS");
@@ -233,7 +259,7 @@ public class XmlSunat {
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
-            parte_decimal = "CON " + Num[1] + "/100 " + moneda + ".";
+            parte_decimal = "CON " + rightPadZeros(Num[1], 2) + "/100 " + moneda + ".";
             //se convierte el numero a literal
             if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";

@@ -46,7 +46,15 @@ class TableDashboard extends React.Component {
     	  clientDocTypePH: 'Ingrese DNI',
     	  clientName: 'Señor(es)',
     	  clientNamePH: 'Nombre(s)',
-      }	  
+      },
+      loadingGif: false,
+      invoiceTypeModified: '01',
+      invoiceNumberModified: '',
+      invoiceNumberModifiedDisp: '',
+      invoiceTypeModifiedToggle: true,
+      dateCreditNote: new Date(),
+      motiveCd: '',
+      motiveCdDescription: ''
     };
   }
   
@@ -89,6 +97,20 @@ class TableDashboard extends React.Component {
     if (evt.target.value == '0' && this.state.selectedOption == 'boleta') {
     	this.setState({ clientName: 'CLIENTES VARIOS' });
     }
+  }
+  
+  invoiceNumberModifiedDispChange = (evt) => {
+	    this.setState({ invoiceNumberModifiedDisp: evt.target.value });
+	    
+	    var pad = "00000000";
+	    var n = evt.target.value;
+	    var valueWithZeros = (pad+n).slice(-pad.length);
+	    
+	    if (this.state.invoiceTypeModifiedToggle) {
+	    	this.setState({ invoiceNumberModified: "F001-" + valueWithZeros });
+	    } else {
+	    	this.setState({ invoiceNumberModified: "B001-" + valueWithZeros });
+	    }
   }
   
   truckPlateNumberChange = (evt) => {
@@ -185,42 +207,131 @@ class TableDashboard extends React.Component {
   
   onKeyPress(event) {
 	if (event.which === 13 ) {
+		const form = event.target.form;
+		const index = Array.prototype.indexOf.call(form, event.target);
+		form.elements[index+1].focus();
 		event.preventDefault();
 	}
   }
   
+  _invoiceTypeHandleClick(){
+	this.setState({invoiceTypeModifiedToggle: !this.state.invoiceTypeModifiedToggle});
+  }
+  
+  motiveCdHandleChange(event) {
+	  this.setState({motiveCd: event.target.value});
+
+	  var index = event.nativeEvent.target.selectedIndex;
+	  this.setState({motiveCdDescription: event.nativeEvent.target[index].text.toUpperCase()});
+  }
+  
   onTabPress(event) {
+	
+	this.setState({ showError: false});
 	
 	// Search RUC only for facturas
 	if (this.state.selectedOption != 'boleta') {
 		var self = this;  
 		var search = "https://api.sunat.cloud/ruc/" + event.target.value;
-		
-		jQuery.ajax({
-			type: "GET",
-			contentType: "application/json", 
-			url:search,
-			cache: false,
-			timeout: 600000,
-			success: (data) => {
-			    self.setState({clientAddress: data.domicilio_fiscal});
-				self.setState({clientName: data.razon_social});
-			      
-			},
-			error: function(e){
-	
-			}	
-		});
+		/*var search = "https://www.facturacionelectronica.us/facturacion/controller/ws_consulta_rucdni_v2.php?documento=RUC&usuario=10415898890&password=webmaster2017&nro_documento=" + event.target.value + "&token=5212289e8f02ac832f6d5eab71966ba4";*/
+
+		if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
+			// display RUC search loading
+			self.setState({loadingGif: true});
+			
+			jQuery.ajax({
+				type: "GET",
+				contentType: "application/json", 
+				url:search,
+				cache: false,
+				timeout: 600000,
+				success: (data) => {
+				    self.setState({clientAddress: data.domicilio_fiscal});
+					self.setState({clientName: data.razon_social});
+					
+					/*self.setState({clientAddress: data.result[0].Direccion});
+					self.setState({clientName: data.result[0].RazonSocial});*/
+					
+					// When no RUC found
+					var isDataEmpty = true;
+					for(var prop in data) {
+				        if(data.hasOwnProperty(prop))
+				        	isDataEmpty = false;
+				    }
+					
+					if (isDataEmpty) {
+						var errors = {
+				    		submit: 'Numero de RUC no econtrado.'
+					    };
+						this.setState({errors: errors}); 
+						self._toggleError();
+					} 
+					
+					// hide delay delay
+					self.setState({loadingGif: false});
+				},
+				error: function(e){
+					self.setState({loadingGif: false});
+				}	
+			});
+		} else {
+			var errors = {
+	    		submit: 'Numero de RUC es incorrecto.'
+		    };
+			this.setState({errors: errors}); 
+			self._toggleError();
+		}
 	}
 	
+  }
+  
+  invoiceSearch(event) {
+	  	
+	  	var self = this;
+	  	var search = {};
+	    
+	    search["invoiceNumber"] = this.state.invoiceNumberModified;
+		
+		$.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/findInvoice",
+			data: JSON.stringify(search),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: function(data) {
+				
+			  self.setState({invoiceNumber: 'F001-XXXXXXXX', 
+				  clientDocNumber: data.result[0].clientDocNumber,
+				  clientName: data.result[0].clientName,
+				  clientDocType: data.result[0].clientDocType,
+				  clientAddress: data.result[0].clientAddress,
+				  truckPlateNumber: data.result[0].truckPlateNumber,
+				  dateCreditNote: data.result[0].date,
+				  galsD2: data.result[0].galsD2,
+				  galsG90: data.result[0].galsG90,
+				  galsG95: data.result[0].galsG95,
+				  priceD2: data.result[0].priceD2,
+				  priceG90: data.result[0].priceG90,
+				  solesD2: data.result[0].solesD2,
+				  solesG90: data.result[0].solesG90,
+				  solesG95: data.result[0].solesG95,
+			  });
+		
+			}, error: function(e){
+				console.log("ERROR: ", e);
+			}	
+		});
+	  
   }
   
   handleSubmit = (evt) => {
 		
 		evt.preventDefault();
 		
-		const {invoiceNumber, invoiceType, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
-	    var self = this;
+		const {invoiceTypeModified, invoiceNumberModified, motiveCd, motiveCdDescription, invoiceNumber, invoiceType, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
+		var self = this;
 	    var errors = {
 	    		submit: '',
 	    		clientDocNumber: '',
@@ -249,7 +360,10 @@ class TableDashboard extends React.Component {
 		    solesD2: solesD2,
 		    solesG90: solesG90,
 		    solesG95: solesG95,
-		    
+		    invoiceTypeModified: invoiceTypeModified,
+		    invoiceNumberModified: invoiceNumberModified,
+		    motiveCd: motiveCd,
+		    motiveCdDescription: motiveCdDescription,
 	    	saveOrUpdate: 'save'
 	    };
 
@@ -369,11 +483,29 @@ class TableDashboard extends React.Component {
 						self.setState({submitDisabled: true});
 						var qrcode1 = new QRCode("qrcode1");
 						qrcode1.clear();
-						qrcode1.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+						qrcode1.makeCode("20501568776|" + 
+								invoiceVoResp.invoiceType + "|" + 
+								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
+								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
+								invoiceVoResp.totalIGV + "|" +
+								invoiceVoResp.total + "|" +
+								moment(invoiceVoResp.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A') + "|" + 
+								invoiceVoResp.clientDocType + "|" +
+								invoiceVoResp.clientDocNumber
+								);
 						
 						var qrcode2 = new QRCode("qrcode2");
 						qrcode2.clear();
-						qrcode2.makeCode("www.grifoslajoya.com/verRecibo/" + invoiceNumber);
+						qrcode2.makeCode("20501568776|" + 
+								invoiceVoResp.invoiceType + "|" + 
+								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
+								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
+								invoiceVoResp.totalIGV + "|" +
+								invoiceVoResp.total + "|" +
+								moment(invoiceVoResp.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A') + "|" + 
+								invoiceVoResp.clientDocType + "|" +
+								invoiceVoResp.clientDocNumber
+								);
 					} else {
 						errors["submit"] = "Recibo rechazado por Sunat. " + invoiceVoResp.sunatErrorStr;
 						self._toggleError();
@@ -392,8 +524,16 @@ class TableDashboard extends React.Component {
 	  }
   
   render() {    
-    return (
-    
+	 
+	  let buttonText = 'FACTURA';
+	  let invoicePrefix = 'F001   -';
+	  if (!this.state.invoiceTypeModifiedToggle) {
+			buttonText = 'BOLETA';
+			invoicePrefix = 'B001   -';
+	  }
+	  
+	  return (
+			  
       <form onSubmit={this.handleSubmit}>
       	  
 	      {this.state.showError && 
@@ -410,16 +550,24 @@ class TableDashboard extends React.Component {
 	      
 	      <div className="invoice">
 	          <div className="row invoice-logo">
-	              <div className="col-xs-6 invoice-logo-space">
-	                  <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> </div>
-	              <div className="col-xs-6">
+	          	  <div className="col-md-4 invoice-logo-space hidden-xs">
+	          	   <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> </div>
+	          	  <div className="col-xs-6 col-md-4 invoice-logo-space">
+			          <ul className="list-unstyled">
+	                  <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
+	                  <li> Av. Miguel Grau Mza B Lote 1-2 </li>
+	                  <li> Lima - Lima - Ate </li>
+	                  <li> +51 356 0345 </li>
+	              </ul>
+		          </div>
+	              <div className="col-xs-6 col-md-4">
 	                  <p> <strong className="uppercase ">{this.state.selectedOption} ELECTRÓNICA</strong> <br/>
 	                      <span className="muted"> RUC: 20501568776  </span><br/>
 	                      <span className="muted bold"> {this.state.invoiceNumber}  </span>
 	                  </p>
 	              </div>
 	          </div>
-	          <div className="row">
+	          {/*<div className="row">
 	              <div className="col-md-12">
 	                  <ul className="list-unstyled">
 	                      <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
@@ -428,31 +576,13 @@ class TableDashboard extends React.Component {
 	                      <li> +51 356 0345 </li>
 	                  </ul>
 	              </div>
-              </div>
+              </div>*/}
               <div className="portlet-body form">
         		
-	    	      <div className="row">
-		    	      <div className="col-md-2">
+	              <div className="row">
+		              <div className="col-md-12 col-xs-12">
 			              <div className="form-group">
-			                  <label className="control-label">Fecha</label>
-			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
-			              </div>
-			          </div>
-	    	      	  <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">{this.state.docLabelObj.clientDocType}</label>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
-	    	              </div>
-	    	          </div>
-	    	          <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
-	    	                  <input type="text" className="form-control" placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
-	    	              </div>
-	    	          </div>
-	    	          <div className="col-md-4">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">Tipo de Recibo</label>
+			                  <label className="control-label">Tipo de Comprobante</label>
 		    	              <div className="clearfix">
 					    	      <div className="btn-group">
 			                      <label className={this.state.showBoletaRadioButton}>
@@ -463,8 +593,84 @@ class TableDashboard extends React.Component {
 			                          <input type="radio" value="nota de credito" disabled={this.state.notaDeCreditoDisabled} className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
 			                      </div>
 		                      </div>
-	                      </div>
-        	          </div>
+		                  </div>
+			          </div>
+	              </div>
+	              {this.state.selectedOption == 'nota de credito' &&
+	              <div className="row">
+		              <div className="col-md-1">
+				          <div className="form-group">
+		            	  	<label className="control-label">{invoicePrefix}</label><br></br>  
+		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn green-meadow">{this.state.invoiceTypeModifiedToggle && <i className="fa fa-toggle-on"></i>} {!this.state.invoiceTypeModifiedToggle && <i className="fa fa-toggle-off"></i>} {buttonText}</a>
+		                  </div>
+		              </div>
+		              <div className="col-md-2">
+	    	              <div className="form-group">
+	    	              	  <table style={{width:'30%'}}>
+		  	                  	<tbody>
+		  	                  	  <tr>
+		    	                    <td><label className="control-label">Nro</label></td>
+		    	                    <td>{this.state.loadingGif &&
+		  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
+		    	                  </tr>
+		    	                </tbody>
+		    	              </table>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={"Nro Comprobante"} onBlur={this.invoiceSearch.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
+		                  </div>
+	    	          </div>
+		    	      <div className="col-md-2">
+			              <div className="form-group">
+			                  <label className="control-label">Fecha</label>
+			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateCreditNote).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			              </div>
+			          </div>
+	    	          <div className="col-md-2">
+	    	              <div className="form-group">
+	    	                  <label className="control-label">Seleccione Motivo</label>
+	    	                  <select className="ticket-assign form-control input-medium" value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
+	    	                  	  <option value=""></option>
+	    	                  	  <option value="01">Anulacion de la Operacion</option>
+	    	                  	  <option value="02">Anulacion por error en el RUC</option>
+	    	                  	  <option value="03">Correccion por error en la descripcion</option>
+	    	                  	  <option value="04">Descuento global</option>
+	    	                  	  <option value="05">Descuento por item</option>
+	    	                  	  <option value="06">Devolucion total</option>
+	    	                  	  <option value="07">Devolucion por item</option>
+	    	                  	  <option value="08">Bonificacion</option>
+	    	                  	  <option value="09">Disminucion en el valor</option>
+	    	                  	  <option value="10">Otros conceptos</option>
+			                  </select>
+	    	              </div>
+	    	          </div>
+	              </div>
+	              }
+              	  <div className="row">
+		    	      <div className="col-md-2">
+			              <div className="form-group">
+			                  <label className="control-label">Fecha</label>
+			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			              </div>
+			          </div>
+	    	      	  <div className="col-md-2">
+	    	              <div className="form-group">
+	    	                  <table style={{width:'30%'}}>
+	    	                  	<tbody>
+	    	                  	  <tr>
+		    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}</label></td>
+		    	                    <td>{this.state.loadingGif &&
+		  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
+		    	                  </tr>
+		    	                </tbody>
+		    	              </table>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	                	  </div>
+	    	          </div>
+	    	          <div className="col-md-2">
+	    	              <div className="form-group">
+	    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
+	    	                  <input type="text" className="form-control" placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
+	    	              </div>
+	    	          </div>
 	              </div>
 	              <div className="row">
 	    	          <div className="col-md-4">
