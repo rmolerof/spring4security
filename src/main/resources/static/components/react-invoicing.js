@@ -92,7 +92,6 @@ class TableDashboard extends React.Component {
   
   clientDocNumberChange = (evt) => {
     this.setState({ clientDocNumber: evt.target.value });
-    this.setState({ clientDocNumber: evt.target.value == '' ? '': Math.floor(evt.target.value) });
     
     if (evt.target.value == '0' && this.state.selectedOption == 'boleta') {
     	this.setState({ clientName: 'CLIENTES VARIOS' });
@@ -108,8 +107,10 @@ class TableDashboard extends React.Component {
 	    
 	    if (this.state.invoiceTypeModifiedToggle) {
 	    	this.setState({ invoiceNumberModified: "F001-" + valueWithZeros });
+	    	this.setState({ invoiceNumber: "F001-XXXXXXXX" });
 	    } else {
 	    	this.setState({ invoiceNumberModified: "B001-" + valueWithZeros });
+	    	this.setState({ invoiceNumber: "B001-XXXXXXXX" });
 	    }
   }
   
@@ -216,6 +217,16 @@ class TableDashboard extends React.Component {
   
   _invoiceTypeHandleClick(){
 	this.setState({invoiceTypeModifiedToggle: !this.state.invoiceTypeModifiedToggle});
+	
+	if (!this.state.invoiceTypeModifiedToggle) {
+		this.setState({invoiceType: "07"});
+		this.setState({invoiceTypeModified: "01"});
+		this.setState({ invoiceNumber: "F001-XXXXXXXX" });
+	} else {
+		this.setState({invoiceType: "07"});
+		this.setState({invoiceTypeModified: "03"});
+		this.setState({ invoiceNumber: "B001-XXXXXXXX" });
+	}
   }
   
   motiveCdHandleChange(event) {
@@ -229,28 +240,25 @@ class TableDashboard extends React.Component {
 	
 	this.setState({ showError: false});
 	
-	// Search RUC only for facturas
+	var self = this; 
+	var search = {};
+	search["docId"] = event.target.value;
+	
 	if (this.state.selectedOption != 'boleta') {
-		var self = this;  
-		var search = "https://api.sunat.cloud/ruc/" + event.target.value;
-		/*var search = "https://www.facturacionelectronica.us/facturacion/controller/ws_consulta_rucdni_v2.php?documento=RUC&usuario=10415898890&password=webmaster2017&nro_documento=" + event.target.value + "&token=5212289e8f02ac832f6d5eab71966ba4";*/
-
+		
 		if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
 			// display RUC search loading
 			self.setState({loadingGif: true});
 			
 			jQuery.ajax({
-				type: "GET",
+				type: "POST",
 				contentType: "application/json", 
-				url:search,
+				url:"/api/findRuc",
+				data: JSON.stringify(search),
+				datatype: 'json',
 				cache: false,
 				timeout: 600000,
 				success: (data) => {
-				    self.setState({clientAddress: data.domicilio_fiscal});
-					self.setState({clientName: data.razon_social});
-					
-					/*self.setState({clientAddress: data.result[0].Direccion});
-					self.setState({clientName: data.result[0].RazonSocial});*/
 					
 					// When no RUC found
 					var isDataEmpty = true;
@@ -259,13 +267,16 @@ class TableDashboard extends React.Component {
 				        	isDataEmpty = false;
 				    }
 					
-					if (isDataEmpty) {
+					if (isDataEmpty || !data.result.status) {
 						var errors = {
 				    		submit: 'Numero de RUC no econtrado.'
 					    };
 						this.setState({errors: errors}); 
 						self._toggleError();
-					} 
+					} else {
+						self.setState({clientAddress: data.result.direccionS});
+						self.setState({clientName: data.result.razonSocial});
+					}
 					
 					// hide delay delay
 					self.setState({loadingGif: false});
@@ -274,6 +285,55 @@ class TableDashboard extends React.Component {
 					self.setState({loadingGif: false});
 				}	
 			});
+		} else {
+			var errors = {
+	    		submit: 'Numero de RUC es incorrecto.'
+		    };
+			this.setState({errors: errors}); 
+			self._toggleError();
+		}
+		
+	} else {
+		if (event.target.value && event.target.value > 0 &&  event.target.value.length == 8) {
+			// display RUC search loading
+			self.setState({loadingGif: true});
+			
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json", 
+				url:"/api/findDni",
+				data: JSON.stringify(search),
+				datatype: 'json',
+				cache: false,
+				timeout: 600000,
+				success: (data) => {
+					
+					// When no RUC found
+					var isDataEmpty = true;
+					for(var prop in data) {
+				        if(data.hasOwnProperty(prop))
+				        	isDataEmpty = false;
+				    }
+					
+					if (isDataEmpty || !data.result.status) {
+						var errors = {
+				    		submit: 'Numero de DNI no econtrado.'
+					    };
+						this.setState({errors: errors}); 
+						self._toggleError();
+					} else {
+						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
+					}
+					
+					// hide delay delay
+					self.setState({loadingGif: false});
+				},
+				error: function(e){
+					self.setState({loadingGif: false});
+				}	
+			});
+		} else if (event.target.value == "0") { 
+			return;
 		} else {
 			var errors = {
 	    		submit: 'Numero de RUC es incorrecto.'
@@ -302,7 +362,7 @@ class TableDashboard extends React.Component {
 			timeout: 600000,
 			success: function(data) {
 				
-			  self.setState({invoiceNumber: 'F001-XXXXXXXX', 
+			  self.setState({
 				  clientDocNumber: data.result[0].clientDocNumber,
 				  clientName: data.result[0].clientName,
 				  clientDocType: data.result[0].clientDocType,
@@ -662,7 +722,7 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	    	                  <input type="text" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	                	  </div>
 	    	          </div>
 	    	          <div className="col-md-2">
@@ -731,21 +791,21 @@ class TableDashboard extends React.Component {
 	                      </thead>
 	                      <tbody>
 	                      	  <tr>
-	                              <td className="hidden-xs"> 01-Diesel </td>
+	                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
 	                              <td className="hidden-sm-up"> D2 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
 	                          </tr>
 	                          <tr>
-	                              <td className="hidden-xs"> 02-Gas 90 </td>
+	                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
 	                              <td className="hidden-sm-up"> G90 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
 	                          </tr>
 	                          <tr>
-	                              <td className="hidden-xs"> 03-Gas 95 </td>
+	                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
 	                              <td className="hidden-sm-up"> G95 </td>
 	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
@@ -817,7 +877,7 @@ class TableDashboard extends React.Component {
 	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
 	                  {!this.state.invoiceHash && <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
 	                  <button type="submit" disabled={this.state.submitDisabled} className="btn btn-lg green hidden-print margin-bottom-5">
-	    	          	<i className="fa fa-check"></i> Enviar Recibo
+	    	          	<i className="fa fa-check"></i> Enviar Comprobante
 	    	          </button>
 	              </div>
 	          </div>
@@ -899,7 +959,7 @@ class TableDashboard extends React.Component {
 	                      	  {this.state.galsD2 > 0 && 
 	                      	  <tr>
 	                              <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-	                                  01-Diesel 2
+	                                  01-MAX-D BIODIESEL
 	                              </td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
@@ -909,7 +969,7 @@ class TableDashboard extends React.Component {
 	                      	  {this.state.galsG90 > 0 && 
 	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-	                                  02-Gas 90
+	                                  02-GASOHOL 90
 	                              </td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
@@ -919,7 +979,7 @@ class TableDashboard extends React.Component {
 	                      	  {this.state.galsG95 > 0 && 
 	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-	                                  03-Gas 95
+	                                  03-GASOHOL 95
 	                              </td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
 	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>

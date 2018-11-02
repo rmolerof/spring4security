@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import hello.businessModel.GasPricesVo;
 import hello.businessModel.Station;
 import hello.businessModel.TanksVo;
+import hello.model.AjaxGetDniResponse;
 import hello.model.AjaxGetInvoiceResponse;
 import hello.model.AjaxGetInvoicesResponse;
 import hello.model.AjaxGetPricesResponse;
+import hello.model.AjaxGetRucResponse;
 import hello.model.AjaxGetStationResponse;
 import hello.model.AjaxGetStockResponse;
 import hello.model.AjaxResponseBody;
@@ -25,8 +27,12 @@ import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
 import hello.model.SearchCriteria;
 import hello.model.SearchDateCriteria;
+import hello.model.SearchDocIdCriteria;
 import hello.model.SearchInvoiceCriteria;
 import hello.model.User;
+import hello.rucdnisearch.DNIVo;
+import hello.rucdnisearch.RUCVo;
+import hello.services.RucDniService;
 import hello.services.UserService;
 
 @RestController
@@ -38,6 +44,8 @@ public class SearchController {
 	public void setUserService(UserService userService) {
 		this.userService = userService;
 	}
+	@Autowired
+	RucDniService rucDniService;
 	
 	@PostMapping("/api/search")
 	public ResponseEntity<?> getSearchResultViaAjax(@Valid @RequestBody SearchCriteria search, Errors errors){
@@ -312,6 +320,52 @@ public class SearchController {
 		List<InvoiceVo> users = userService.findInvoice(search.getInvoiceNumber());
 		if(users.isEmpty()) {
 			result.setMsg("No hay datos para la recibo Nro: " + search.getInvoiceNumber());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/findRuc")
+	public ResponseEntity<?> findRuc(@Valid @RequestBody SearchDocIdCriteria search, Errors errors){
+		AjaxGetRucResponse result = new AjaxGetRucResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		RUCVo users = rucDniService.findRUCDetails(search.getDocId());
+		if(!users.isStatus()) {
+			result.setMsg("No hay datos para la RUC Nro: " + search.getDocId());
+		} else {
+			result.setMsg("Datos hallados");
+		}
+		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/findDni")
+	public ResponseEntity<?> findDni(@Valid @RequestBody SearchDocIdCriteria search, Errors errors){
+		AjaxGetDniResponse result = new AjaxGetDniResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		DNIVo users = rucDniService.findDNIDetails(search.getDocId());
+		if(!users.isStatus()) {
+			result.setMsg("No hay datos para la DNI Nro: " + search.getDocId());
 		} else {
 			result.setMsg("Datos hallados");
 		}

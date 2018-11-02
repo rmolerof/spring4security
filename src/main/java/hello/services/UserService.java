@@ -419,9 +419,15 @@ public class UserService {
 					invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
 				} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
 					// Nota de credito
-					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
-					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
-					invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+					if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("03")) {
+						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
+						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+						invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+					} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("01")) {
+						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+						invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+					}
 				}
 				
 				invoiceVo.setTotalVerbiage(invoiceVo.getTotal() < 0D ? XmlSunat.Convertir(new Double(Math.abs(invoiceVo.getTotal())).toString(), true, "PEN"): XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));

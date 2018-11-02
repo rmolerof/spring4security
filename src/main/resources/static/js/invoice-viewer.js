@@ -90,6 +90,7 @@ function fire_ajax_submit() {
             $('#totalVerbiage').html(data.result[0].totalVerbiage);
             $('#invoiceHash').html(data.result[0].invoiceHash);
             
+            $('canvas').remove();
             var qrcode1 = new QRCode("qrcode1");
 			qrcode1.clear();
 			qrcode1.makeCode("20501568776|" + 

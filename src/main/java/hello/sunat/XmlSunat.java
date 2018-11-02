@@ -125,7 +125,7 @@ public class XmlSunat {
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");// 10: grabado (01 tipo codigo), 31 (gratuito), 20 (exonerado), inefectas 30
 		    cpe_Detalle.setCODIGO("01");//codigo interno
-		    cpe_Detalle.setDESCRIPCION("Diesel 2");//nombre interno
+		    cpe_Detalle.setDESCRIPCION("MAX-D BIODIESEL B.A (UV)");//nombre interno
 		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
@@ -141,8 +141,8 @@ public class XmlSunat {
 		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
-		    cpe_Detalle.setCODIGO("0001");
-		    cpe_Detalle.setDESCRIPCION("PRUEBA");
+		    cpe_Detalle.setCODIGO("02");
+		    cpe_Detalle.setDESCRIPCION("GASOHOL PRIMAX 90");
 		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
@@ -158,18 +158,13 @@ public class XmlSunat {
 		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
-		    cpe_Detalle.setCODIGO("0001");
-		    cpe_Detalle.setDESCRIPCION("PRUEBA");
+		    cpe_Detalle.setCODIGO("03");
+		    cpe_Detalle.setDESCRIPCION("GASOHOL PRIMAX 95");
 		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = "";
-	    if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
-	    	rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
-	    } else {
-	    	rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
-	    }
+	    String rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 	    boolean alreadyExists = new File(rutaXMLCPE).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -177,7 +172,12 @@ public class XmlSunat {
 			(new File(rutaXMLCPE)).getParentFile().mkdirs();
 		}
 	    
-	    return CPESunat.GenerarXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+	    	return CPESunat.GenerarXML_NC(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    } else {
+	    	return CPESunat.GenerarXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    }
+	    
 	}
 	
 	public static void firma(InvoiceVo invoiceVo) throws FileNotFoundException, NoSuchAlgorithmException,
@@ -186,12 +186,7 @@ public class XmlSunat {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = "";
-		if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
-			rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-	    } else {
-	    	rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-	    }
+		String rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String rutaFirma = userHomeDir + "/xmlsSunat/signatureSunat/FIRMABETA.pfx";
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    
@@ -213,12 +208,7 @@ public class XmlSunat {
 	public static String envio(InvoiceVo invoiceVo) {
 		String UsuSol = "MODDATOS";// pruebas de sunat
 		String PassSol = "moddatos";// password de prueba de sunat
-		String NombreCPE = "";
-		if (!invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
-			NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-	    } else {
-	    	NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-	    }
+		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = userHomeDir + "/xmlsSunat/";
 		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";

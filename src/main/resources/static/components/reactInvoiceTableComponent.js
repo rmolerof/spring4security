@@ -41,8 +41,10 @@ class InvoiceTableSummary extends React.Component {
 					var invoiceType = '';
 					if (invoicesSummaryData[i].invoiceType == '01') {
 						invoiceType = 'FACTURA'
-					} else {
+					} else if (invoicesSummaryData[i].invoiceType == '03') {
 						invoiceType = 'BOLETA'
+					} else if (invoicesSummaryData[i].invoiceType == '07') {
+						invoiceType = 'N. CREDITO'
 					}
 					var clientDocType = '';
 					if (invoicesSummaryData[i].clientDocType == '1') {
