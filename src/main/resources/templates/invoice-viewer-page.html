@@ -95,19 +95,19 @@
 			                                 </thead>
 			                                 <tbody>
 			                                     <tr id="d2Row">
-			                                         <td> 01-Diesel 2 </td>
+			                                         <td> 01-MAX-D BIODIESEL </td>
 			                                         <td class="text-right"> <span id="galsD2"></span> </td>
 			                                         <td class="text-right"> S/ <span id="priceD2"></span> </td>
 			                                         <td class="text-right"> S/ <span id="solesD2"></span> </td>
 			                                     </tr>
 			                                     <tr id="g90Row">
-			                                         <td> 02-Gas 90 </td>
+			                                         <td> 02-GASOHOL 90 </td>
 			                                         <td class="text-right"> <span id="galsG90"></span> </td>
 			                                         <td class="text-right"> S/ <span id="priceG90"></span> </td>
 			                                         <td class="text-right"> S/ <span id="solesG90"></span> </td>
 			                                     </tr>
 			                                     <tr id="g95Row">
-			                                         <td> 03-Gas 95 </td>
+			                                         <td> 03-GASOHOL 95 </td>
 			                                         <td class="text-right"> <span id="galsG95"></span> </td>
 			                                         <td class="text-right"> S/ <span id="priceG95"></span> </td>
 			                                         <td class="text-right"> S/ <span id="solesG95"></span> </td>
@@ -117,15 +117,16 @@
 			                         </div>
 			                     </div>
 			                     <div class="row">
-			                         <div class="col-xs-4">
-			                             <div class="well">
+			                         <div class="col-xs-6">
+			                             <div >
 			                                  <address>
-								                  <strong>SON:</strong>
-							                      <br/> <span id="totalVerbiage"></span>
-							                      <br/>
-							                  	  <strong>Código Hash:</strong>
-							                      <br/> <span id="invoiceHash"></span>
-							                	  <br/>
+								                  <strong>Son: </strong> <span id="totalVerbiage"></span>
+							                      <br/> <strong>Código Hash: </strong> <span id="invoiceHash"></span>
+							                	  <div id="creditNoteDetails">
+							                	  <strong>Motivo: </strong> <span id="motiveCdDescription"></span>
+							                	  <br/> <strong>Nro Documento Referencia: </strong> <span id="invoiceNumberModified"></span>
+							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span id="dateOfInvoiceModified"></span>
+							                	  </div>
 							                  </address>
 							                  <address>
 							                      <strong>Potenciado por:</strong>
@@ -133,8 +134,25 @@
 							                  </address>
 			                             </div>
 			                         </div>
-			                         <div class="col-xs-4">
-			                             <div class="well">
+			                         <div class="col-xs-6 invoice-block">
+			                             <ul class="list-unstyled amounts">
+			                                 <li> <strong>Subtotal Ventas:</strong> S/ <span id="subTotal"></span> </li>
+			                                 <li> <strong>Descuento:</strong> S/ <span id="discount"></span> </li>
+			                                 <li> <strong>IGV (18%)</strong> S/ <span id="totalIGV"></span> </li>
+			                                 <li> <strong>Importe Total:</strong> S/ <span id="total"></span> </li>
+			                                 <li> <strong>Tarjeta de Crédito/Débito:</strong> S/ <span id="electronicPmt"></span> </li>
+			                                 <li> <strong>Efectivo:</strong> S/ <span id="cashPmt"></span> </li>
+			                                 <li> <strong>Evectivo Entregado:</strong> S/ <span id="cashGiven"></span> </li>
+			                                 <li> <strong>Vuelto:</strong> S/ <span id="change"></span> </li>
+			                             </ul>
+			                             <a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
+			                                 <i class="fa fa-print"></i>
+			                             </a>
+			                         </div>
+			                    </div>
+			                    <div class="row">
+			                    	<div class="col-xs-4">
+			                             <div >
 			                                  <address>
 							                      <strong>Código QR:</strong>
 							                  </address>
@@ -142,19 +160,6 @@
 									          	<div id="qrcode1" class="col-xs-12 col-md-offset-3" ></div>
 									          </div>
 			                             </div>
-			                         </div>
-			                         <div class="col-xs-4 invoice-block">
-			                             <ul class="list-unstyled amounts">
-			                                 <li>
-			                                     <strong>Subtotal:</strong> S/ <span id="subTotal"></span> </li>
-			                                 <li>
-			                                     <strong>IGV (18%)</strong> S/ <span id="totalIGV"></span> </li>
-			                                 <li>
-			                                     <strong>Total:</strong> S/ <span id="total"></span> </li>
-			                             </ul>
-			                             <a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
-			                                 <i class="fa fa-print"></i>
-			                             </a>
 			                         </div>
 			                    </div>
 		                	</div>

@@ -36,15 +36,26 @@ public class InvoiceDao {
 	private Double solesD2 = 0D;
 	private Double solesG90 = 0D;
 	private Double solesG95 = 0D;
-	// Totals
-	private Double total;
+	// Payment
 	private Double subTotal;
+	private Double discount;
 	private Double totalIGV;
+	private Double total;
+	private Double electronicPmt;
+	private Double cashPmt;
+	private Double cashGiven;
+	private Double change;
 	
 	private String totalVerbiage;
 	private String invoiceHash;
 	private String saveOrUpdate;
 	private String sunatErrorStr;
+	
+	private String invoiceTypeModified = "";
+	private String invoiceNumberModified  = "";
+	private String motiveCd = "";
+	private String motiveCdDescription = "";
+	private Date dateOfInvoiceModified = new Date(0L);
 
 	public InvoiceDao() {
 		super();
@@ -72,9 +83,19 @@ public class InvoiceDao {
 		this.subTotal = new Double(invoiceVo.getSubTotal());
 		this.totalIGV = new Double(invoiceVo.getTotalIGV());
 		this.total = new Double(invoiceVo.getTotal());
+		this.discount = new Double(invoiceVo.getDiscount());
+		this.electronicPmt = new Double(invoiceVo.getElectronicPmt());
+		this.cashPmt = new Double(invoiceVo.getCashPmt());
+		this.cashGiven = new Double(invoiceVo.getCashGiven());
+		this.change = new Double(invoiceVo.getChange());
 		this.totalVerbiage = new String(invoiceVo.getTotalVerbiage());
 		this.invoiceHash = new String(invoiceVo.getInvoiceHash());
 		this.saveOrUpdate = new String(invoiceVo.getSaveOrUpdate());
+		this.invoiceTypeModified = new String(invoiceVo.getInvoiceTypeModified());
+		this.invoiceNumberModified  = new String(invoiceVo.getInvoiceNumberModified());
+		this.motiveCd = new String(invoiceVo.getMotiveCd());
+		this.motiveCdDescription = new String(invoiceVo.getMotiveCdDescription());
+		this.dateOfInvoiceModified = new Date(invoiceVo.getDateOfInvoiceModified().getTime());
 		
 	}
 
@@ -309,6 +330,86 @@ public class InvoiceDao {
 
 	public void setSunatErrorStr(String sunatErrorStr) {
 		this.sunatErrorStr = sunatErrorStr;
+	}
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+
+	public Double getElectronicPmt() {
+		return electronicPmt;
+	}
+
+	public void setElectronicPmt(Double electronicPmt) {
+		this.electronicPmt = electronicPmt;
+	}
+
+	public Double getCashPmt() {
+		return cashPmt;
+	}
+
+	public void setCashPmt(Double cashPmt) {
+		this.cashPmt = cashPmt;
+	}
+
+	public Double getCashGiven() {
+		return cashGiven;
+	}
+
+	public void setCashGiven(Double cashGiven) {
+		this.cashGiven = cashGiven;
+	}
+
+	public Double getChange() {
+		return change;
+	}
+
+	public void setChange(Double change) {
+		this.change = change;
+	}
+
+	public String getInvoiceTypeModified() {
+		return invoiceTypeModified;
+	}
+
+	public void setInvoiceTypeModified(String invoiceTypeModified) {
+		this.invoiceTypeModified = invoiceTypeModified;
+	}
+
+	public String getInvoiceNumberModified() {
+		return invoiceNumberModified;
+	}
+
+	public void setInvoiceNumberModified(String invoiceNumberModified) {
+		this.invoiceNumberModified = invoiceNumberModified;
+	}
+
+	public String getMotiveCd() {
+		return motiveCd;
+	}
+
+	public void setMotiveCd(String motiveCd) {
+		this.motiveCd = motiveCd;
+	}
+
+	public String getMotiveCdDescription() {
+		return motiveCdDescription;
+	}
+
+	public void setMotiveCdDescription(String motiveCdDescription) {
+		this.motiveCdDescription = motiveCdDescription;
+	}
+
+	public Date getDateOfInvoiceModified() {
+		return dateOfInvoiceModified;
+	}
+
+	public void setDateOfInvoiceModified(Date dateOfInvoiceModified) {
+		this.dateOfInvoiceModified = dateOfInvoiceModified;
 	}
 	
 }

@@ -28,10 +28,15 @@ public class InvoiceVo {
 	private Double solesD2 = 0D;
 	private Double solesG90 = 0D;
 	private Double solesG95 = 0D;
-	// Totals
-	private Double total;
+	// Payment
 	private Double subTotal;
+	private Double discount;
 	private Double totalIGV;
+	private Double total;
+	private Double electronicPmt;
+	private Double cashPmt;
+	private Double cashGiven;
+	private Double change;
 	
 	private String totalVerbiage;
 	private String invoiceHash;
@@ -43,6 +48,7 @@ public class InvoiceVo {
 	private String invoiceNumberModified  = "";
 	private String motiveCd = "";
 	private String motiveCdDescription = "";
+	private Date dateOfInvoiceModified = new Date(0L);
 	
 	public InvoiceVo() {
 		super();
@@ -70,10 +76,19 @@ public class InvoiceVo {
 		this.subTotal = new Double(invoiceDao.getSubTotal());
 		this.totalIGV = new Double(invoiceDao.getTotalIGV());
 		this.total = new Double(invoiceDao.getTotal());
+		this.discount = new Double(invoiceDao.getDiscount());
+		this.electronicPmt = new Double(invoiceDao.getElectronicPmt());
+		this.cashPmt = new Double(invoiceDao.getCashPmt());
+		this.cashGiven = new Double(invoiceDao.getCashGiven());
+		this.change = new Double(invoiceDao.getChange());
 		this.totalVerbiage = new String(invoiceDao.getTotalVerbiage());
 		this.invoiceHash = new String(invoiceDao.getInvoiceHash());
 		this.saveOrUpdate = new String(invoiceDao.getSaveOrUpdate());
-		
+		this.invoiceTypeModified = new String(invoiceDao.getInvoiceTypeModified());
+		this.invoiceNumberModified  = new String(invoiceDao.getInvoiceNumberModified());
+		this.motiveCd = new String(invoiceDao.getMotiveCd());
+		this.motiveCdDescription = new String(invoiceDao.getMotiveCdDescription());
+		this.dateOfInvoiceModified = new Date(invoiceDao.getDateOfInvoiceModified().getTime());
 	}
 	
 	public static double roundTwo(double amt) {
@@ -193,20 +208,11 @@ public class InvoiceVo {
 	public void setSaveOrUpdate(String saveOrUpdate) {
 		this.saveOrUpdate = saveOrUpdate;
 	}
-	public Double getTotal() {
-		return roundTwo(getSolesD2() + getSolesG90() + getSolesG95());
-	}
 	public void setTotal(Double total) {
 		this.total = total;
 	}
-	public Double getSubTotal() {
-		return roundTwo(getTotal() /  1.18D);
-	}
 	public void setSubTotal(Double subTotal) {
 		this.subTotal = subTotal;
-	}
-	public Double getTotalIGV() {
-		return roundTwo(getTotal() - getSubTotal());
 	}
 	public void setTotalIGV(Double totalIGV) {
 		this.totalIGV = totalIGV;
@@ -270,6 +276,66 @@ public class InvoiceVo {
 
 	public void setMotiveCdDescription(String motiveCdDescription) {
 		this.motiveCdDescription = motiveCdDescription;
+	}
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+
+	public Double getElectronicPmt() {
+		return electronicPmt;
+	}
+
+	public void setElectronicPmt(Double electronicPmt) {
+		this.electronicPmt = electronicPmt;
+	}
+
+	public Double getChange() {
+		return change;
+	}
+
+	public void setChange(Double change) {
+		this.change = change;
+	}
+
+	public Double getCashPmt() {
+		return cashPmt;
+	}
+
+	public void setCashPmt(Double cashPmt) {
+		this.cashPmt = cashPmt;
+	}
+
+	public Double getCashGiven() {
+		return cashGiven;
+	}
+
+	public void setCashGiven(Double cashGiven) {
+		this.cashGiven = cashGiven;
+	}
+
+	public Double getSubTotal() {
+		return subTotal;
+	}
+
+	public Double getTotalIGV() {
+		return totalIGV;
+	}
+
+	public Double getTotal() {
+		return total;
+	}
+
+	public Date getDateOfInvoiceModified() {
+		return dateOfInvoiceModified;
+	}
+
+	public void setDateOfInvoiceModified(Date dateOfInvoiceModified) {
+		this.dateOfInvoiceModified = dateOfInvoiceModified;
 	}
 	
 }

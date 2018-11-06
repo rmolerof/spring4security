@@ -36,8 +36,10 @@ function fire_ajax_submit() {
 			
             if(data.result[0].invoiceType == "01") {
             	$('#invoiceType').html("factura");
+            	$('#creditNoteDetails').hide();
             } else if(data.result[0].invoiceType == "03") {
             	$('#invoiceType').html("boleta");
+            	$('#creditNoteDetails').hide();
             } else if(data.result[0].invoiceType == "07") {
             	$('#invoiceType').html("nota de credito");
             }
@@ -84,11 +86,19 @@ function fire_ajax_submit() {
             $('#solesG95').html(data.result[0].solesG95);
             
             $('#subTotal').html(data.result[0].subTotal);
+            $('#discount').html(data.result[0].discount);
             $('#totalIGV').html(data.result[0].totalIGV);
             $('#total').html(data.result[0].total);
+            $('#electronicPmt').html(data.result[0].electronicPmt);
+            $('#cashPmt').html(data.result[0].cashPmt);
+            $('#cashGiven').html(data.result[0].cashGiven);
+            $('#change').html(data.result[0].change);
             
             $('#totalVerbiage').html(data.result[0].totalVerbiage);
             $('#invoiceHash').html(data.result[0].invoiceHash);
+            $('#motiveCdDescription').html(data.result[0].motiveCdDescription);
+            $('#invoiceNumberModified').html(data.result[0].invoiceNumberModified);
+            $('#dateOfInvoiceModified').html(moment(data.result[0].dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A'));
             
             $('canvas').remove();
             var qrcode1 = new QRCode("qrcode1");

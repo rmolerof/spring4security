@@ -26,7 +26,16 @@ class TableDashboard extends React.Component {
       solesD2: '',
       solesG90: '',
       solesG95: '',
-	  // Save or update in DB
+      // Payment
+  	  subTotal: '',
+	  discount: '',
+	  totalIGV: '',
+	  total: '',
+	  electronicPmt: '',
+	  cashPmt: '',
+	  cashGiven: '',
+	  change: '',
+      // Save or update in DB
       gasPrices: [],
       totalVerbiage: '',
       invoiceHash: '',
@@ -38,9 +47,9 @@ class TableDashboard extends React.Component {
       facturaDisabled: false,
       notaDeCreditoDisabled: false,
       submitDisabled: false,
-      showBoletaRadioButton: 'btn blue active',
-      showFacturaRadioButton: 'btn btn-default',
-      showNotaDeCreditoRadioButton: 'btn btn-default',
+      showBoletaRadioButton: 'btn blue active btn-sm',
+      showFacturaRadioButton: 'btn btn-default btn-sm',
+      showNotaDeCreditoRadioButton: 'btn btn-default btn-sm',
       docLabelObj: {
     	  clientDocType: 'DNI',
     	  clientDocTypePH: 'Ingrese DNI',
@@ -52,7 +61,7 @@ class TableDashboard extends React.Component {
       invoiceNumberModified: '',
       invoiceNumberModifiedDisp: '',
       invoiceTypeModifiedToggle: true,
-      dateCreditNote: new Date(),
+      dateOfInvoiceModified: new Date(),
       motiveCd: '',
       motiveCdDescription: ''
     };
@@ -61,27 +70,154 @@ class TableDashboard extends React.Component {
   galsD2Change = (evt) => {
 	  	this.setState({ galsD2: evt.target.value == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	  	this.setState({ solesD2: evt.target.value == '' ? '': ((evt.target.value * this.state.priceD2 * 100).toFixed() / 100) });
+	  	
+	  	var totalSum = ((parseFloat(((evt.target.value * this.state.priceD2 * 100).toFixed() / 100) || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	    var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	    var discount = this.state.discount || 0;
+	    var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	    var total = (subTotal - discount + totalIGV).toFixed(2);
+	    var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	    var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	    this.setState({ subTotal: subTotal});
+	    this.setState({ totalIGV: totalIGV});
+	    this.setState({ total: total});
+	    this.setState({ cashPmt: cashPmt});
+	    this.setState({ change: change});
   }
   galsG90Change = (evt) => {
 	    this.setState({ galsG90: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	    this.setState({ solesG90: evt.target.value == '' ? '': ((evt.target.value * this.state.priceG90 * 100).toFixed() / 100) });
+	    
+	    var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(((evt.target.value * this.state.priceG90 * 100).toFixed() / 100) || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	    var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	    var discount = (this.state.discount || 0);
+	    var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	    var total = (subTotal - discount + totalIGV).toFixed(2);
+	    var cashPmt = total - (this.state.electronicPmt || 0);
+	    var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	    this.setState({ subTotal: subTotal});
+	    this.setState({ totalIGV: totalIGV});
+	    this.setState({ total: total});
+	    this.setState({ cashPmt: cashPmt});
+	    this.setState({ change: change});
   }
   galsG95Change = (evt) => {
 	    this.setState({ galsG95: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	    this.setState({ solesG95: evt.target.value == '' ? '': ((evt.target.value * this.state.priceG95 * 100).toFixed() / 100) });
+	    
+	    var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(((evt.target.value * this.state.priceG95 * 100).toFixed() / 100) || 0)) * 100).toFixed() / 100;
+	    var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	    var discount = this.state.discount || 0;
+	    var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	    var total = (subTotal - discount + totalIGV).toFixed(2);
+	    var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	    var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	    this.setState({ subTotal: subTotal});
+	    this.setState({ totalIGV: totalIGV});
+	    this.setState({ total: total});
+	    this.setState({ cashPmt: cashPmt});
+	    this.setState({ change: change});
   }
   solesD2Change = (evt) => {
 	    this.setState({ solesD2: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	    this.setState({ galsD2: evt.target.value == '' ? '': ((evt.target.value / this.state.priceD2 * 100).toFixed() / 100) });
+	    
+	    var totalSum = ((parseFloat(evt.target.value || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	    var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	    var discount = this.state.discount || 0;
+	    var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	    var total = (subTotal - discount + totalIGV).toFixed(2);
+	    var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	    var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	    this.setState({ subTotal: subTotal});
+	    this.setState({ totalIGV: totalIGV});
+	    this.setState({ total: total});
+	    this.setState({ cashPmt: cashPmt});
+	    this.setState({ change: change});
   }
   solesG90Change = (evt) => {
 	  this.setState({ solesG90: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	  this.setState({ galsG90: evt.target.value == '' ? '': ((evt.target.value / this.state.priceG90 * 100).toFixed() / 100) });
+	  
+	  var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(evt.target.value || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	  var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	  var discount = this.state.discount || 0;
+	  var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	  var total = (subTotal - discount + totalIGV).toFixed(2);
+	  var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	  var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	  this.setState({ subTotal: subTotal});
+	  this.setState({ totalIGV: totalIGV});
+	  this.setState({ total: total});
+	  this.setState({ cashPmt: cashPmt});
+	  this.setState({ change: change});
   }
   solesG95Change = (evt) => {
 	  this.setState({ solesG95: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	  this.setState({ galsG95: evt.target.value == '' ? '': ((evt.target.value / this.state.priceG95 * 100).toFixed() / 100) });
+	  
+	  var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(evt.target.value || 0)) * 100).toFixed() / 100;
+	  var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	  var discount = this.state.discount || 0;
+	  var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	  var total = (subTotal - discount + totalIGV).toFixed(2);
+	  var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	  var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	  this.setState({ subTotal: subTotal});
+	  this.setState({ totalIGV: totalIGV});
+	  this.setState({ total: total});
+	  this.setState({ cashPmt: cashPmt});
+	  this.setState({ change: change});
   }
+  discountChange = (evt) => {
+	  this.setState({ discount: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+	  
+	  var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	  var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	  var discount = evt.target.value || 0;
+	  var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	  var total = (subTotal - discount + totalIGV).toFixed(2);
+	  var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	  var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	  this.setState({ subTotal: subTotal});
+	  this.setState({ totalIGV: totalIGV});
+	  this.setState({ total: total});
+	  this.setState({ cashPmt: cashPmt});
+	  this.setState({ change: change});
+  }
+  electronicPmtChange = (evt) => {
+	  this.setState({ electronicPmt: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+	  
+	  var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	  var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	  var discount = this.state.discount || 0;
+	  var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	  var total = (subTotal - discount + totalIGV).toFixed(2);
+	  var cashPmt = (total - (evt.target.value  || 0)).toFixed(2);
+	  var change = ((this.state.cashGiven || 0) - cashPmt).toFixed(2);
+	  this.setState({ subTotal: subTotal});
+	  this.setState({ totalIGV: totalIGV});
+	  this.setState({ total: total});
+	  this.setState({ cashPmt: cashPmt});
+	  this.setState({ change: change});
+  }
+  cashGivenChange = (evt) => {
+	  this.setState({ cashGiven: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+	  
+	  var totalSum = ((parseFloat(this.state.solesD2 || 0) + parseFloat(this.state.solesG90 || 0) + parseFloat(this.state.solesG95 || 0)) * 100).toFixed() / 100;
+	  var subTotal = parseFloat((totalSum - (totalSum * 18 / 1.18).toFixed() / 100).toFixed(2));
+	  var discount = this.state.discount || 0;
+	  var totalIGV = parseFloat(((((totalSum - totalSum * 0.18 / 1.18) - discount) * 18).toFixed() / 100).toFixed(2));
+	  var total = (subTotal - discount + totalIGV).toFixed(2);
+	  var cashPmt = (total - (this.state.electronicPmt  || 0)).toFixed(2);
+	  var change = ((evt.target.value  || 0) - cashPmt).toFixed(2);
+	  this.setState({ subTotal: subTotal});
+	  this.setState({ totalIGV: totalIGV});
+	  this.setState({ total: total});
+	  this.setState({ cashPmt: cashPmt});
+	  this.setState({ change: change});
+  }
+  
   clientAddressChange = (evt) => {
 	    this.setState({ clientAddress: evt.target.value });
   }
@@ -127,11 +263,11 @@ class TableDashboard extends React.Component {
   handleOptionChange = (changeEvent) => {
 	  this.setState({selectedOption: changeEvent.target.value});
 	  
-	  var cssB = (this.state.showBoletaRadioButton === "btn btn-default" && changeEvent.target.value == 'boleta') ? "btn blue active" : "btn btn-default";
+	  var cssB = (this.state.showBoletaRadioButton === "btn btn-default btn-sm" && changeEvent.target.value == 'boleta') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 	  this.setState({showBoletaRadioButton: cssB});
-	  var cssF = (this.state.showFacturaRadioButton === "btn btn-default" && changeEvent.target.value == 'factura') ? "btn blue active" : "btn btn-default";
+	  var cssF = (this.state.showFacturaRadioButton === "btn btn-default btn-sm" && changeEvent.target.value == 'factura') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 	  this.setState({showFacturaRadioButton: cssF});
-	  var cssNV = (this.state.showNotaDeCreditoRadioButton === "btn btn-default" && changeEvent.target.value == 'nota de credito') ? "btn blue active" : "btn btn-default";
+	  var cssNV = (this.state.showNotaDeCreditoRadioButton === "btn btn-default btn-sm" && changeEvent.target.value == 'nota de credito') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 	  this.setState({showNotaDeCreditoRadioButton: cssNV});
 	  
 	  if (changeEvent.target.value == 'boleta') {
@@ -368,7 +504,7 @@ class TableDashboard extends React.Component {
 				  clientDocType: data.result[0].clientDocType,
 				  clientAddress: data.result[0].clientAddress,
 				  truckPlateNumber: data.result[0].truckPlateNumber,
-				  dateCreditNote: data.result[0].date,
+				  dateOfInvoiceModified: data.result[0].date,
 				  galsD2: data.result[0].galsD2,
 				  galsG90: data.result[0].galsG90,
 				  galsG95: data.result[0].galsG95,
@@ -377,6 +513,14 @@ class TableDashboard extends React.Component {
 				  solesD2: data.result[0].solesD2,
 				  solesG90: data.result[0].solesG90,
 				  solesG95: data.result[0].solesG95,
+				  subTotal: data.result[0].subTotal,
+				  discount: data.result[0].discount,
+				  totalIGV: data.result[0].totalIGV,
+				  total: data.result[0].total,
+				  electronicPmt: data.result[0].electronicPmt,
+				  cashPmt: data.result[0].cashPmt,
+				  cashGiven: data.result[0].cashGiven,
+				  change: data.result[0].change,
 			  });
 		
 			}, error: function(e){
@@ -390,7 +534,37 @@ class TableDashboard extends React.Component {
 		
 		evt.preventDefault();
 		
-		const {invoiceTypeModified, invoiceNumberModified, motiveCd, motiveCdDescription, invoiceNumber, invoiceType, clientDocType, clientAddress, clientDocNumber, clientName, truckPlateNumber, galsD2, galsG90, galsG95, priceD2, priceG90, priceG95, solesD2, solesG90,solesG95,gasPrices, date} = this.state;
+		const {subTotal, 
+			discount, 
+			totalIGV, 
+			total, 
+			electronicPmt, 
+			cashPmt, 
+			cashGiven, 
+			change, 
+			invoiceTypeModified, 
+			invoiceNumberModified, 
+			motiveCd, 
+			motiveCdDescription,
+			dateOfInvoiceModified,
+			invoiceNumber, 
+			invoiceType, 
+			clientDocType, 
+			clientAddress, 
+			clientDocNumber, 
+			clientName, 
+			truckPlateNumber, 
+			galsD2, 
+			galsG90, 
+			galsG95, 
+			priceD2, 
+			priceG90, 
+			priceG95, 
+			solesD2, 
+			solesG90,
+			solesG95,
+			gasPrices, 
+			date} = this.state;
 		var self = this;
 	    var errors = {
 	    		submit: '',
@@ -420,10 +594,19 @@ class TableDashboard extends React.Component {
 		    solesD2: solesD2,
 		    solesG90: solesG90,
 		    solesG95: solesG95,
+		    subTotal: subTotal,
+		    discount: (discount || 0),
+		    totalIGV: totalIGV,
+		    total: total,
+		    electronicPmt: (electronicPmt || 0),
+		    cashPmt: cashPmt,
+		    cashGiven: (cashGiven || 0),
+		    change: change ,
 		    invoiceTypeModified: invoiceTypeModified,
 		    invoiceNumberModified: invoiceNumberModified,
 		    motiveCd: motiveCd,
 		    motiveCdDescription: motiveCdDescription,
+		    dateOfInvoiceModified: dateOfInvoiceModified,
 	    	saveOrUpdate: 'save'
 	    };
 
@@ -520,25 +703,25 @@ class TableDashboard extends React.Component {
 				success: (data) => {
 					var invoiceVoResp = data.result[0];
 					
-					self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
-					self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
-					self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
-					self.setState({ status: invoiceVoResp.status });
-					self.setState({ invoiceNumber: invoiceVoResp.invoiceNumber });
-					
-					// Prevent user from changing invoice type after submission
-					if (this.state.selectedOption == 'boleta') {
-						self.setState({ notaDeCreditoDisabled: true });
-						self.setState({ facturaDisabled: true });
-					} else if (this.state.selectedOption == 'factura') {
-						self.setState({ notaDeCreditoDisabled: true });
-						self.setState({ boletaDisabled: true });
-					} else if (this.state.selectedOption == 'nota de credito') {
-						self.setState({ facturaDisabled: true });
-						self.setState({ boletaDisabled: true });
-					}
-					
 					if (invoiceVoResp.sunatErrorStr.charAt(0) == "1" && invoiceVoResp.status == '1') {
+						self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
+						self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
+						self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
+						self.setState({ status: invoiceVoResp.status });
+						self.setState({ invoiceNumber: invoiceVoResp.invoiceNumber });
+						
+						// Prevent user from changing invoice type after submission
+						if (this.state.selectedOption == 'boleta') {
+							self.setState({ notaDeCreditoDisabled: true });
+							self.setState({ facturaDisabled: true });
+						} else if (this.state.selectedOption == 'factura') {
+							self.setState({ notaDeCreditoDisabled: true });
+							self.setState({ boletaDisabled: true });
+						} else if (this.state.selectedOption == 'nota de credito') {
+							self.setState({ facturaDisabled: true });
+							self.setState({ boletaDisabled: true });
+						}
+					
 						self.setState({ showSuccess: true });
 						self.setState({submitDisabled: true});
 						var qrcode1 = new QRCode("qrcode1");
@@ -566,13 +749,25 @@ class TableDashboard extends React.Component {
 								invoiceVoResp.clientDocType + "|" +
 								invoiceVoResp.clientDocNumber
 								);
+						var qrcode3 = new QRCode("qrcode3");
+						qrcode3.clear();
+						qrcode3.makeCode("20501568776|" + 
+								invoiceVoResp.invoiceType + "|" + 
+								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
+								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
+								invoiceVoResp.totalIGV + "|" +
+								invoiceVoResp.total + "|" +
+								moment(invoiceVoResp.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A') + "|" + 
+								invoiceVoResp.clientDocType + "|" +
+								invoiceVoResp.clientDocNumber
+								);
 					} else {
 						errors["submit"] = "Recibo rechazado por Sunat. " + invoiceVoResp.sunatErrorStr;
 						self._toggleError();
 					}
 				},
 				error: function(e){
-					errors["submit"] = "Recibo no aceptada. Intente otra vez"  + e.responseText;
+					errors["submit"] = "Recibo no aceptado. Intente otra vez. "  + e.responseText;
 					self._toggleError();
 				}	
 			});
@@ -611,7 +806,8 @@ class TableDashboard extends React.Component {
 	      <div className="invoice">
 	          <div className="row invoice-logo">
 	          	  <div className="col-md-4 invoice-logo-space hidden-xs">
-	          	   <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> </div>
+	          	   {/*<img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" />*/} 
+	          	  </div>
 	          	  <div className="col-xs-6 col-md-4 invoice-logo-space">
 			          <ul className="list-unstyled">
 	                  <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
@@ -680,8 +876,8 @@ class TableDashboard extends React.Component {
 	    	          </div>
 		    	      <div className="col-md-2">
 			              <div className="form-group">
-			                  <label className="control-label">Fecha</label>
-			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateCreditNote).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			                  <label className="control-label">Fecha de Comprobante de Referencia</label>
+			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 			              </div>
 			          </div>
 	    	          <div className="col-md-2">
@@ -816,18 +1012,14 @@ class TableDashboard extends React.Component {
 	              </div>
 	          </div>
 	          <div className="row">
-	              <div className="col-xs-3">
+	              <div className="hidden-xs col-sm-3">
 	                  <div className="well">
 	                      <address>
-	                          <strong>Código Hash:</strong>
-	                          <br/> {this.state.invoiceHash}
-                        	  <br/>
-	                          {/*<strong>Nro de <span className="uppercase" >{this.state.selectedOption}</span>:</strong>
-	                          <br/> {this.state.invoiceNumber}
-	                          <br/>*/}
-	                          <strong>SON:</strong>
-		                      <br/> {this.state.totalVerbiage}
-		                      <br/>
+	                          <strong>Código Hash: </strong> {this.state.invoiceHash}
+	                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
+	                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
+		                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
+		                      }
                           </address>
 	                      <address>
 	                          <strong>Consulte su documento en:</strong>
@@ -835,7 +1027,7 @@ class TableDashboard extends React.Component {
 	                      </address>
 	                  </div>
 	              </div>
-		          <div className="col-xs-3">
+		          <div className="hidden-xs col-sm-3">
 	                  <div className="well">
 		                  <address>
 		                      <strong>Código QR:</strong>
@@ -846,39 +1038,127 @@ class TableDashboard extends React.Component {
 				          </div>
 	                  </div>
 	              </div>
-	              <div className="col-xs-6 invoice-block">
+	              <div className="col-xs-12 col-sm-6 invoice-block">
 	                  <div className="row invoice-subtotal">
 				          <div className="col-xs-12">
 					          <table className="table table-hover">
 					              <tbody>
 					                  <tr>
 					                      <td>
-					                      	<strong>Sub-Total ventas:</strong>
+					                      	<strong>Sub-Total Ventas:</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100 - (((this.state.solesD2  || 0) + (this.state.solesG90  || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold">{this.state.subTotal}</td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+					                      	<strong>Descuento:</strong>
+					                      </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
 					                      	<strong>IGV (18%):</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100).toFixed(2)} </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold">{this.state.totalIGV} </td>
 					                  </tr>
 					                  <tr>
 					                      <td>
 				                      		<strong>Importe Total:</strong>
 					                      </td>
-					                      <td className="text-center sbold">S/ {(((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100)).toFixed(2)}</td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold">{this.state.total}</td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong><u>Forma de Pago:</u></strong>
+					                      </td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong>Tarjeta Crédito/Débito:</strong>
+					                      </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong>Efectivo:</strong>
+					                      </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold">{this.state.cashPmt}</td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong>Efectivo Entregado:</strong>
+					                      </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
+					                  </tr>
+					                  <tr>
+					                      <td>
+				                      		<strong>Vuelto:</strong>
+					                      </td>
+					                      <td>
+					                      	S/ 
+					                      </td>
+					                      <td className="text-right sbold">{this.state.change}</td>
 					                  </tr>
 					              </tbody>
 					          </table>	
 		          		  </div>
 			          </div>
-	                  <br/>
-	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
-	                  {!this.state.invoiceHash && <a type="submit" className="btn btn-lg blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
-	                  <button type="submit" disabled={this.state.submitDisabled} className="btn btn-lg green hidden-print margin-bottom-5">
+			          
+	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {!this.state.invoiceHash && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
+	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar Comprobante
 	    	          </button>
+	              </div>
+	          </div>
+	          <div className="row">
+	              <div className="hidden-sm hidden-md hidden-lg">
+	                  <div className="well">
+	                      <address>
+		                      <strong>Código Hash: </strong> {this.state.invoiceHash}
+	                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
+	                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
+		                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
+		                      }
+	                      </address>
+	                      <address>
+	                          <strong>Consulte su documento en:</strong>
+	                          <a> www.grifoslajoya.com </a>
+	                      </address>
+	                  </div>
+	              </div>
+	          </div>
+	          <div className="row">
+		          <div className="hidden-sm hidden-md hidden-lg">
+	                  <div className="well">
+		                  <address>
+		                      <strong>Código QR:</strong>
+		                  </address>
+		                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+				          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode3" className="col-xs-12 col-md-offset-3" ></div>
+				          </div>
+	                  </div>
 	              </div>
 	          </div>
 	      </div>
@@ -887,7 +1167,7 @@ class TableDashboard extends React.Component {
 	          <div className="row invoice-head">
 	              <div className="col-md-12 col-xs-12 text-center">
 	                  <div className="invoice-logo">
-	                      <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" style={{display: 'block', margin: 'auto'}} alt="" />
+	                  	  {/*<img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" style={{display: 'block', margin: 'auto'}} alt="" />*/}
 	                      <span className="uppercase" >{this.state.selectedOption} Electrónica</span><br/>
 	                      <span className="uppercase" >{this.state.invoiceNumber}</span>
 	                    	  
@@ -900,6 +1180,7 @@ class TableDashboard extends React.Component {
 	                      <br/> Lima - Lima - Ate 
 	                      <br/> Teléfono: +51 356 0345
 	                      <br/> www.grifoslajoya.com 
+	                      <br/> <span className="muted"> RUC: 20501568776  </span>
                       </div>
 	              </div>
 	          </div>
@@ -996,21 +1277,57 @@ class TableDashboard extends React.Component {
 			              <tbody>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                          Subtotal
+			                          Sub-total Ventas:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed() / 100 - (((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100 ).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.subTotal}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      IGV (18%)
+			                      Descuento:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 18 / 1.18).toFixed() / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.discount}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                          Total
+			                      IGV (18%):
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {((((this.state.solesD2 || 0) + (this.state.solesG90 || 0) + (this.state.solesG95 || 0)) * 100).toFixed(2) / 100).toFixed(2)}</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.totalIGV}</td>
+			                  </tr>
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Importe Total:
+			                      </td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.total}</td>
+			                  </tr>
+			                  <tr>
+		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		                      	  <u>Forma de Pago:</u>
+			                      </td>
+			                      
+			                  </tr>
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Tarjeta Crédito/Débito:
+			                      </td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.electronicPmt}</td>
+			                  </tr>
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Efectivo:
+			                      </td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.cashPmt}</td>
+			                  </tr>
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Efectivo Entregado:
+			                      </td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.cashGiven}</td>
+			                  </tr>
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Vuelto:
+			                      </td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.change}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
@@ -1018,12 +1335,13 @@ class TableDashboard extends React.Component {
 	          </div>
 	          <div className="row col-xs-12">
 	                  <address>
-		                  <strong>SON:</strong>
-	                      <br/> {this.state.totalVerbiage}
-	                      <br/>
-	                  	  <strong>Código Hash:</strong>
-	                      <br/> {this.state.invoiceHash}
-	                	  <br/>
+		                  <strong>Código Hash: </strong> {this.state.invoiceHash}
+	                      <br/> <strong>Son: </strong> {this.state.totalVerbiage}
+	                      <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Motivo: </strong> {this.state.motiveCdDescription} 
+	                      <br/> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
+	                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}
+	                      </div>
+	                      }
 	                  </address>
 	                  <address>
 	                      <strong>Consulte su documento en:</strong>

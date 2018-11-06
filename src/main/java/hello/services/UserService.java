@@ -430,7 +430,7 @@ public class UserService {
 					}
 				}
 				
-				invoiceVo.setTotalVerbiage(invoiceVo.getTotal() < 0D ? XmlSunat.Convertir(new Double(Math.abs(invoiceVo.getTotal())).toString(), true, "PEN"): XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
+				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 				
 				// Sunat 
 				XmlSunat.invokeSunat(invoiceVo);
