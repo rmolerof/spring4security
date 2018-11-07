@@ -21,11 +21,11 @@
             		<div class="page-content-wrapper">
 		                <!-- BEGIN CONTENT BODY -->
 		                <div class="page-content">
-			            	Status: <span id="errorAlert"></span>
+			            	Status: <strong class="uppercase"><span id="errorAlert"></span></strong>
 		                    <div class="invoice">
 			                     <div class="row invoice-logo">
 						              <div class="col-xs-6 invoice-logo-space">
-						                  <img src="../assets/pages/media/invoice/lajoya.png" class="img-responsive" alt="" /> </div>
+						                  <!-- <img src="../assets/pages/media/invoice/lajoya.png" class="img-responsive" alt="" /> --></div> 
 						              <div class="col-xs-6">
 						                  <p> <strong class="uppercase "><span id="invoiceType"></span> ELECTRÓNICA</strong> <br/>
 						                      <span class="muted"> RUC: 20501568776  </span><br/>
@@ -60,7 +60,7 @@
 						    	                  <span id="clientDocNumber"></span>
 						    	              </div>
 						    	          </div>
-						    	          <div class="col-md-2">
+						    	          <div class="col-md-5">
 						    	              <div class="form-group">
 						    	                  <label class="control-label"><span id="clientNameVrb"></span></label>: 
 						    	                  <span id="clientName"></span>
@@ -74,7 +74,7 @@
 						    	                  <span id="clientAddress"></span>
 						    	              </div>
 						    	          </div>
-						    	          <div class="col-md-2 selectedOption" > <!-- {this.state.selectedOption != 'boleta' && -->
+						    	          <div class="col-md-5 selectedOption" > <!-- {this.state.selectedOption != 'boleta' && -->
 						    	              <div class="form-group">
 						    	                  <label class="control-label">Nro de Placa: </label>
 						    	                  <span id="truckPlateNumber"></span>
@@ -84,7 +84,7 @@
 					              </div>
 			                     <div class="row">
 			                         <div class="col-xs-12">
-			                             <table class="table table-striped table-hover">
+			                             <table class="table table-striped table-condensed table-hover">
 			                                 <thead>
 			                                     <tr>
 			                                         <th class="text-center"> Producto </th>
@@ -135,16 +135,50 @@
 			                             </div>
 			                         </div>
 			                         <div class="col-xs-6 invoice-block">
-			                             <ul class="list-unstyled amounts">
-			                                 <li> <strong>Subtotal Ventas:</strong> S/ <span id="subTotal"></span> </li>
-			                                 <li> <strong>Descuento:</strong> S/ <span id="discount"></span> </li>
-			                                 <li> <strong>IGV (18%)</strong> S/ <span id="totalIGV"></span> </li>
-			                                 <li> <strong>Importe Total:</strong> S/ <span id="total"></span> </li>
-			                                 <li> <strong>Tarjeta de Crédito/Débito:</strong> S/ <span id="electronicPmt"></span> </li>
-			                                 <li> <strong>Efectivo:</strong> S/ <span id="cashPmt"></span> </li>
-			                                 <li> <strong>Evectivo Entregado:</strong> S/ <span id="cashGiven"></span> </li>
-			                                 <li> <strong>Vuelto:</strong> S/ <span id="change"></span> </li>
-			                             </ul>
+										<table class="table table-condensed table-hover">
+											<tbody>
+												<tr>
+													<td><strong>Sub-Total Ventas:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="subTotal"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Descuento:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="discount"></span></td>
+												</tr>
+												<tr>
+													<td><strong>IGV (18%):</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="totalIGV"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Importe Total:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="total"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Tarjeta de Crédito/Débito:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="electronicPmt"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Efectivo:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="cashPmt"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Evectivo Entregado:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="cashGiven"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Vuelto:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="change"></span></td>
+												</tr>
+											</tbody>
+										</table>
 			                             <a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
 			                                 <i class="fa fa-print"></i>
 			                             </a>

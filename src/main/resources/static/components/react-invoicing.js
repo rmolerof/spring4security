@@ -472,7 +472,7 @@ class TableDashboard extends React.Component {
 			return;
 		} else {
 			var errors = {
-	    		submit: 'Numero de RUC es incorrecto.'
+	    		submit: 'Numero de DNI es incorrecto.'
 		    };
 			this.setState({errors: errors}); 
 			self._toggleError();
@@ -485,9 +485,11 @@ class TableDashboard extends React.Component {
 	  	
 	  	var self = this;
 	  	var search = {};
+	  	self.setState({ showError: false});
 	    
-	    search["invoiceNumber"] = this.state.invoiceNumberModified;
-		
+	    search["invoiceNumber"] = self.state.invoiceNumberModified;
+	    self.setState({loadingGif: true});
+	    
 		$.ajax({
 			type: "POST",
 			contentType: "application/json", 
@@ -498,36 +500,116 @@ class TableDashboard extends React.Component {
 			timeout: 600000,
 			success: function(data) {
 				
-			  self.setState({
-				  clientDocNumber: data.result[0].clientDocNumber,
-				  clientName: data.result[0].clientName,
-				  clientDocType: data.result[0].clientDocType,
-				  clientAddress: data.result[0].clientAddress,
-				  truckPlateNumber: data.result[0].truckPlateNumber,
-				  dateOfInvoiceModified: data.result[0].date,
-				  galsD2: data.result[0].galsD2,
-				  galsG90: data.result[0].galsG90,
-				  galsG95: data.result[0].galsG95,
-				  priceD2: data.result[0].priceD2,
-				  priceG90: data.result[0].priceG90,
-				  solesD2: data.result[0].solesD2,
-				  solesG90: data.result[0].solesG90,
-				  solesG95: data.result[0].solesG95,
-				  subTotal: data.result[0].subTotal,
-				  discount: data.result[0].discount,
-				  totalIGV: data.result[0].totalIGV,
-				  total: data.result[0].total,
-				  electronicPmt: data.result[0].electronicPmt,
-				  cashPmt: data.result[0].cashPmt,
-				  cashGiven: data.result[0].cashGiven,
-				  change: data.result[0].change,
-			  });
+			  if (data.result[0].clientDocNumber) {	
+				  self.setState({
+					  clientDocNumber: data.result[0].clientDocNumber,
+					  clientName: data.result[0].clientName,
+					  clientDocType: data.result[0].clientDocType,
+					  clientAddress: data.result[0].clientAddress,
+					  truckPlateNumber: data.result[0].truckPlateNumber,
+					  dateOfInvoiceModified: data.result[0].date,
+					  galsD2: data.result[0].galsD2,
+					  galsG90: data.result[0].galsG90,
+					  galsG95: data.result[0].galsG95,
+					  priceD2: data.result[0].priceD2,
+					  priceG90: data.result[0].priceG90,
+					  solesD2: data.result[0].solesD2,
+					  solesG90: data.result[0].solesG90,
+					  solesG95: data.result[0].solesG95,
+					  subTotal: data.result[0].subTotal,
+					  discount: data.result[0].discount,
+					  totalIGV: data.result[0].totalIGV,
+					  total: data.result[0].total,
+					  electronicPmt: data.result[0].electronicPmt,
+					  cashPmt: data.result[0].cashPmt,
+					  cashGiven: data.result[0].cashGiven,
+					  change: data.result[0].change,
+				  });
+			  } else {
+			  	  var errors = {
+		  			  submit: 'Numero de Comprobante no fue encontrado o es incorrecto.'
+			  	  };
+			  	  self.setState({errors: errors}); 
+			  	  self._toggleError();
+			  }
+			  
+			  self.setState({loadingGif: false});
 		
 			}, error: function(e){
 				console.log("ERROR: ", e);
 			}	
 		});
 	  
+  }
+  
+  newInvoice = () => {
+	  
+	  $('canvas').remove();
+      $('img').remove();
+  
+	  this.setState({
+		  errors: {},
+		  showError: false,
+		  showSuccess: false,
+		  invoiceNumber: 'B001-XXXXXXXX',
+		  // customer
+	      clientDocNumber: '',
+	      clientName: '',
+	      clientDocType: '1',
+	      clientAddress: '',
+	      truckPlateNumber: '',
+		  // invoice breakdown
+	      date: new Date(),
+	      invoiceType: '03',
+		  // Break-down
+	      galsD2: '',
+	      galsG90: '',
+	      galsG95: '',
+//	      priceD2: '',
+//	      priceG90: '',
+//	      priceG95: '',
+	      solesD2: '',
+	      solesG90: '',
+	      solesG95: '',
+	      // Payment
+	  	  subTotal: '',
+		  discount: '',
+		  totalIGV: '',
+		  total: '',
+		  electronicPmt: '',
+		  cashPmt: '',
+		  cashGiven: '',
+		  change: '',
+	      // Save or update in DB
+	      gasPrices: [],
+	      totalVerbiage: '',
+	      invoiceHash: '',
+	      saveOrUpdate: 'save',
+	      sunatErrorStr: '',
+	      status: '',
+	      selectedOption: 'boleta',
+	      boletaDisabled: false,
+	      facturaDisabled: false,
+	      notaDeCreditoDisabled: false,
+	      submitDisabled: false,
+	      showBoletaRadioButton: 'btn blue active btn-sm',
+	      showFacturaRadioButton: 'btn btn-default btn-sm',
+	      showNotaDeCreditoRadioButton: 'btn btn-default btn-sm',
+	      docLabelObj: {
+	    	  clientDocType: 'DNI',
+	    	  clientDocTypePH: 'Ingrese DNI',
+	    	  clientName: 'Señor(es)',
+	    	  clientNamePH: 'Nombre(s)',
+	      },
+	      loadingGif: false,
+	      invoiceTypeModified: '01',
+	      invoiceNumberModified: '',
+	      invoiceNumberModifiedDisp: '',
+	      invoiceTypeModifiedToggle: true,
+	      dateOfInvoiceModified: new Date(),
+	      motiveCd: '',
+	      motiveCdDescription: ''
+	  });
   }
   
   handleSubmit = (evt) => {
@@ -781,10 +863,10 @@ class TableDashboard extends React.Component {
   render() {    
 	 
 	  let buttonText = 'FACTURA';
-	  let invoicePrefix = 'F001   -';
+	  let invoicePrefix = 'F001-';
 	  if (!this.state.invoiceTypeModifiedToggle) {
 			buttonText = 'BOLETA';
-			invoicePrefix = 'B001   -';
+			invoicePrefix = 'B001-';
 	  }
 	  
 	  return (
@@ -854,10 +936,10 @@ class TableDashboard extends React.Component {
 	              </div>
 	              {this.state.selectedOption == 'nota de credito' &&
 	              <div className="row">
-		              <div className="col-md-1">
+		              <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">{invoicePrefix}</label><br></br>  
-		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn green-meadow">{this.state.invoiceTypeModifiedToggle && <i className="fa fa-toggle-on"></i>} {!this.state.invoiceTypeModifiedToggle && <i className="fa fa-toggle-off"></i>} {buttonText}</a>
+		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn green-meadow">{this.state.invoiceTypeModifiedToggle} {!this.state.invoiceTypeModifiedToggle} {buttonText}</a>
 		                  </div>
 		              </div>
 		              <div className="col-md-2">
@@ -876,7 +958,7 @@ class TableDashboard extends React.Component {
 	    	          </div>
 		    	      <div className="col-md-2">
 			              <div className="form-group">
-			                  <label className="control-label">Fecha de Comprobante de Referencia</label>
+			                  <label className="control-label">Fecha Comprobante Referencia</label>
 			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 			              </div>
 			          </div>
@@ -975,7 +1057,7 @@ class TableDashboard extends React.Component {
 	          </div>*/}
 	          <div className="row">
 	              <div className="col-xs-12">
-	                  <table className="table table-striped table-hover">
+	                  <table className="table table-condensed table-hover">
 	                      <thead>
 	                          <tr>
 	                              <th className="hidden-xs"> Prod </th>
@@ -989,23 +1071,23 @@ class TableDashboard extends React.Component {
 	                      	  <tr>
 	                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
 	                              <td className="hidden-sm-up"> D2 </td>
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
 	                          </tr>
 	                          <tr>
 	                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
 	                              <td className="hidden-sm-up"> G90 </td>
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
 	                          </tr>
 	                          <tr>
 	                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
 	                              <td className="hidden-sm-up"> G95 </td>
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
 	                          </tr>
 	                      </tbody>
 	                  </table>
@@ -1041,7 +1123,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-xs-12 col-sm-6 invoice-block">
 	                  <div className="row invoice-subtotal">
 				          <div className="col-xs-12">
-					          <table className="table table-hover">
+					          <table className="table table-condensed table-hover">
 					              <tbody>
 					                  <tr>
 					                      <td>
@@ -1059,7 +1141,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1091,7 +1173,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1109,7 +1191,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1125,11 +1207,12 @@ class TableDashboard extends React.Component {
 		          		  </div>
 			          </div>
 			          
-	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > Imprimir&nbsp;<i className="fa fa-print"></i></a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
-	                  {!this.state.invoiceHash && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > Imprimir&nbsp;<i className="fa fa-print"></i></a>}&nbsp;
-	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
-	    	          	<i className="fa fa-check"></i> Enviar Comprobante
-	    	          </button>
+	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {!this.state.invoiceHash && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
+	                  <button type="submit" disabled={this.state.submitDisabled && false} className="btn green hidden-print margin-bottom-5">
+	    	          	<i className="fa fa-check"></i> Enviar
+	    	          </button>&nbsp;
+	    	          <a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
 	              </div>
 	          </div>
 	          <div className="row">
