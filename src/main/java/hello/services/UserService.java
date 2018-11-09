@@ -1,5 +1,6 @@
 package hello.services;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,8 +16,10 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -65,6 +68,8 @@ public class UserService {
 	private InvoicesRepository invoicesRepository;
 	@Autowired
 	private NextSequenceInvoiceService nextSequenceInvoiceService;
+	@Autowired
+	private ResourceLoader resourceLoader;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -432,10 +437,18 @@ public class UserService {
 				
 				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 				
-				// Sunat 
-				XmlSunat.invokeSunat(invoiceVo);
-				XmlSunat.firma(invoiceVo);
-				String deliveryResponse = XmlSunat.envio(invoiceVo);
+				// Sunat
+				String basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
+				
+				// Delete files in xmlsSunat folder
+				File f = new File(basePath + "/xmlsSunat");
+				if (f.exists() && f.isDirectory()) {
+					FileUtils.cleanDirectory(f.getAbsoluteFile());
+				}
+				
+				XmlSunat.invokeSunat(invoiceVo, basePath);
+				XmlSunat.firma(invoiceVo, basePath);
+				String deliveryResponse = XmlSunat.envio(invoiceVo, basePath);
 				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 
@@ -449,7 +462,7 @@ public class UserService {
 			}
 		} catch (Exception e) {
 			invoiceVo.setStatus("0");
-			invoiceVo.setSunatErrorStr(e.getMessage());
+			invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());
 		}
 		
 		return Stream.of(invoiceVo).collect(Collectors.toList());

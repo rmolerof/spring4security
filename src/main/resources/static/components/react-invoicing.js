@@ -1209,7 +1209,7 @@ class TableDashboard extends React.Component {
 			          
 	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
 	                  {!this.state.invoiceHash && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
-	                  <button type="submit" disabled={this.state.submitDisabled && false} className="btn green hidden-print margin-bottom-5">
+	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
 	    	          <a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>

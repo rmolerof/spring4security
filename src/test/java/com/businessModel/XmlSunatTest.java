@@ -104,9 +104,9 @@ public class XmlSunatTest {
 		XmlSunat.envio(invoiceVo);*/
 		
 		// Nota de credito
-		XmlSunat.invokeSunat(invoiceVo3);
-		XmlSunat.firma(invoiceVo3);
-		XmlSunat.envio(invoiceVo3);
+		XmlSunat.invokeSunat(invoiceVo3, System.getProperty("user.home"));
+		XmlSunat.firma(invoiceVo3, System.getProperty("user.home"));
+		XmlSunat.envio(invoiceVo3, System.getProperty("user.home"));
 	}
 	
 	public static void firma() throws FileNotFoundException, NoSuchAlgorithmException,

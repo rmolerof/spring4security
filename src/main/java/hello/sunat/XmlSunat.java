@@ -39,11 +39,9 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
-//	private static final String userHomeDir = System.getProperty("user.home");
-	private static final String userHomeDir = "/home/ec2-user"; 
 	
 	// OBLIGATORIO
-	public static int invokeSunat(InvoiceVo invoiceVo) throws Exception {
+	public static int invokeSunat(InvoiceVo invoiceVo, String basePath) throws Exception {
 		CpeBean cpe = new CpeBean();
 	    cpe.setTIPO_OPERACION("0101");// OBLIGATORIO 0101 venta interna (grifo), venta itinerante
 	    cpe.setTOTAL_GRAVADAS(invoiceVo.getSubTotal());// OBLIGATORIO IGUAL A SUB_TOTAL
@@ -164,7 +162,7 @@ public class XmlSunat {
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+	    String rutaXMLCPE = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 	    boolean alreadyExists = new File(rutaXMLCPE).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -180,14 +178,15 @@ public class XmlSunat {
 	    
 	}
 	
-	public static void firma(InvoiceVo invoiceVo) throws FileNotFoundException, NoSuchAlgorithmException,
+	public static void firma(InvoiceVo invoiceVo, String basePath) throws FileNotFoundException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, ParserConfigurationException, SAXException, MarshalException,
 			KeyStoreException, IOException, CertificateException, Exception {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = userHomeDir + "/xmlsSunat/signatureSunat/FIRMABETA.pfx";
+		String rutaXML = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String rutaFirma = basePath + "/certificates/FIRMABETA.pfx";
+		
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -205,12 +204,12 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static String envio(InvoiceVo invoiceVo) {
+	public static String envio(InvoiceVo invoiceVo, String basePath) {
 		String UsuSol = "MODDATOS";// pruebas de sunat
 		String PassSol = "moddatos";// password de prueba de sunat
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
-		String RutaArchivo = userHomeDir + "/xmlsSunat/";
+		String RutaArchivo = basePath + "/xmlsSunat/";
 		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, RutaWS);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
