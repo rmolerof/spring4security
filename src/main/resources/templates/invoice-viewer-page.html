@@ -21,19 +21,19 @@
             		<div class="page-content-wrapper">
 		                <!-- BEGIN CONTENT BODY -->
 		                <div class="page-content">
-			            	Status: <strong class="uppercase"><span id="errorAlert"></span></strong>
+			            	<!-- Status: <strong class="uppercase"><span id="errorAlert"></span></strong> -->
 		                    <div class="invoice">
 			                     <div class="row invoice-logo">
-						              <div class="col-xs-6 invoice-logo-space">
-						                  <!-- <img src="../assets/pages/media/invoice/lajoya.png" class="img-responsive" alt="" /> --></div> 
-						              <div class="col-xs-6">
+						              <div class="col-xs-12 invoice-logo-space">
+						                  <!-- <img src="../assets/pages/media/invoice/lajoya.png" class="img-responsive" alt="" /> -->
+						                  Status: <strong class="uppercase"><span id="errorAlert"></span></strong></div> 
+						              <div class="col-xs-12 text-center">
 						                  <p> <strong class="uppercase "><span id="invoiceType"></span> ELECTRÓNICA</strong> <br/>
 						                      <span class="muted"> RUC: 20501568776  </span><br/>
 						                      <span class="muted bold" id="invoiceNbr"></span>
 						                  </p>
 						              </div>
 						          </div>
-			                     <hr/>
 			                     <div class="row">
 						              <div class="col-md-12">
 						                  <ul class="list-unstyled">
@@ -48,20 +48,20 @@
         		
 						    	      <div class="row">
 							    	      <div class="col-md-3">
-								              <div class="form-group">
+								              <div class="form-group" style="margin-bottom: 0px;">
 								                  <label class="control-label">Fecha</label>: 
 								                  <span id="dateId"></span>
 								                  
 								              </div>
 								          </div>
 						    	      	  <div class="col-md-2">
-						    	              <div class="form-group">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
 						    	                  <label class="control-label"><span id="clientDocType"></span></label>: 
 						    	                  <span id="clientDocNumber"></span>
 						    	              </div>
 						    	          </div>
 						    	          <div class="col-md-5">
-						    	              <div class="form-group">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
 						    	                  <label class="control-label"><span id="clientNameVrb"></span></label>: 
 						    	                  <span id="clientName"></span>
 						    	              </div>
@@ -69,13 +69,13 @@
 						              </div>
 						              <div class="row">
 						    	          <div class="col-md-5">
-						    	              <div class="form-group">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
 						    	                  <label class="control-label">Dirección: </label>
 						    	                  <span id="clientAddress"></span>
 						    	              </div>
 						    	          </div>
-						    	          <div class="col-md-5 selectedOption" > <!-- {this.state.selectedOption != 'boleta' && -->
-						    	              <div class="form-group">
+						    	          <div class="col-md-5" > <!-- {this.state.selectedOption != 'boleta' && -->
+						    	              <div class="form-group" style="margin-bottom: 0px;">
 						    	                  <label class="control-label">Nro de Placa: </label>
 						    	                  <span id="truckPlateNumber"></span>
 						    	              </div>
@@ -97,35 +97,35 @@
 			                                     <tr id="d2Row">
 			                                         <td> 01-MAX-D BIODIESEL </td>
 			                                         <td class="text-right"> <span id="galsD2"></span> </td>
-			                                         <td class="text-right"> S/ <span id="priceD2"></span> </td>
-			                                         <td class="text-right"> S/ <span id="solesD2"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceD2"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesD2"></span> </td>
 			                                     </tr>
 			                                     <tr id="g90Row">
 			                                         <td> 02-GASOHOL 90 </td>
 			                                         <td class="text-right"> <span id="galsG90"></span> </td>
-			                                         <td class="text-right"> S/ <span id="priceG90"></span> </td>
-			                                         <td class="text-right"> S/ <span id="solesG90"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceG90"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesG90"></span> </td>
 			                                     </tr>
 			                                     <tr id="g95Row">
 			                                         <td> 03-GASOHOL 95 </td>
 			                                         <td class="text-right"> <span id="galsG95"></span> </td>
-			                                         <td class="text-right"> S/ <span id="priceG95"></span> </td>
-			                                         <td class="text-right"> S/ <span id="solesG95"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceG95"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesG95"></span> </td>
 			                                     </tr>
 			                                 </tbody>
 			                             </table>
 			                         </div>
 			                     </div>
 			                     <div class="row">
-			                         <div class="col-xs-6">
+			                         <div class="col-xs-6 hidden-xs">
 			                             <div >
 			                                  <address>
-								                  <strong>Son: </strong> <span id="totalVerbiage"></span>
-							                      <br/> <strong>Código Hash: </strong> <span id="invoiceHash"></span>
-							                	  <div id="creditNoteDetails">
-							                	  <strong>Motivo: </strong> <span id="motiveCdDescription"></span>
-							                	  <br/> <strong>Nro Documento Referencia: </strong> <span id="invoiceNumberModified"></span>
-							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span id="dateOfInvoiceModified"></span>
+								                  <strong>Son: </strong> <span class="totalVerbiage"></span>
+							                      <br/> <strong>Código Hash: </strong> <span class="invoiceHash"></span>
+							                	  <div class="creditNoteDetails">
+							                	  <strong>Motivo: </strong> <span class="motiveCdDescription"></span>
+							                	  <br/> <strong>Nro Documento Referencia: </strong> <span class="invoiceNumberModified"></span>
+							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span class="dateOfInvoiceModified"></span>
 							                	  </div>
 							                  </address>
 							                  <address>
@@ -134,7 +134,7 @@
 							                  </address>
 			                             </div>
 			                         </div>
-			                         <div class="col-xs-6 invoice-block">
+			                         <div class="col-xs-12 invoice-block">
 										<table class="table table-condensed table-hover">
 											<tbody>
 												<tr>
@@ -179,24 +179,48 @@
 												</tr>
 											</tbody>
 										</table>
-			                             <a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
-			                                 <i class="fa fa-print"></i>
-			                             </a>
+			                             
 			                         </div>
-			                    </div>
-			                    <div class="row">
-			                    	<div class="col-xs-4">
+			                         <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
 			                             <div >
 			                                  <address>
-							                      <strong>Código QR:</strong>
+								                  <strong>Son: </strong> <span class="totalVerbiage"></span>
+							                      <br/> <strong>Código Hash: </strong> <span class="invoiceHash"></span>
+							                	  <div class="creditNoteDetails">
+							                	  <strong>Motivo: </strong> <span class="motiveCdDescription"></span>
+							                	  <br/> <strong>Nro Documento Referencia: </strong> <span class="invoiceNumberModified"></span>
+							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span class="dateOfInvoiceModified"></span>
+							                	  </div>
 							                  </address>
-							                  <div style="width: '150px'; height: '150px'; display: 'block'; margin: 'auto'; zoom: 0.3" >
-									          	<div id="qrcode1" class="col-xs-12 col-md-offset-3" ></div>
-									          </div>
+							                  <address>
+							                      <strong>Potenciado por:</strong>
+							                      <a> www.grifoslajoya.com </a>
+							                  </address>
 			                             </div>
 			                         </div>
 			                    </div>
+			                    <div class="row">
+								<div class="col-xs-4">
+									<div class="text-center">
+										<table class="table table-condensed table-hover">
+											<tbody>
+												<tr>
+													<td><strong>Código&nbsp;QR:</strong></td>
+													<td><div
+														style="width: '150px'; height: '150px'; display: 'block'; margin: 'auto'; zoom: 0.3">
+														<div id="qrcode1" class="col-xs-12 col-md-offset-3"></div>
+														</div>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
 		                	</div>
+		                	<a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
+                                <i class="fa fa-print"></i>
+                            </a>
 	                	</div>
                 	</div>
                	</div>
