@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5a10a553-797d-4482-8c3c-0c2c68849727">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mlab"/>
+	
+	<field name="id" class="org.bson.types.ObjectId"/>
+	<field name="cashGiven" class="java.lang.Double"/>
+	<field name="cashPmt" class="java.lang.Double"/>
+	<field name="change" class="java.lang.Double"/>
+	<field name="clientAddress" class="java.lang.String"/>
+	<field name="clientDocNumber" class="java.lang.String"/>
+	<field name="clientDocType" class="java.lang.String"/>
+	<field name="clientName" class="java.lang.String"/>
+	<field name="date" class="java.util.Date"/>
+	<field name="dateOfInvoiceModified" class="java.util.Date"/>
+	<field name="discount" class="java.lang.Double"/>
+	<field name="electronicPmt" class="java.lang.Double"/>
+	<field name="galsD2" class="java.lang.Double"/>
+	<field name="galsG90" class="java.lang.Double"/>
+	<field name="galsG95" class="java.lang.Double"/>
+	<field name="invoiceHash" class="java.lang.String"/>
+	<field name="invoiceNumber" class="java.lang.String"/>
+	<field name="invoiceNumberModified" class="java.lang.String"/>
+	<field name="invoiceType" class="java.lang.String"/>
+	<field name="invoiceTypeModified" class="java.lang.String"/>
+	<field name="motiveCd" class="java.lang.String"/>
+	<field name="motiveCdDescription" class="java.lang.String"/>
+	<field name="priceD2" class="java.lang.Double"/>
+	<field name="priceG90" class="java.lang.Double"/>
+	<field name="priceG95" class="java.lang.Double"/>
+	<field name="saveOrUpdate" class="java.lang.String"/>
+	<field name="solesD2" class="java.lang.Double"/>
+	<field name="solesG90" class="java.lang.Double"/>
+	<field name="solesG95" class="java.lang.Double"/>
+	<field name="subTotal" class="java.lang.Double"/>
+	<field name="total" class="java.lang.Double"/>
+	<field name="totalIGV" class="java.lang.Double"/>
+	<field name="totalVerbiage" class="java.lang.String"/>
+	<field name="truckPlateNumber" class="java.lang.String"/>
+	<title>
+		<band height="108">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="-14" width="305" height="106" backcolor="#006699" uuid="61b26b08-1e16-4ac0-9f4e-54cdb9fcb3d5"/>
+				<staticText>
+					<reportElement x="20" y="10" width="272" height="43" forecolor="#FFFFFF" uuid="9bca019e-5344-41a2-b1e1-233b3b2a3ed0"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[GRIFO
+LA JOYA DE SANTA ISABEL E.I.R.L.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="54" y="50" width="196" height="58" forecolor="#FFFFFF" uuid="f20c60f6-d6cc-48c1-be84-abb796c67763"/>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Av. Miguel Grau Mza B Lote 1-2
+Lima - Lima - Ate
+Teléfono: +51 356 0345
+www.grifoslajoya.com
+RUC: 20501568776
+DNI	]]></text>
+				</staticText>
+			</frame>
+			<rectangle>
+				<reportElement x="350" y="0" width="175" height="76" uuid="737fa893-6399-406b-b260-1c8d71d47c7a"/>
+			</rectangle>
+			<line>
+				<reportElement x="350" y="21" width="175" height="1" uuid="9760dcbd-6fd2-4752-9828-eefc864f7336"/>
+			</line>
+			<staticText>
+				<reportElement x="390" y="33" width="100" height="17" uuid="3e8ac9cc-56bf-4942-b83a-cf16c2fc3a22"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[RUC: 20501568776]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="390" y="46" width="100" height="30" uuid="a82d8c39-6504-4a52-ad2d-6cab777e332f"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{invoiceNumber}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="100" width="555" height="1" uuid="97db5e6b-29b6-482b-b290-17f73cf45045"/>
+			</line>
+			<rectangle>
+				<reportElement x="350" y="0" width="175" height="21" backcolor="#EDEBEB" uuid="e624999c-2798-48b8-98f1-c96251b4b4eb"/>
+			</rectangle>
+			<textField>
+				<reportElement x="340" y="3" width="106" height="30" uuid="a82d8c39-6504-4a52-ad2d-6cab777e332f"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{invoiceType}.equals( "03") ? "BOLETA" : ($F{invoiceType}.equals( "01") ? "FACTURA": "NOTA DE CRÉDITO" )]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="446" y="3" width="79" height="20" uuid="c1d2a245-08a0-47ac-a64b-b0009666bc3c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ ELECTRÓNICA]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="133" splitType="Stretch">
+			<textField>
+				<reportElement x="106" y="40" width="100" height="30" uuid="151dfd19-0f22-4520-8294-a1fa400a56ed">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{clientDocNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="20" width="170" height="30" uuid="091c2013-c4ae-4a76-8a95-9fbe63dc497b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="632ccc59-a153-42f5-a9b6-4c80001fcc7f"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{clientName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="0" width="100" height="30" uuid="542737d8-bc49-43a8-9b33-0c6b9f2a7f0e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3310d51f-6727-4478-8baa-18320a48a87a"/>
+				</reportElement>
+				<text><![CDATA[Fecha:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="41" width="100" height="30" uuid="4160725b-9429-44db-ac10-14c9d9285e05">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{clientDocType}.equals("6") ? "RUC:" : "DNI:"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="60" width="100" height="30" uuid="242851c7-c9d5-458f-b9b4-727c08bbc781">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3310d51f-6727-4478-8baa-18320a48a87a"/>
+				</reportElement>
+				<text><![CDATA[Dirección:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="106" y="60" width="448" height="30" uuid="b8b9d073-870d-4b7e-8c96-0d5601caab32">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{clientAddress}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="87" width="100" height="30" uuid="81c00620-7ddd-4cb5-9276-5d4ddb07a031">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3310d51f-6727-4478-8baa-18320a48a87a"/>
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "03") ? new Boolean(false): new Boolean(true)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Nro de Placa:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="106" y="87" width="100" height="30" uuid="da1b79f4-6bfd-4724-a084-879c51e595c9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "03") ? new Boolean(false): new Boolean(true)]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{truckPlateNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="0" width="149" height="30" uuid="436ef052-1a10-475a-9971-4a60c3e53a08"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="6" y="20" width="100" height="30" uuid="c13c25ac-750c-4a8d-952b-196f4076a765">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{clientDocType}.equals("6") ? "Razón Social:" : "Señor(es):"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="554" splitType="Stretch">
+			<textField>
+				<reportElement x="106" y="36" width="100" height="20" uuid="5a5e3b2a-12b0-4b50-acee-dbb0ed49362f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.3f gals", $F{galsD2})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="38" width="100" height="20" uuid="bf71d8b7-f611-4d41-aa7b-98f8c993ba2f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b365777f-56e7-49f4-a0ff-94e1205a45fc"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{solesD2})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="261" y="36" width="100" height="20" uuid="2c8aae85-58e1-4a17-a42a-47dd640ad5da">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="96d789d8-5fdd-4db9-8a43-bcab834d1c84"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{priceD2})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="37" width="100" height="20" uuid="8754880a-446f-416e-877c-719f38d44186"/>
+				<text><![CDATA[MAX-D BIODIESEL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="261" y="63" width="100" height="22" uuid="64eb1594-a835-48f2-9635-6264a7ae5b07">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="96d789d8-5fdd-4db9-8a43-bcab834d1c84"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{priceG90})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="63" width="100" height="20" uuid="6a6fcf5c-22e5-4516-8a32-7a5981dfcc6d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.3f gals", $F{galsG90})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="64" width="100" height="20" uuid="0fc46ec7-9d1a-4ade-a47d-d9969815d716">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b365777f-56e7-49f4-a0ff-94e1205a45fc"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{solesG90})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="261" y="97" width="100" height="18" uuid="b902036d-ccab-439d-86a8-c59f1d47f489">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="96d789d8-5fdd-4db9-8a43-bcab834d1c84"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{priceG95})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="99" width="100" height="16" uuid="2388066a-fb92-4e46-a3bb-bd0caa910c71">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.3f gals", $F{galsG95})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="95" width="100" height="20" uuid="7bbaa096-2ff6-4ea7-aae5-6ba8a5b4616c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b365777f-56e7-49f4-a0ff-94e1205a45fc"/>
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("S/ %.2f", $F{solesG95})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="68" width="100" height="14" uuid="6335eb7a-ebe3-4761-9dff-d18b43f248ff">
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[GASOHOL 90]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="99" width="100" height="16" uuid="c2a22fc6-2892-46a4-b522-f1ba4ba8318d">
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[GASOHOL 95]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="267" y="125" width="100" height="18" uuid="d2c7e3bc-ab67-41e7-8856-43cab393e613"/>
+				<text><![CDATA[Sub-total ventas:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="125" width="143" height="18" uuid="a8587a1a-a511-4bf1-8f59-809f62f1f36f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{subTotal})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="143" width="100" height="18" uuid="ecbf5098-a33b-4211-b18a-e65d9ff598e7"/>
+				<text><![CDATA[Descuento:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="143" width="143" height="18" uuid="4fed812d-77aa-4092-b3af-c8d9e960fb0b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{discount})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="161" width="100" height="18" uuid="134246e8-7f40-4a6a-8bea-c44ec7f4fe40"/>
+				<text><![CDATA[IGV(18%):]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="161" width="143" height="18" uuid="ae17e4d8-bfcd-4f74-9bf7-3c7f90da2c54">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{totalIGV})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="179" width="100" height="18" uuid="fb0e748b-13e7-46cf-9e46-25d25e00ca04"/>
+				<text><![CDATA[Importe total:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="179" width="143" height="18" uuid="1b279494-d100-4055-a1fc-ae063260b00d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{total})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="197" width="100" height="18" uuid="7d4d271c-b15b-4de7-8e7e-1b4bc926be61"/>
+				<text><![CDATA[Tarjeta de Crédito/Débito:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="197" width="143" height="18" uuid="7c7c33bc-cf96-4245-94e0-f040c5434d92">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{electronicPmt})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="215" width="100" height="18" uuid="4d996301-7d05-4f29-b1c2-fa2f9624fbe2"/>
+				<text><![CDATA[Efectivo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="215" width="143" height="18" uuid="5e75a3c4-0f3e-481e-975c-dd060b2d8a69">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{cashPmt})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="233" width="100" height="18" uuid="b7df9605-1cfa-491d-a4b5-4ce910edbd6e"/>
+				<text><![CDATA[Efectivo Entregado:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="233" width="143" height="18" uuid="7c13d944-c309-42b8-aa69-e53db5c0793e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{cashGiven})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="251" width="100" height="18" uuid="94506ffc-34e8-4e94-96d8-414df6f3fb72"/>
+				<text><![CDATA[Vuelto:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="368" y="251" width="143" height="18" uuid="7429539f-5a57-41fa-b493-5e5655055311">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{change})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="292" width="100" height="18" uuid="2af92bed-b552-4bfe-bc7b-eba8ac36f3ed"/>
+				<text><![CDATA[Son:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="292" width="268" height="18" uuid="4dfbc155-bd13-4dd7-aacf-af46f3b584bc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{totalVerbiage}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="310" width="100" height="20" uuid="92a77def-c896-4572-91a0-f594d04b1b75"/>
+				<text><![CDATA[Código Hash:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="310" width="268" height="20" uuid="5b518bf4-933c-42e1-ac93-c77b2b386a23">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{invoiceHash}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="330" width="100" height="20" uuid="a7daa1ab-b392-4fd4-9f85-b23e5aea395f">
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Motivo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="330" width="268" height="20" uuid="9bf74a78-bae5-43f8-a0f8-179e5e56a249">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{motiveCdDescription}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="350" width="100" height="30" uuid="d382954d-d3a3-4747-aa10-b2de11a5c68e">
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Nro Documento Referencia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="350" width="268" height="20" uuid="9b8aafed-b53d-4743-8222-a46997f76459">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{invoiceNumberModified}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="380" width="100" height="30" uuid="8efc07e2-69b6-49fd-b3ef-047b809389c9">
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Fecha Documento Referencia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="380" width="268" height="30" uuid="6a8c80fa-a734-4a7a-a104-b3d46accd74d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{dateOfInvoiceModified})]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="62" y="416" width="150" height="100" uuid="22fdb3ee-1d6b-4bfb-aeaa-1aa5ab19396f"/>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<jr:codeExpression><![CDATA["20501568776" + "|" + $F{invoiceType} + "|" + $F{invoiceNumber}.substring(0, 4) + "|" + $F{invoiceNumber}.substring(5, 13) + "|" + $F{totalIGV} + "|" + $F{total} + "|" + new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{date}) + "|" + $F{clientDocType} + "|" + $F{clientDocNumber}]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+			<line>
+				<reportElement x="0" y="60" width="555" height="1" uuid="73d59907-3fcc-47df-8b4e-37a45048da9c">
+					<printWhenExpression><![CDATA[$F{galsD2} > 0.0 ? new Boolean(true) : new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="0" y="90" width="555" height="1" uuid="82febff7-090b-4c56-92f3-d80a3691ed44">
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="0" y="119" width="555" height="1" uuid="e80e3d63-3110-4a4a-9eb0-25cf448f66b5">
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="-1" y="280" width="555" height="1" uuid="9c872f47-4c69-410e-b92a-bb536dd78c66">
+					<printWhenExpression><![CDATA[$F{galsG90} > 0.0 ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="29" backcolor="#EDEBEB" uuid="26220612-c47a-4d07-8441-edf91b67fb17"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="416" width="100" height="30" uuid="26356e61-cb79-4ac5-b3e7-59fd27fa69d7"/>
+				<text><![CDATA[Código QR:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="163" y="7" width="100" height="19" uuid="35e41e97-9f47-4b5e-a2d9-d80467753519">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="7" width="100" height="20" uuid="45ce88b7-8765-454e-92f3-4698f4e3bad4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b365777f-56e7-49f4-a0ff-94e1205a45fc"/>
+				</reportElement>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="7" width="100" height="20" uuid="ab236563-3a25-44ff-85d9-a10fea37e6ee">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="96d789d8-5fdd-4db9-8a43-bcab834d1c84"/>
+				</reportElement>
+				<text><![CDATA[Precio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="8" width="100" height="18" uuid="782ad7dd-0b91-4221-9291-ecbb74ec7301"/>
+				<text><![CDATA[Producto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-1" y="520" width="268" height="30" uuid="98714b11-1c9d-407f-bde8-9dc48ffd56df"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Consulte su comprobante en: www.grifoslajoya.com]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="125" width="19" height="18" uuid="5857977b-5bc5-4ed3-8d05-fd51f0897356"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="143" width="19" height="18" uuid="b80659ce-5e10-47d7-b0c0-7fcbb400bf3d"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="161" width="19" height="18" uuid="6d51cc8f-cb83-4336-9b90-c9d09770b1f5"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="179" width="19" height="18" uuid="37989bef-c349-41b0-b56a-4048cc3511db"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="197" width="19" height="18" uuid="e7ddae02-1d3d-434c-b064-581d278826c9"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="215" width="19" height="18" uuid="2b6fab36-f00f-40e4-9e44-77334eddd8e0"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="233" width="19" height="18" uuid="ad2fbaa9-52c6-4df2-8359-ad0c080b34b2"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="251" width="19" height="18" uuid="10a88cc3-1315-4a2e-99ca-1fbae8cd7d0f"/>
+				<text><![CDATA[S/]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

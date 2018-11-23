@@ -1,5 +1,6 @@
 package hello.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import hello.businessModel.GasPricesVo;
 import hello.businessModel.Station;
 import hello.businessModel.TanksVo;
+import hello.model.AjaxEmailInvoiceResponse;
 import hello.model.AjaxGetDniResponse;
 import hello.model.AjaxGetInvoiceResponse;
 import hello.model.AjaxGetInvoicesResponse;
@@ -34,18 +36,20 @@ import hello.rucdnisearch.DNIVo;
 import hello.rucdnisearch.RUCVo;
 import hello.services.RucDniService;
 import hello.services.UserService;
+import hello.services.Utils;
 
 @RestController
 public class SearchController {
 
 	UserService userService;
-	
 	@Autowired
 	public void setUserService(UserService userService) {
 		this.userService = userService;
 	}
 	@Autowired
 	RucDniService rucDniService;
+	@Autowired
+	Utils utils;
 	
 	@PostMapping("/api/search")
 	public ResponseEntity<?> getSearchResultViaAjax(@Valid @RequestBody SearchCriteria search, Errors errors){
@@ -271,13 +275,13 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<InvoiceVo> users = userService.submitInvoice(invoiceVo);
-		if(users.isEmpty()) {
-			result.setMsg("No se pudeo enviar recibo");
+		List<InvoiceVo> invoiceVos = userService.submitInvoice(invoiceVo);
+		if(invoiceVos.isEmpty()) {
+			result.setMsg("No se pudo remitir comprobante: " + invoiceVo);
 		} else {
-			result.setMsg("Recibo enviado");
+			result.setMsg("Comprobante remitido: " + invoiceVos.get(0).getInvoiceNumber());
 		}
-		result.setResult(users);
+		result.setResult(invoiceVos);
 		
 		return ResponseEntity.ok(result);
 		
@@ -370,6 +374,42 @@ public class SearchController {
 			result.setMsg("Datos hallados");
 		}
 		result.setResult(users);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/emailInvoice")
+	public ResponseEntity<?> emailInvoice(@Valid @RequestBody SearchInvoiceCriteria search, Errors errors){
+		AjaxEmailInvoiceResponse result = new AjaxEmailInvoiceResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		// Generate XML
+		String xmlPath = utils.generateXMLFromDB(search.getInvoiceNumber());
+		
+		// Generate PDF
+		String pdfPath = utils.generateReport(search.getInvoiceNumber());
+		
+		String to = "rmolerof@gmail.com";
+		String from = "support@grifoslajoya.net";
+		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
+		String body = "Buen Día. Adjuntado está su comprobante de pago: " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
+		List<String> attachmentPaths = Arrays.asList(new String(xmlPath), new String(pdfPath));
+		
+		String response = utils.sendEmail(to, from, subject, body, attachmentPaths);
+		
+		if(response.equals("0")) {
+			result.setMsg("No se pudo enviar email para comprobante: " + search.getInvoiceNumber());
+		} else {
+			result.setMsg("Email enviado para comprobante: " + search.getInvoiceNumber());
+		}
+		result.setResult(response);
 		
 		return ResponseEntity.ok(result);
 		

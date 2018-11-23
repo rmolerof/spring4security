@@ -57,6 +57,7 @@ class TableDashboard extends React.Component {
     	  clientNamePH: 'Nombre(s)',
       },
       loadingGif: false,
+      emailingGif: false,
       invoiceTypeModified: '01',
       invoiceNumberModified: '',
       invoiceNumberModifiedDisp: '',
@@ -542,6 +543,45 @@ class TableDashboard extends React.Component {
 	  
   }
   
+  emailInvoice = () => {
+	var self = this;
+	var search = {};
+	self.setState({ showError: false, showSuccess: false });
+	
+	search["invoiceNumber"] = self.state.invoiceNumber;
+	search["selectedOption"] = self.state.selectedOption;
+	
+	self.setState({emailingGif: true});
+	
+	$.ajax({
+		type: "POST",
+		contentType: "application/json", 
+		url:"/api/emailInvoice",
+		data: JSON.stringify(search),
+		datatype: 'json',
+		cache: false,
+		timeout: 600000,
+		success: function(data) {
+			
+		  if (data.result == '1') {	
+			  self.setState({ sunatErrorStr: data.msg });
+			  self.setState({ showSuccess: true });
+		  } else {
+		  	  var errors = {
+	  			  submit: data.msg
+		  	  };
+		  	  self.setState({errors: errors}); 
+		  	  self._toggleError();
+		  }
+		  
+		  self.setState({emailingGif: false});
+	
+		}, error: function(e){
+			console.log("ERROR: ", e);
+		}	
+	});
+  }
+  
   newInvoice = () => {
 	  
 	  $('canvas').remove();
@@ -788,7 +828,8 @@ class TableDashboard extends React.Component {
 					if (invoiceVoResp.sunatErrorStr.charAt(0) == "1" && invoiceVoResp.status == '1') {
 						self.setState({ totalVerbiage: invoiceVoResp.totalVerbiage });
 						self.setState({ invoiceHash: invoiceVoResp.invoiceHash });
-						self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });
+						/*self.setState({ sunatErrorStr: invoiceVoResp.sunatErrorStr });*/
+						self.setState({ sunatErrorStr: data.msg });
 						self.setState({ status: invoiceVoResp.status });
 						self.setState({ invoiceNumber: invoiceVoResp.invoiceNumber });
 						
@@ -881,7 +922,7 @@ class TableDashboard extends React.Component {
 
 	      {this.state.showSuccess && 
 	      	<div className="alert alert-success">
-	      		<strong>Success!</strong> Tu recibo has sido remitido. {this.state.sunatErrorStr}
+	      		<strong>Success!</strong> {this.state.sunatErrorStr}
 	      	</div>
 	      }
 	      
@@ -1212,6 +1253,10 @@ class TableDashboard extends React.Component {
 	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
+	    	          <button type="button" onClick={this.emailInvoice} disabled={!this.state.submitDisabled} className="btn green-meadow hidden-print margin-bottom-5">
+	    	          	<i className="fa fa-envelope"></i> Email
+	    	          </button>&nbsp;
+	    	          {/*<a type="submit" onClick={this.emailInvoice.bind(this)} disabled={!this.state.submitDisabled} className="btn green-meadow margin-bottom-5"><i className="fa fa-envelope"></i> Email</a>&nbsp;*/}
 	    	          <a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
 	              </div>
 	          </div>

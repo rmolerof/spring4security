@@ -185,7 +185,7 @@ public class XmlSunat {
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
 		String rutaXML = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = basePath + "/certificates/FIRMABETA.pfx";
+		String rutaFirma = basePath + "/certificatesAndTemplates/FIRMABETA.pfx";
 		
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    

@@ -1,10 +1,36 @@
 package hello.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import hello.businessModel.Dispenser;
@@ -12,10 +38,31 @@ import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TotalDay;
+import hello.domain.InvoiceDao;
+import hello.domain.InvoicesRepository;
 import hello.model.DayDataCriteria;
+import hello.model.InvoiceVo;
+import hello.reports.CustomJRDataSource;
+import hello.sunat.XmlSunat;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 @Service
 public class Utils {
+	
+	private static Logger logger = LogManager.getLogger(Utils.class);
+	
+	private String basePath;
+	public static final String myRUC = "20501568776";
+	
+	@Autowired
+    private InvoicesRepository invoicesRepository;
+	@Autowired
+	private ResourceLoader resourceLoader;
 
 	public Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
 		
@@ -62,12 +109,177 @@ public class Utils {
 			entry.getValue().setGals(totalDay.getStockGals(entry.getKey()));
 		}
 		
-		// Save updated station status
-		//System.out.println(newCurrentStation);
-		
 		return newCurrentStation;
 	}
 	
+	public String sendEmail(String to, String from, String subject, String body, List<String> attachmentPaths) {
+
+		// IAM user name: ses-smtp-user.grifoslajoya
+		final String username = "AKIAJGROAN7ASXFRCUFQ";// change accordingly 20181119-215130
+		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";// change accordingly
+
+		// Assuming you are sending email through relay.jangosmtp.net
+		String host = "email-smtp.us-east-1.amazonaws.com";
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", "587");
+
+		// Get the Session object.
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+
+		try {
+			// Create a default MimeMessage object.
+			Message message = new MimeMessage(session);
+
+			// Set From: header field of the header.
+			message.setFrom(new InternetAddress(from));
+
+			// Set To: header field of the header.
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+
+			// Set Subject: header field
+			message.setSubject(subject);
+
+			// Create the message part
+			BodyPart messageBodyPart = new MimeBodyPart();
+
+			// Now set the actual message
+			messageBodyPart.setText(body);
+
+			// Create a multipar message
+			Multipart multipart = new MimeMultipart();
+
+			// Set text message part
+			multipart.addBodyPart(messageBodyPart);
+
+			// Part two is attachment
+			for (String path: attachmentPaths) {
+				addAttachment(multipart, path);
+			}
+
+			// Send the complete message parts
+			message.setContent(multipart);
+
+			// Send message
+			Transport.send(message);
+
+			logger.info("Email sent successfully. Subject: " + subject);
+			
+			return "1";
+		} catch (MessagingException e) {
+			logger.error(e.getMessage());
+			//throw new RuntimeException(e);
+			return "0";
+		}
+
+	}
+
+	private static void addAttachment(Multipart multipart, String filename) throws MessagingException {
+		DataSource source = new FileDataSource(filename);
+		BodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setDataHandler(new DataHandler(source));
+		messageBodyPart.setFileName(new File(filename).getName());
+		multipart.addBodyPart(messageBodyPart);
+	}
+	
+	public String generateReport(String invoiceNbr) {
+		JasperReport jasperReport;
+		JasperPrint jasperPrint;
+		String pdfPath = getBasePath() + "/jasperReports/Comprobante_" + invoiceNbr + ".pdf";
+		
+		if (new File(pdfPath).isFile()) {
+			logger.info("File found in local memory: " + pdfPath);
+		} else {
+			
+			// Create path if basePath doesn't exist
+			File f = new File(pdfPath);
+		    if(!f.getParentFile().isDirectory()){
+				f.getParentFile().mkdirs();
+			}
+		
+			try {
+				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesandtemplates/laJoyaInvoice.jrxml");
+				
+				List<InvoiceDao> custList = Stream.of(invoicesRepository.findFirstByInvoiceNumber(invoiceNbr)).collect(Collectors.toList());
+				
+				CustomJRDataSource<InvoiceDao> dataSource = new CustomJRDataSource<InvoiceDao>().initBy(custList);
+				jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<String, Object>(), dataSource);
+				JasperExportManager.exportReportToPdfFile(jasperPrint, pdfPath);
+			
+			} catch(JRException e) {
+				logger.error(e.getMessage());
+				pdfPath = "";
+			} catch(Exception e) {
+				logger.error(e.getMessage());
+				pdfPath = "";
+			}
+		}
+		
+		return pdfPath;
+	}
+	
+	public String generateXMLFromDB(String invoiceNbr) {
+		
+		
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+		String xmlPath = getBasePath() + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+		
+		if (new File(xmlPath).isFile()) {
+			logger.info("File found in local memory: " + xmlPath);
+		} else {
+			
+			try {
+				
+				XmlSunat.invokeSunat(invoiceVo, getBasePath());
+				XmlSunat.firma(invoiceVo, getBasePath());
+				
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				xmlPath = "";
+			}
+		}
+		
+		return xmlPath;
+	}
+	
+	public void deletePath(String path) {
+		// Delete files in xmlsSunat folder
+		File f = new File(path);
+		if (f.exists() && f.isDirectory()) {
+			try {
+				FileUtils.cleanDirectory(f.getAbsoluteFile());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public String getBasePath() {
+		if (null == this.basePath) {
+			try {
+				this.basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
+				
+				return this.basePath;
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+			}
+		} 
+		
+		return basePath;
+	}
+	
+	public void setBasePath(String basePath) {
+		this.basePath = basePath;
+	}
+
 	public double toFixedTwo(double amt) {
 		return Math.floor(amt * 100) / 100.0;
 	}
