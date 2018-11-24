@@ -19,6 +19,7 @@ public class DNIDao {
 	private String nombre;
 	private String paterno;
 	private String materno;
+	private String correoElectronico = "";
 	
 	public DNIDao() {
 		super();
@@ -27,6 +28,7 @@ public class DNIDao {
 	public DNIDao(DNIVo dniVo) {
 		this.date = new Date(dniVo.getDate().getTime());
 		this.dni = new String(dniVo.getDni());
+		this.correoElectronico = new String(dniVo.getCorreoElectronico());
 		this.nombre = new String(dniVo.getNombre());
 		this.paterno = new String(dniVo.getPaterno());
 		this.materno = new String(dniVo.getMaterno());
@@ -73,6 +75,14 @@ public class DNIDao {
 
 	public void setDni(String dni) {
 		this.dni = dni;
+	}
+
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
 	}
 	
 	

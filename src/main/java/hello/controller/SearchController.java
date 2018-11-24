@@ -396,10 +396,13 @@ public class SearchController {
 		// Generate PDF
 		String pdfPath = utils.generateReport(search.getInvoiceNumber());
 		
-		String to = "rmolerof@gmail.com";
+		// Save email
+		utils.saveCustomerEmail(search.getClientEmailAddress(), search.getClientDocNumber(), search.getClientDocType());
+		
+		String to = search.getClientEmailAddress().toLowerCase();
 		String from = "support@grifoslajoya.net";
 		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
-		String body = "Buen Día. Adjuntado está su comprobante de pago: " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
+		String body = "Estimado Cliente. Buen día. Adjuntado está su comprobante: " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
 		List<String> attachmentPaths = Arrays.asList(new String(xmlPath), new String(pdfPath));
 		
 		String response = utils.sendEmail(to, from, subject, body, attachmentPaths);

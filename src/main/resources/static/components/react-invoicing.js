@@ -1,3 +1,5 @@
+var Modal = ReactBootstrap.Modal;
+var Button = ReactBootstrap.Button;
 
 class TableDashboard extends React.Component {
   constructor() {
@@ -6,6 +8,7 @@ class TableDashboard extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
+	  showEmailModal: false, 
 	  invoiceNumber: 'B001-XXXXXXXX',
 	  // customer
       clientDocNumber: '',
@@ -13,6 +16,7 @@ class TableDashboard extends React.Component {
       clientDocType: '1',
       clientAddress: '',
       truckPlateNumber: '',
+      clientEmailAddress: '',
 	  // invoice breakdown
       date: '',
       invoiceType: '03',
@@ -220,11 +224,15 @@ class TableDashboard extends React.Component {
   }
   
   clientAddressChange = (evt) => {
-	    this.setState({ clientAddress: evt.target.value });
+	    this.setState({ clientAddress: evt.target.value.toUpperCase() });
+  }
+  
+  clientEmailAddressChange = (evt) => {
+	    this.setState({ clientEmailAddress: evt.target.value.toUpperCase() });
   }
   
   clientNameChange = (evt) => {
-	    this.setState({ clientName: evt.target.value });
+	    this.setState({ clientName: evt.target.value.toUpperCase() });
   }
   
   clientDocNumberChange = (evt) => {
@@ -252,7 +260,7 @@ class TableDashboard extends React.Component {
   }
   
   truckPlateNumberChange = (evt) => {
-    this.setState({ truckPlateNumber: evt.target.value });
+    this.setState({ truckPlateNumber: evt.target.value.toUpperCase()});
   }
   
   _toggleError = () => {
@@ -413,6 +421,7 @@ class TableDashboard extends React.Component {
 					} else {
 						self.setState({clientAddress: data.result.direccionS});
 						self.setState({clientName: data.result.razonSocial});
+						self.setState({clientEmailAddress: data.result.correoElectronico});
 					}
 					
 					// hide delay delay
@@ -460,6 +469,7 @@ class TableDashboard extends React.Component {
 						self._toggleError();
 					} else {
 						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
+						self.setState({clientEmailAddress: data.result.correoElectronico});
 					}
 					
 					// hide delay delay
@@ -543,43 +553,57 @@ class TableDashboard extends React.Component {
 	  
   }
   
+  handleEmailModalCancel() {
+	  this.setState({ showEmailModal: false });
+  }
+  
+  handleEmailModalClose() {
+	    var self = this;
+		var search = {};
+  
+		self.setState({ showEmailModal: false });
+	    
+	    search["invoiceNumber"] = self.state.invoiceNumber;
+		search["selectedOption"] = self.state.selectedOption;
+		search["clientEmailAddress"] = self.state.clientEmailAddress;
+		search["clientDocNumber"] = self.state.clientDocNumber;
+		search["clientDocType"] = self.state.clientDocType;
+		
+		self.setState({emailingGif: true});
+		
+		$.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/emailInvoice",
+			data: JSON.stringify(search),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: function(data) {
+				
+			  if (data.result == '1') {	
+				  self.setState({ sunatErrorStr: data.msg });
+				  self.setState({ showSuccess: true });
+			  } else {
+			  	  var errors = {
+		  			  submit: data.msg
+			  	  };
+			  	  self.setState({errors: errors}); 
+			  	  self._toggleError();
+			  }
+			  
+			  self.setState({emailingGif: false});
+		
+			}, error: function(e){
+				console.log("ERROR: ", e);
+			}	
+		});
+  }
+  
   emailInvoice = () => {
 	var self = this;
-	var search = {};
-	self.setState({ showError: false, showSuccess: false });
+	self.setState({ showError: false, showSuccess: false, showEmailModal: true });
 	
-	search["invoiceNumber"] = self.state.invoiceNumber;
-	search["selectedOption"] = self.state.selectedOption;
-	
-	self.setState({emailingGif: true});
-	
-	$.ajax({
-		type: "POST",
-		contentType: "application/json", 
-		url:"/api/emailInvoice",
-		data: JSON.stringify(search),
-		datatype: 'json',
-		cache: false,
-		timeout: 600000,
-		success: function(data) {
-			
-		  if (data.result == '1') {	
-			  self.setState({ sunatErrorStr: data.msg });
-			  self.setState({ showSuccess: true });
-		  } else {
-		  	  var errors = {
-	  			  submit: data.msg
-		  	  };
-		  	  self.setState({errors: errors}); 
-		  	  self._toggleError();
-		  }
-		  
-		  self.setState({emailingGif: false});
-	
-		}, error: function(e){
-			console.log("ERROR: ", e);
-		}	
-	});
   }
   
   newInvoice = () => {
@@ -597,6 +621,7 @@ class TableDashboard extends React.Component {
 	      clientName: '',
 	      clientDocType: '1',
 	      clientAddress: '',
+	      clientEmailAddress: '',
 	      truckPlateNumber: '',
 		  // invoice breakdown
 	      date: new Date(),
@@ -902,7 +927,7 @@ class TableDashboard extends React.Component {
 	  }
   
   render() {    
-	 
+	  
 	  let buttonText = 'FACTURA';
 	  let invoicePrefix = 'F001-';
 	  if (!this.state.invoiceTypeModifiedToggle) {
@@ -1254,10 +1279,12 @@ class TableDashboard extends React.Component {
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
 	    	          <button type="button" onClick={this.emailInvoice} disabled={!this.state.submitDisabled} className="btn green-meadow hidden-print margin-bottom-5">
-	    	          	<i className="fa fa-envelope"></i> Email
+	    	          	<i className="fa fa-envelope"></i> Email 
 	    	          </button>&nbsp;
 	    	          {/*<a type="submit" onClick={this.emailInvoice.bind(this)} disabled={!this.state.submitDisabled} className="btn green-meadow margin-bottom-5"><i className="fa fa-envelope"></i> Email</a>&nbsp;*/}
 	    	          <a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
+	    	          {this.state.emailingGif &&
+    	                  <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 	              </div>
 	          </div>
 	          <div className="row">
@@ -1481,6 +1508,30 @@ class TableDashboard extends React.Component {
 	          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode2" className="col-xs-12 col-md-offset-3" ></div>
 	          </div>
 	      </div>
+	      
+	      <Modal show={this.state.showEmailModal} onHide={this.handleEmailModalCancel.bind(this)}>
+	          <Modal.Header closeButton>
+	            <Modal.Title>Ingrese o actualize email</Modal.Title>
+	          </Modal.Header>
+	          
+	          <Modal.Body>
+	            <p>
+		            <div className="input-group">
+		                <span className="input-group-addon">
+		                    <i className="fa fa-envelope"></i>
+		                </span>
+		                <input type="email" className="form-control" placeholder="Correo electrónico"  onKeyPress={this.onKeyPress} value={this.state.clientEmailAddress} onChange={this.clientEmailAddressChange}></input>
+			        </div>
+	            </p>
+	              
+	
+	          </Modal.Body>
+	          
+	          <Modal.Footer>
+	          	<Button onClick={this.handleEmailModalCancel.bind(this)}>Cancelar</Button>
+	          	<Button bsStyle="primary" onClick={this.handleEmailModalClose.bind(this)}>Enviar</Button>
+	          </Modal.Footer>
+          </Modal>
 	      
       </form>
     )

@@ -38,8 +38,12 @@ import hello.businessModel.ExpenseOrCredit;
 import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TotalDay;
+import hello.domain.DNIDao;
+import hello.domain.DNIsRepository;
 import hello.domain.InvoiceDao;
 import hello.domain.InvoicesRepository;
+import hello.domain.RUCDao;
+import hello.domain.RUCsRepository;
 import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
 import hello.reports.CustomJRDataSource;
@@ -63,6 +67,10 @@ public class Utils {
     private InvoicesRepository invoicesRepository;
 	@Autowired
 	private ResourceLoader resourceLoader;
+	@Autowired
+    private RUCsRepository rucsRepository;
+	@Autowired
+    private DNIsRepository dnisRepository;
 
 	public Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
 		
@@ -248,6 +256,41 @@ public class Utils {
 		}
 		
 		return xmlPath;
+	}
+	
+	public String saveCustomerEmail(String clientEmailAddress, String clientDocNumber, String clientDocType) {
+		
+		if (!clientDocNumber.equals("0")) {
+			if (clientDocType.equals("1")) {
+				
+				// search DNI in DB
+				DNIDao dniDao = dnisRepository.findFirstByDni(clientDocNumber);
+				
+				// if not Found, search in Sunat
+				if (null == dniDao) {
+					return "0";
+				}
+				
+				dniDao.setCorreoElectronico(clientEmailAddress);
+				dnisRepository.save(dniDao);
+				return "1";
+			} else {
+	
+				RUCDao rucDao = rucsRepository.findFirstByRuc(clientDocNumber);
+				
+				// if not Found, search in Sunat
+				if (null == rucDao) {
+					return "0";
+				}
+				
+				rucDao.setCorreoElectronico(clientEmailAddress);
+				rucsRepository.save(rucDao);
+				return "1";
+			}
+		}
+		
+		return "0";
+		
 	}
 	
 	public void deletePath(String path) {

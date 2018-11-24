@@ -8,6 +8,7 @@ public class RUCVo {
 	private String ruc;
 	private String razonSocial;
 	private String nombreComercial;
+	private String correoElectronico = "";
 	private String tipo;
 	private String estado;
 	private String condicion;
@@ -29,6 +30,7 @@ public class RUCVo {
 		this.ruc = new String(rucDao.getRuc());
 		this.razonSocial = new String(rucDao.getRazonSocial());
 		this.nombreComercial = new String(rucDao.getNombreComercial());
+		this.correoElectronico = new String(rucDao.getCorreoElectronico());
 		this.tipo = new String(rucDao.getTipo());
 		this.estado = new String(rucDao.getEstado());
 		this.condicion = new String(rucDao.getCondicion());
@@ -133,6 +135,14 @@ public class RUCVo {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
 	}
 
 	

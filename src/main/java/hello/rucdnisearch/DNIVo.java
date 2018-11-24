@@ -10,6 +10,7 @@ public class DNIVo {
 	private String nombre;
 	private String paterno;
 	private String materno;
+	private String correoElectronico = "";
 	private boolean status;
 	
 	public DNIVo() {
@@ -19,6 +20,7 @@ public class DNIVo {
 	public DNIVo(DNIDao dniDao) {
 		this.date = new Date(dniDao.getDate().getTime());
 		this.dni = new String(dniDao.getDni());
+		this.correoElectronico = new String(dniDao.getCorreoElectronico());
 		this.nombre = new String(dniDao.getNombre());
 		this.paterno = new String(dniDao.getPaterno());
 		this.materno = new String(dniDao.getMaterno());
@@ -65,6 +67,14 @@ public class DNIVo {
 
 	public void setDni(String dni) {
 		this.dni = dni;
+	}
+
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
 	}
 	
 	
