@@ -123,11 +123,13 @@ public class Utils {
 	public String sendEmail(String to, String from, String subject, String body, List<String> attachmentPaths) {
 
 		// IAM user name: ses-smtp-user.grifoslajoya
-		final String username = "AKIAJGROAN7ASXFRCUFQ";// change accordingly 20181119-215130
-		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";// change accordingly
-
-		// Assuming you are sending email through relay.jangosmtp.net
-		String host = "email-smtp.us-east-1.amazonaws.com";
+		/*final String username = "AKIAJGROAN7ASXFRCUFQ";
+		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";
+		String host = "email-smtp.us-east-1.amazonaws.com";*/
+		
+		final String username = "ruden.madero";
+		final String password = "rudenmadero@0820";
+		String host = "smtp.gmail.com";
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");

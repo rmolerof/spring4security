@@ -12,9 +12,12 @@ class TableDashboard extends React.Component {
 	  invoiceNumber: 'B001-XXXXXXXX',
 	  // customer
       clientDocNumber: '',
+      clientDocNumberDisabled: false,
       clientName: '',
+      clientNameDisabled: false,
       clientDocType: '1',
       clientAddress: '',
+      clientAddressDisabled: false,
       truckPlateNumber: '',
       clientEmailAddress: '',
 	  // invoice breakdown
@@ -236,7 +239,7 @@ class TableDashboard extends React.Component {
   }
   
   clientDocNumberChange = (evt) => {
-    this.setState({ clientDocNumber: evt.target.value });
+    this.setState({ clientDocNumber: evt.target.value.trim() });
     
     if (evt.target.value == '0' && this.state.selectedOption == 'boleta') {
     	this.setState({ clientName: 'CLIENTES VARIOS' });
@@ -394,6 +397,8 @@ class TableDashboard extends React.Component {
 		if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
 			// display RUC search loading
 			self.setState({loadingGif: true});
+			self.setState({clientNameDisabled: false});
+			self.setState({clientAddressDisabled: false});
 			
 			jQuery.ajax({
 				type: "POST",
@@ -416,12 +421,14 @@ class TableDashboard extends React.Component {
 						var errors = {
 				    		submit: 'Numero de RUC no econtrado.'
 					    };
-						this.setState({errors: errors}); 
+						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
 						self._toggleError();
 					} else {
 						self.setState({clientAddress: data.result.direccionS});
 						self.setState({clientName: data.result.razonSocial});
 						self.setState({clientEmailAddress: data.result.correoElectronico});
+						self.setState({clientNameDisabled: true});
+						self.setState({clientAddressDisabled: true});
 					}
 					
 					// hide delay delay
@@ -435,7 +442,7 @@ class TableDashboard extends React.Component {
 			var errors = {
 	    		submit: 'Numero de RUC es incorrecto.'
 		    };
-			this.setState({errors: errors}); 
+			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
 			self._toggleError();
 		}
 		
@@ -443,6 +450,8 @@ class TableDashboard extends React.Component {
 		if (event.target.value && event.target.value > 0 &&  event.target.value.length == 8) {
 			// display RUC search loading
 			self.setState({loadingGif: true});
+			self.setState({clientNameDisabled: false});
+			self.setState({clientAddressDisabled: false});
 			
 			jQuery.ajax({
 				type: "POST",
@@ -465,11 +474,13 @@ class TableDashboard extends React.Component {
 						var errors = {
 				    		submit: 'Numero de DNI no econtrado.'
 					    };
-						this.setState({errors: errors}); 
+						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
 						self._toggleError();
 					} else {
 						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
 						self.setState({clientEmailAddress: data.result.correoElectronico});
+						self.setState({clientNameDisabled: true});
+						self.setState({clientAddressDisabled: true});
 					}
 					
 					// hide delay delay
@@ -480,12 +491,14 @@ class TableDashboard extends React.Component {
 				}	
 			});
 		} else if (event.target.value == "0") { 
+			self.setState({clientNameDisabled: true});
+			self.setState({clientAddressDisabled: true});
 			return;
 		} else {
 			var errors = {
 	    		submit: 'Numero de DNI es incorrecto.'
 		    };
-			this.setState({errors: errors}); 
+			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
 			self._toggleError();
 		}
 	}
@@ -496,7 +509,7 @@ class TableDashboard extends React.Component {
 	  	
 	  	var self = this;
 	  	var search = {};
-	  	self.setState({ showError: false});
+	  	self.setState({ showError: false, clientDocNumberDisabled: false, clientNameDisabled: false, clientAddressDisabled: false});
 	    
 	    search["invoiceNumber"] = self.state.invoiceNumberModified;
 	    self.setState({loadingGif: true});
@@ -535,12 +548,15 @@ class TableDashboard extends React.Component {
 					  cashPmt: data.result[0].cashPmt,
 					  cashGiven: data.result[0].cashGiven,
 					  change: data.result[0].change,
+					  clientDocNumberDisabled: true,
+					  clientNameDisabled: true, 
+					  clientAddressDisabled: true
 				  });
 			  } else {
 			  	  var errors = {
 		  			  submit: 'Numero de Comprobante no fue encontrado o es incorrecto.'
 			  	  };
-			  	  self.setState({errors: errors}); 
+			  	  self.setState({errors: errors, clientDocNumber: '', clientName: '', clientAddress: '', clientDocNumberDisabled: false, clientNameDisabled: false, clientAddressDisabled: false}); 
 			  	  self._toggleError();
 			  }
 			  
@@ -560,44 +576,58 @@ class TableDashboard extends React.Component {
   handleEmailModalClose() {
 	    var self = this;
 		var search = {};
+		var formIsValid = true;
+		
+		var errors = {
+	    		submit: '',
+	    };
+	    
   
 		self.setState({ showEmailModal: false });
+		
+		if (!self.state.clientEmailAddress.trim()) {
+	    	errors["submit"] = "Email no puede estar vacio";
+			formIsValid = false;
+			self.setState({errors: errors, showError: true, showSuccess: false}); 
+	    }
 	    
-	    search["invoiceNumber"] = self.state.invoiceNumber;
-		search["selectedOption"] = self.state.selectedOption;
-		search["clientEmailAddress"] = self.state.clientEmailAddress;
-		search["clientDocNumber"] = self.state.clientDocNumber;
-		search["clientDocType"] = self.state.clientDocType;
-		
-		self.setState({emailingGif: true});
-		
-		$.ajax({
-			type: "POST",
-			contentType: "application/json", 
-			url:"/api/emailInvoice",
-			data: JSON.stringify(search),
-			datatype: 'json',
-			cache: false,
-			timeout: 600000,
-			success: function(data) {
-				
-			  if (data.result == '1') {	
-				  self.setState({ sunatErrorStr: data.msg });
-				  self.setState({ showSuccess: true });
-			  } else {
-			  	  var errors = {
-		  			  submit: data.msg
-			  	  };
-			  	  self.setState({errors: errors}); 
-			  	  self._toggleError();
-			  }
-			  
-			  self.setState({emailingGif: false});
-		
-			}, error: function(e){
-				console.log("ERROR: ", e);
-			}	
-		});
+		if (formIsValid) {
+		    search["invoiceNumber"] = self.state.invoiceNumber;
+			search["selectedOption"] = self.state.selectedOption;
+			search["clientEmailAddress"] = self.state.clientEmailAddress;
+			search["clientDocNumber"] = self.state.clientDocNumber;
+			search["clientDocType"] = self.state.clientDocType;
+			
+			self.setState({emailingGif: true});
+			
+			$.ajax({
+				type: "POST",
+				contentType: "application/json", 
+				url:"/api/emailInvoice",
+				data: JSON.stringify(search),
+				datatype: 'json',
+				cache: false,
+				timeout: 600000,
+				success: function(data) {
+					
+				  if (data.result == '1') {	
+					  self.setState({ sunatErrorStr: data.msg });
+					  self.setState({ showSuccess: true });
+				  } else {
+				  	  var errors = {
+			  			  submit: data.msg
+				  	  };
+				  	  self.setState({errors: errors}); 
+				  	  self._toggleError();
+				  }
+				  
+				  self.setState({emailingGif: false});
+			
+				}, error: function(e){
+					console.log("ERROR: ", e);
+				}	
+			});
+		}
   }
   
   emailInvoice = () => {
@@ -761,6 +791,13 @@ class TableDashboard extends React.Component {
 	    	
     	} else {
 	    	errors["submit"] = "Cantidades no pueden ser nulas";
+			formIsValid = false;
+	    }
+	    
+	    if (((electronicPmt || 0) +  (cashGiven || 0)) >= total) {
+	    	
+    	} else {
+	    	errors["submit"] = "Pagos por Tarjeta Crédito/Débito y Efectivo son menor a Importe Total";
 			formIsValid = false;
 	    }
 	    
@@ -1019,7 +1056,7 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" placeholder={"Nro Comprobante"} onBlur={this.invoiceSearch.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onBlur={this.invoiceSearch.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
 		                  </div>
 	    	          </div>
 		    	      <div className="col-md-2">
@@ -1031,7 +1068,7 @@ class TableDashboard extends React.Component {
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Seleccione Motivo</label>
-	    	                  <select className="ticket-assign form-control input-medium" value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
+	    	                  <select className="ticket-assign form-control input-medium" style={{borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
 	    	                  	  <option value=""></option>
 	    	                  	  <option value="01">Anulacion de la Operacion</option>
 	    	                  	  <option value="02">Anulacion por error en el RUC</option>
@@ -1066,13 +1103,13 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input type="text" pattern="[0-9]*" className="form-control" placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	    	                  <input type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	                	  </div>
 	    	          </div>
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
-	    	                  <input type="text" className="form-control" placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
+	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientNameDisabled} placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
 	    	              </div>
 	    	          </div>
 	              </div>
@@ -1080,14 +1117,14 @@ class TableDashboard extends React.Component {
 	    	          <div className="col-md-4">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Dirección</label>
-	    	                  <input type="text" className="form-control" placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
+	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
 	    	              </div>
 	    	          </div>
 	    	          {this.state.selectedOption != 'boleta' &&
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Nro de Placa: </label>
-	    	                  <input type="text" className="form-control" placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
+	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
 	    	              </div>
 	    	          </div>
 	    	          }
@@ -1137,23 +1174,23 @@ class TableDashboard extends React.Component {
 	                      	  <tr>
 	                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
 	                              <td className="hidden-sm-up"> D2 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
 	                          </tr>
 	                          <tr>
 	                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
 	                              <td className="hidden-sm-up"> G90 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
 	                          </tr>
 	                          <tr>
 	                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
 	                              <td className="hidden-sm-up"> G95 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
 	                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
+	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
 	                          </tr>
 	                      </tbody>
 	                  </table>
@@ -1207,7 +1244,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1239,7 +1276,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1257,7 +1294,7 @@ class TableDashboard extends React.Component {
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1345,7 +1382,7 @@ class TableDashboard extends React.Component {
 			              <tbody>
 				              <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      {this.state.docLabelObj.clientDocType}
+			                      {this.state.docLabelObj.clientDocType}:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientDocNumber}</td>
 			                  </tr>
@@ -1354,12 +1391,6 @@ class TableDashboard extends React.Component {
 			                      {this.state.docLabelObj.clientName}:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientName}</td>
-			                  </tr>
-			                  <tr>
-			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			                      Fecha:
-			                      </td>
-			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
@@ -1375,6 +1406,12 @@ class TableDashboard extends React.Component {
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
 			                  }
+			                  <tr>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			                      Fecha:
+			                      </td>
+			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</td>
+			                  </tr>
 			              </tbody>
 			          </table>
 	              </div>
@@ -1385,7 +1422,7 @@ class TableDashboard extends React.Component {
 	                  <table className="table table-hover">
 	                      <thead>
 	                          <tr>
-                      			  <th className="invoice-title" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Producto</th>
+                      			  <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Producto</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Cantidad</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Precio</th>
 	                              <th className="invoice-title text-center" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>Importe</th>
@@ -1397,29 +1434,29 @@ class TableDashboard extends React.Component {
 	                              <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 	                                  01-MAX-D BIODIESEL
 	                              </td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsD2 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceD2 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.solesD2 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      	  }
 	                      	  {this.state.galsG90 > 0 && 
 	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-	                                  02-GASOHOL 90
+	                                  02-GASOHOL PRIMAX 90
 	                              </td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG90 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG90 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.solesG90 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      	  }
 	                      	  {this.state.galsG95 > 0 && 
 	                      	  <tr>
 	                          	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-	                                  03-GASOHOL 95
+	                                  03-GASOHOL PRIMAX 95
 	                              </td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/ {parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
-	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.galsG95 || '0').toFixed(2)}</td>
+	                              <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{parseFloat(this.state.priceG95 || '0').toFixed(2)}</td>
+	                              <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.solesG95 || '0').toFixed(2)}</td>
 	                          </tr>
 	                      	  }
 	                      </tbody>
@@ -1434,29 +1471,33 @@ class TableDashboard extends React.Component {
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                          Sub-total Ventas:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.subTotal}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{this.state.subTotal}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Descuento:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.discount}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.discount || '0').toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      IGV (18%):
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.totalIGV}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{this.state.totalIGV}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Importe Total:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.total}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{this.state.total}</td>
 			                  </tr>
 			                  <tr>
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-		                      	  <u>Forma de Pago:</u>
+		                      	  	<strong><u>Forma de Pago:</u></strong>
 			                      </td>
 			                      
 			                  </tr>
@@ -1464,25 +1505,29 @@ class TableDashboard extends React.Component {
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Tarjeta Crédito/Débito:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.electronicPmt}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.electronicPmt || '0').toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Efectivo:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.cashPmt}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{this.state.cashPmt}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Efectivo Entregado:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.cashGiven}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.cashGiven || '0').toFixed(2)}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Vuelto:
 			                      </td>
-			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>S/ {this.state.change}</td>
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>S/</td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{this.state.change}</td>
 			                  </tr>
 			              </tbody>
 			          </table>	
@@ -1515,16 +1560,12 @@ class TableDashboard extends React.Component {
 	          </Modal.Header>
 	          
 	          <Modal.Body>
-	            <p>
 		            <div className="input-group">
 		                <span className="input-group-addon">
 		                    <i className="fa fa-envelope"></i>
 		                </span>
 		                <input type="email" className="form-control" placeholder="Correo electrónico"  onKeyPress={this.onKeyPress} value={this.state.clientEmailAddress} onChange={this.clientEmailAddressChange}></input>
 			        </div>
-	            </p>
-	              
-	
 	          </Modal.Body>
 	          
 	          <Modal.Footer>

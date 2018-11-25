@@ -127,6 +127,8 @@ public class RucDniService {
 	public RUCVo getRUCWS(String ruc) throws Exception {
 		
 		RUCVo rucVo = null;
+		/*String Usuario = "20501568776";//10447915125
+		String Password = "ruc1234";//xxxxx*/
 		String Usuario = "10447915125";
 		String Password = "xxxxx";
 		String Documento = "RUC";
