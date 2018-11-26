@@ -215,7 +215,7 @@ public class Utils {
 			}
 		
 			try {
-				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesandtemplates/laJoyaInvoice.jrxml");
+				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
 				
 				List<InvoiceDao> custList = Stream.of(invoicesRepository.findFirstByInvoiceNumber(invoiceNbr)).collect(Collectors.toList());
 				

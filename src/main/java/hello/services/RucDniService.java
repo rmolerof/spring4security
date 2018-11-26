@@ -127,10 +127,10 @@ public class RucDniService {
 	public RUCVo getRUCWS(String ruc) throws Exception {
 		
 		RUCVo rucVo = null;
-		/*String Usuario = "20501568776";//10447915125
-		String Password = "ruc1234";//xxxxx*/
-		String Usuario = "10447915125";
-		String Password = "xxxxx";
+		String Usuario = "20501568776";
+		String Password = "ruc1234";
+		/*String Usuario = "10447915125";
+		String Password = "xxxxx";*/
 		String Documento = "RUC";
 		String Nro_documento = ruc; 
 		
@@ -171,12 +171,12 @@ public class RucDniService {
 		rucVo.setEstado(obj.getJSONObject("result").getString("Estado"));
 		rucVo.setCondicion(obj.getJSONObject("result").getString("Condicion"));
 		rucVo.setDireccion(obj.getJSONObject("result").getString("Direccion"));
-		rucVo.setDepartamento(obj.getJSONObject("result").getString("departamento"));
-		rucVo.setProvincia(obj.getJSONObject("result").getString("provincia"));
-		rucVo.setDistrito(obj.getJSONObject("result").getString("distrito"));
-		rucVo.setInscripcion(obj.getJSONObject("result").getString("Inscripcion"));
-		rucVo.setActividadExterior(obj.getJSONObject("result").getString("ActividadExterior"));
-		rucVo.setDireccionS(obj.getJSONObject("result").getString("direccion"));
+		rucVo.setDepartamento(true == obj.getJSONObject("result").isNull("departamento") ? "": obj.getJSONObject("result").getString("departamento"));
+		rucVo.setProvincia(true == obj.getJSONObject("result").isNull("provincia") ? "": obj.getJSONObject("result").getString("provincia"));
+		rucVo.setDistrito(true == obj.getJSONObject("result").isNull("distrito") ? "": obj.getJSONObject("result").getString("distrito"));
+		rucVo.setInscripcion(true == obj.getJSONObject("result").isNull("Inscripcion") ? "": obj.getJSONObject("result").getString("Inscripcion"));
+		rucVo.setActividadExterior(true == obj.getJSONObject("result").isNull("ActividadExterior") ? "": obj.getJSONObject("result").getString("ActividadExterior"));
+		rucVo.setDireccionS(true == obj.getJSONObject("result").isNull("direccion") ? "": obj.getJSONObject("result").getString("direccion"));
 		rucVo.setDate(new Date());
 		rucVo.setStatus(true);
 		

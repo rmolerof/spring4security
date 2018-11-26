@@ -797,7 +797,7 @@ class TableDashboard extends React.Component {
 	    if (((electronicPmt || 0) +  (cashGiven || 0)) >= total) {
 	    	
     	} else {
-	    	errors["submit"] = "Pagos por Tarjeta Crédito/Débito y Efectivo son menor a Importe Total";
+	    	errors["submit"] = "Pagos por Tarjeta Crédito/Débito y Efectivo son menor al Importe Total";
 			formIsValid = false;
 	    }
 	    
