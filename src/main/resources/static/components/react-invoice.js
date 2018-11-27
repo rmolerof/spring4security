@@ -293,6 +293,8 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '1'});
 		this.setState({invoiceType: '03'});
 		this.setState({invoiceNumber: 'B001-XXXXXXXX'});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
+
 	  } else if (changeEvent.target.value == 'factura') {
 		  var docLabelObj = {
 	    	  clientDocType: 'RUC',
@@ -304,6 +306,8 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '01'});
 		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
+
 	  } else if (changeEvent.target.value == 'nota de credito') {
 		  var docLabelObj = {
 	    	  clientDocType: 'RUC',
@@ -315,6 +319,7 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '07'});
 		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
 	  }
   }
   
@@ -356,14 +361,27 @@ class TableDashboard extends React.Component {
   
   onKeyPress(event) {
 	if (event.which === 13 ) {
-		const form = event.target.form;
-		const index = Array.prototype.indexOf.call(form, event.target);
-		form.elements[index+1].focus();
-		event.preventDefault();
 		
 		if (event.target.name == "clientDocNumber") {
 			this.onTabPress(event);
+			if (this.state.selectedOption != 'boleta') {
+				const form = event.target.form;
+				const index = Array.prototype.indexOf.call(form, event.target);
+				form.elements[index+3].focus();
+				event.preventDefault();
+			} else {
+				const form = event.target.form;
+				const index = Array.prototype.indexOf.call(form, event.target);
+				form.elements[index+2].focus();
+				event.preventDefault();
+			}
+		} else {
+			const form = event.target.form;
+			const index = Array.prototype.indexOf.call(form, event.target);
+			form.elements[index+1].focus();
+			event.preventDefault();
 		}
+
 	}
   }
   
