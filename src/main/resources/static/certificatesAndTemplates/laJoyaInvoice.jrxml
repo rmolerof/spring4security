@@ -2,7 +2,6 @@
 <!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5a10a553-797d-4482-8c3c-0c2c68849727">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mlab"/>
-	
 	<field name="id" class="org.bson.types.ObjectId"/>
 	<field name="cashGiven" class="java.lang.Double"/>
 	<field name="cashPmt" class="java.lang.Double"/>
@@ -111,7 +110,7 @@ DNI	]]></text>
 				<textFieldExpression><![CDATA[$F{clientDocNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="106" y="20" width="170" height="30" uuid="091c2013-c4ae-4a76-8a95-9fbe63dc497b">
+				<reportElement x="106" y="20" width="448" height="30" uuid="091c2013-c4ae-4a76-8a95-9fbe63dc497b">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="632ccc59-a153-42f5-a9b6-4c80001fcc7f"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{clientName}]]></textFieldExpression>

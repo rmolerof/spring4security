@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -217,7 +218,9 @@ public class Utils {
 			try {
 				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
 				
-				List<InvoiceDao> custList = Stream.of(invoicesRepository.findFirstByInvoiceNumber(invoiceNbr)).collect(Collectors.toList());
+				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+				invoiceDao.setDate(new Date(invoiceDao.getDate().getTime() - TimeUnit.HOURS.toMillis(5)));
+				List<InvoiceDao> custList = Stream.of(invoiceDao).collect(Collectors.toList());
 				
 				CustomJRDataSource<InvoiceDao> dataSource = new CustomJRDataSource<InvoiceDao>().initBy(custList);
 				jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<String, Object>(), dataSource);

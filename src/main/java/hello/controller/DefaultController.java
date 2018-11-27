@@ -57,9 +57,9 @@ public class DefaultController {
 		return "dashboard-table-summary-page";
 	}
 	
-	@GetMapping("invoicing-page")
-	public String invoicingPage(){
-		return "invoicing-page";
+	@GetMapping("invoice-page")
+	public String invoicePage(){
+		return "invoice-page";
 	}
 	
 	@GetMapping("invoice-table-page")

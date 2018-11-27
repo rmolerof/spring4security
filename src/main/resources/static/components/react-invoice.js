@@ -360,6 +360,10 @@ class TableDashboard extends React.Component {
 		const index = Array.prototype.indexOf.call(form, event.target);
 		form.elements[index+1].focus();
 		event.preventDefault();
+		
+		if (event.target.name == "clientDocNumber") {
+			this.onTabPress(event);
+		}
 	}
   }
   
@@ -428,7 +432,12 @@ class TableDashboard extends React.Component {
 						self.setState({clientName: data.result.razonSocial});
 						self.setState({clientEmailAddress: data.result.correoElectronico});
 						self.setState({clientNameDisabled: true});
-						self.setState({clientAddressDisabled: true});
+						if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
+							self.setState({clientAddressDisabled: false});
+						} else {
+							self.setState({clientAddressDisabled: true});
+						}
+						
 					}
 					
 					// hide delay delay
@@ -480,7 +489,7 @@ class TableDashboard extends React.Component {
 						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
 						self.setState({clientEmailAddress: data.result.correoElectronico});
 						self.setState({clientNameDisabled: true});
-						self.setState({clientAddressDisabled: true});
+						self.setState({clientAddressDisabled: false});
 					}
 					
 					// hide delay delay
@@ -492,7 +501,7 @@ class TableDashboard extends React.Component {
 			});
 		} else if (event.target.value == "0") { 
 			self.setState({clientNameDisabled: true});
-			self.setState({clientAddressDisabled: true});
+			self.setState({clientAddressDisabled: false});
 			return;
 		} else {
 			var errors = {
@@ -607,7 +616,7 @@ class TableDashboard extends React.Component {
 				data: JSON.stringify(search),
 				datatype: 'json',
 				cache: false,
-				timeout: 600000,
+				timeout: 500,
 				success: function(data) {
 					
 				  if (data.result == '1') {	
@@ -624,7 +633,15 @@ class TableDashboard extends React.Component {
 				  self.setState({emailingGif: false});
 			
 				}, error: function(e){
-					console.log("ERROR: ", e);
+					
+					if (e.statusText == "timeout") {
+						self.setState({ sunatErrorStr: "Correo electrónico sera enviado en unos minutos" });
+						self.setState({ showSuccess: true });
+						self.setState({emailingGif: false});
+					} else {
+						console.log("ERROR: ", e);
+					}
+					
 				}	
 			});
 		}
@@ -984,7 +1001,7 @@ class TableDashboard extends React.Component {
 
 	      {this.state.showSuccess && 
 	      	<div className="alert alert-success">
-	      		<strong>Success!</strong> {this.state.sunatErrorStr}
+	      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
 	      	</div>
 	      }
 	      
@@ -1103,7 +1120,7 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	                	  </div>
 	    	          </div>
 	    	          <div className="col-md-2">
@@ -1120,14 +1137,12 @@ class TableDashboard extends React.Component {
 	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
 	    	              </div>
 	    	          </div>
-	    	          {this.state.selectedOption != 'boleta' &&
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Nro de Placa: </label>
 	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
 	    	              </div>
 	    	          </div>
-	    	          }
 		          </div>
               </div>
              {/* <div className="row">
@@ -1579,6 +1594,6 @@ class TableDashboard extends React.Component {
   }
 }
 
-let target = document.getElementById('react-invoicing-id');
+let target = document.getElementById('react-invoice-id');
 
 ReactDOM.render(<TableDashboard />, target);
