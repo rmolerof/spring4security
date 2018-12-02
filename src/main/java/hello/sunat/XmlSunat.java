@@ -114,7 +114,7 @@ public class XmlSunat {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsD2());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceD2() / 1.18D));
 		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesD2() / 1.18D));//PRECIO X CANTIDAD
@@ -131,7 +131,7 @@ public class XmlSunat {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG90());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG90() / 1.18D));
 		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG90() / 1.18));//PRECIO X CANTIDAD
@@ -148,7 +148,7 @@ public class XmlSunat {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG95());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG95() / 1.18D));
 		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG95() / 1.18D));//PRECIO X CANTIDAD

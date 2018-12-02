@@ -30,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import hello.Application;
+import hello.services.GlobalProperties;
 import hello.services.Utils;
 
 @RunWith(SpringRunner.class)
@@ -40,17 +41,18 @@ public class SendEmailServiceTest {
 	private Utils utils;
 	@Autowired
 	private ResourceLoader resourceLoader;
+	@Autowired
+	private GlobalProperties globalProperties;
 	
 	private String basePath;
 	
 	@Test
 	public void sendEmailTest() {
-		
-		String to = "rmolerof@gmail.com";
-		String from = "support@grifoslajoya.net";
+		String to = "rmolerof@gmail.com";// mecamolfer@hotmail.com
+		String from = globalProperties.getFrom();
 		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - FACTURA: F001-0000001";
-		String body = "Buen Día. Adjuntado está su comprobante de pago FACTURA: F001-0000001";
-		List<String> attachmentPaths = Arrays.asList(new String("C:/Users/mecam/xmlsSunat/20501568776-07-B001-00000022.XML"), new String(getBasePath() + "/jasperReports/laJoyaInvoice_F001-00000030.pdf"));
+		String body = "Buen Día. Adjuntado está su comprobante de pago de FACTURA: F001-0000001";
+		List<String> attachmentPaths = Arrays.asList(new String("C:/Users/mecam/xmlsSunat/20501568776-07-B001-00000022.XML"), new String("C:/Users/mecam/xmlsSunat/invoice.pdf"));
 		
 		utils.sendEmail(to, from, subject, body, attachmentPaths);
 		assertTrue(true);
@@ -58,23 +60,36 @@ public class SendEmailServiceTest {
 	
 //	@Test
 	public void sendEmailRawTest() {
-		// Recipient's email ID needs to be mentioned.
-		String to = "rmolerof@gmail.com";
-
-		// Sender's email ID needs to be mentioned
-//		String from = "fromemail@gmail.com";
-		String from = "support@grifoslajoya.net";
-
-//		final String username = "ruden.madero";// change accordingly
-//		final String password = "rudenmadero@0820";// change accordingly
 		
+		String to = "";
+		String from = "";
+		String host = "";
+		
+		/**
+		 * Grifos la Joya Details
+		 */
+	    to = "rmolerof@gmail.com";
+		from = globalProperties.getFrom();
+		final String username = globalProperties.getUsername();
+		final String password = globalProperties.getPassword();
+		host = globalProperties.getHost();
+		
+		/*
+		 * Gmail 
+		 */
+		/*from = "fromemail@gmail.com";
+		final String username = "ruden.madero";
+		final String password = "rudenmadero@0820";
+		host = "smtp.gmail.com";*/
+		
+		/*
+		 * Amazon SES
+		 */
+		/*from = "support@grifoslajoya.net";
 		// IAM user name: ses-smtp-user.grifoslajoya
-		final String username = "AKIAJGROAN7ASXFRCUFQ";// change accordingly 20181119-215130
-		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";// change accordingly
-
-		// Assuming you are sending email through relay.jangosmtp.net
-//		String host = "smtp.gmail.com";
-		String host = "email-smtp.us-east-1.amazonaws.com";
+		final String username = "AKIAJGROAN7ASXFRCUFQ";
+		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";
+		host = "email-smtp.us-east-1.amazonaws.com"; */
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");

@@ -62,7 +62,6 @@ public class Utils {
 	private static Logger logger = LogManager.getLogger(Utils.class);
 	
 	private String basePath;
-	public static final String myRUC = "20501568776";
 	
 	@Autowired
     private InvoicesRepository invoicesRepository;
@@ -72,6 +71,8 @@ public class Utils {
     private RUCsRepository rucsRepository;
 	@Autowired
     private DNIsRepository dnisRepository;
+	@Autowired
+	private GlobalProperties globalProperties;
 
 	public Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
 		
@@ -123,14 +124,9 @@ public class Utils {
 	
 	public String sendEmail(String to, String from, String subject, String body, List<String> attachmentPaths) {
 
-		// IAM user name: ses-smtp-user.grifoslajoya
-		/*final String username = "AKIAJGROAN7ASXFRCUFQ";
-		final String password = "AiNB2ihZiZ5+OxNnH8q21B1ft0hM6BkoyB6lkhTU3dvT";
-		String host = "email-smtp.us-east-1.amazonaws.com";*/
-		
-		final String username = "ruden.madero";
-		final String password = "rudenmadero@0820";
-		String host = "smtp.gmail.com";
+		final String username = globalProperties.getUsername();
+		final String password = globalProperties.getPassword();
+		String host = globalProperties.getHost();
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -181,11 +177,11 @@ public class Utils {
 			// Send message
 			Transport.send(message);
 
-			logger.info("Email sent successfully. Subject: " + subject);
+			logger.info("Email sent successfully to " + to + ". Subject: " + subject);
 			
 			return "1";
 		} catch (MessagingException e) {
-			logger.error(e.getMessage());
+			logger.error("Error in " + Utils.class + "::sendEmail()", e);
 			//throw new RuntimeException(e);
 			return "0";
 		}
@@ -243,7 +239,7 @@ public class Utils {
 		
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
 		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
-		String xmlPath = getBasePath() + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 		
 		if (new File(xmlPath).isFile()) {
 			logger.info("File found in local memory: " + xmlPath);

@@ -56,6 +56,9 @@ public class InvoiceDao {
 	private String motiveCd = "";
 	private String motiveCdDescription = "";
 	private Date dateOfInvoiceModified = new Date(0L);
+	private Double igvModified = 0D;
+	private Double totalModified = 0D;
+	private Boolean hasBonus = false;
 
 	public InvoiceDao() {
 		super();
@@ -96,6 +99,9 @@ public class InvoiceDao {
 		this.motiveCd = new String(invoiceVo.getMotiveCd());
 		this.motiveCdDescription = new String(invoiceVo.getMotiveCdDescription());
 		this.dateOfInvoiceModified = new Date(invoiceVo.getDateOfInvoiceModified().getTime());
+		this.igvModified = new Double(invoiceVo.getIgvModified());
+		this.totalModified = new Double(invoiceVo.getTotalModified());
+		this.hasBonus = new Boolean(invoiceVo.getHasBonus());
 		
 	}
 
@@ -103,7 +109,7 @@ public class InvoiceDao {
 			String clientDocType, String clientAddress, String truckPlateNumber, Date date, String invoiceType,
 			Double galsD2, Double galsG90, Double galsG95, Double priceD2, Double priceG90, Double priceG95,
 			Double solesD2, Double solesG90, Double solesG95, Double total, Double subTotal, Double totalIGV,
-			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr) {
+			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, Boolean hasBonus) {
 		super();
 		this.id = id;
 		this.invoiceNumber = invoiceNumber;
@@ -130,6 +136,9 @@ public class InvoiceDao {
 		this.invoiceHash = invoiceHash;
 		this.saveOrUpdate = saveOrUpdate;
 		this.sunatErrorStr = sunatErrorStr;
+		this.igvModified = igvModified;
+		this.totalModified = totalModified;
+		this.hasBonus = hasBonus;
 	}
 
 	public ObjectId getId() {
@@ -410,6 +419,30 @@ public class InvoiceDao {
 
 	public void setDateOfInvoiceModified(Date dateOfInvoiceModified) {
 		this.dateOfInvoiceModified = dateOfInvoiceModified;
+	}
+
+	public Double getIgvModified() {
+		return igvModified;
+	}
+
+	public void setIgvModified(Double igvModified) {
+		this.igvModified = igvModified;
+	}
+
+	public Double getTotalModified() {
+		return totalModified;
+	}
+
+	public void setTotalModified(Double totalModified) {
+		this.totalModified = totalModified;
+	}
+
+	public Boolean getHasBonus() {
+		return hasBonus;
+	}
+
+	public void setHasBonus(Boolean hasBonus) {
+		this.hasBonus = hasBonus;
 	}
 	
 }

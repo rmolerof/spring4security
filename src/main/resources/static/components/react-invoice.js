@@ -65,13 +65,17 @@ class TableDashboard extends React.Component {
       },
       loadingGif: false,
       emailingGif: false,
-      invoiceTypeModified: '01',
+      invoiceTypeModified: '',
       invoiceNumberModified: '',
       invoiceNumberModifiedDisp: '',
       invoiceTypeModifiedToggle: true,
       dateOfInvoiceModified: new Date(),
       motiveCd: '',
-      motiveCdDescription: ''
+      motiveCdDescription: '',
+	  igvModified: '',
+	  totalModified: '',
+	  hasBonus: false,
+	  cssBonusButton: 'btn btn-default'
     };
   }
   
@@ -293,6 +297,12 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '1'});
 		this.setState({invoiceType: '03'});
 		this.setState({invoiceNumber: 'B001-XXXXXXXX'});
+		this.setState({invoiceTypeModified: ''});
+		this.setState({invoiceNumberModified: ''});
+		this.setState({invoiceNumberModifiedDisp: ''});
+		this.setState({dateOfInvoiceModified: new Date()});
+		this.setState({igvModified: ''});
+		this.setState({totalModified: ''});
 		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
 
 	  } else if (changeEvent.target.value == 'factura') {
@@ -306,6 +316,12 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '01'});
 		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
+		this.setState({invoiceTypeModified: ''});
+		this.setState({invoiceNumberModified: ''});
+		this.setState({invoiceNumberModifiedDisp: ''});
+		this.setState({dateOfInvoiceModified: new Date()});
+		this.setState({igvModified: ''});
+		this.setState({totalModified: ''});
 		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
 
 	  } else if (changeEvent.target.value == 'nota de credito') {
@@ -319,6 +335,12 @@ class TableDashboard extends React.Component {
 		this.setState({clientDocType: '6'});
 		this.setState({invoiceType: '07'});
 		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
+		this.setState({invoiceTypeModified: '01'});
+		this.setState({invoiceNumberModified: ''});
+		this.setState({invoiceNumberModifiedDisp: ''});
+		this.setState({dateOfInvoiceModified: new Date()});
+		this.setState({igvModified: ''});
+		this.setState({totalModified: ''});
 		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
 	  }
   }
@@ -376,10 +398,12 @@ class TableDashboard extends React.Component {
 				event.preventDefault();
 			}
 		} else {
-			const form = event.target.form;
-			const index = Array.prototype.indexOf.call(form, event.target);
-			form.elements[index+1].focus();
-			event.preventDefault();
+			if (event.target.form) {
+				const form = event.target.form;
+				const index = Array.prototype.indexOf.call(form, event.target);
+				form.elements[index+1].focus();
+				event.preventDefault();
+			}
 		}
 
 	}
@@ -397,6 +421,16 @@ class TableDashboard extends React.Component {
 		this.setState({invoiceTypeModified: "03"});
 		this.setState({ invoiceNumber: "B001-XXXXXXXX" });
 	}
+  }
+  
+  _bonusButtonHandleClick(){
+		this.setState({hasBonus: !this.state.hasBonus});
+		
+		if (!this.state.hasBonus) {
+			this.setState({cssBonusButton: 'btn green-meadow'});
+		} else {
+			this.setState({cssBonusButton: 'btn btn-default'});
+		}
   }
   
   motiveCdHandleChange(event) {
@@ -445,6 +479,10 @@ class TableDashboard extends React.Component {
 					    };
 						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
 						self._toggleError();
+						
+						setTimeout(function() {
+						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+				        }.bind(this), 0);
 					} else {
 						self.setState({clientAddress: data.result.direccionS});
 						self.setState({clientName: data.result.razonSocial});
@@ -471,6 +509,10 @@ class TableDashboard extends React.Component {
 		    };
 			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
 			self._toggleError();
+			
+			setTimeout(function() {
+			    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+	        }.bind(this), 0);
 		}
 		
 	} else {
@@ -503,6 +545,10 @@ class TableDashboard extends React.Component {
 					    };
 						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
 						self._toggleError();
+						
+						setTimeout(function() {
+							ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+					    }.bind(this), 0);
 					} else {
 						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
 						self.setState({clientEmailAddress: data.result.correoElectronico});
@@ -527,6 +573,10 @@ class TableDashboard extends React.Component {
 		    };
 			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
 			self._toggleError();
+			
+			setTimeout(function() {
+				ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+		    }.bind(this), 0);
 		}
 	}
 	
@@ -577,20 +627,31 @@ class TableDashboard extends React.Component {
 					  change: data.result[0].change,
 					  clientDocNumberDisabled: true,
 					  clientNameDisabled: true, 
-					  clientAddressDisabled: true
+					  clientAddressDisabled: true,
+					  invoiceTypeModified: data.result[0].invoiceType,
+					  igvModified: data.result[0].totalIGV,
+					  totalModified: data.result[0].total,
+					  hasBonus: data.result[0].hasBonus,
+					  cssBonusButton: data.result[0].hasBonus == true ? 'btn green-meadow': 'btn btn-default'
 				  });
+				  
 			  } else {
 			  	  var errors = {
 		  			  submit: 'Numero de Comprobante no fue encontrado o es incorrecto.'
 			  	  };
 			  	  self.setState({errors: errors, clientDocNumber: '', clientName: '', clientAddress: '', clientDocNumberDisabled: false, clientNameDisabled: false, clientAddressDisabled: false}); 
 			  	  self._toggleError();
+			  	  
+				  setTimeout(function() {
+					  ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+			      }.bind(this), 0);
 			  }
 			  
 			  self.setState({loadingGif: false});
 		
 			}, error: function(e){
 				console.log("ERROR: ", e);
+				self.setState({loadingGif: false});
 			}	
 		});
 	  
@@ -598,6 +659,10 @@ class TableDashboard extends React.Component {
   
   handleEmailModalCancel() {
 	  this.setState({ showEmailModal: false });
+  }
+  
+  handleResultModalCancel() {
+	  this.setState({ showError: false, showSuccess: false });
   }
   
   handleEmailModalClose() {
@@ -655,7 +720,11 @@ class TableDashboard extends React.Component {
 					if (e.statusText == "timeout") {
 						self.setState({ sunatErrorStr: "Correo electrónico sera enviado en unos minutos" });
 						self.setState({ showSuccess: true });
-						self.setState({emailingGif: false});
+						self.setState({ emailingGif: false});
+						
+						setTimeout(function() {
+						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+				        }.bind(this), 0); 
 					} else {
 						console.log("ERROR: ", e);
 					}
@@ -674,7 +743,7 @@ class TableDashboard extends React.Component {
   newInvoice = () => {
 	  
 	  $('canvas').remove();
-      $('img').remove();
+      $("img[alt$='Scan me!']").remove();
   
 	  this.setState({
 		  errors: {},
@@ -688,6 +757,9 @@ class TableDashboard extends React.Component {
 	      clientAddress: '',
 	      clientEmailAddress: '',
 	      truckPlateNumber: '',
+	      clientDocNumberDisabled: false,
+	      clientNameDisabled: false,
+	      clientAddressDisabled: false,
 		  // invoice breakdown
 	      date: new Date(),
 	      invoiceType: '03',
@@ -732,13 +804,16 @@ class TableDashboard extends React.Component {
 	    	  clientNamePH: 'Nombre(s)',
 	      },
 	      loadingGif: false,
-	      invoiceTypeModified: '01',
+	      invoiceTypeModified: '',
 	      invoiceNumberModified: '',
 	      invoiceNumberModifiedDisp: '',
 	      invoiceTypeModifiedToggle: true,
 	      dateOfInvoiceModified: new Date(),
 	      motiveCd: '',
-	      motiveCdDescription: ''
+	      motiveCdDescription: '',
+	      igvModified: '',
+	      totalModified: '',
+	      hasBonus: false
 	  });
   }
   
@@ -759,6 +834,8 @@ class TableDashboard extends React.Component {
 			motiveCd, 
 			motiveCdDescription,
 			dateOfInvoiceModified,
+			igvModified,
+			totalModified,
 			invoiceNumber, 
 			invoiceType, 
 			clientDocType, 
@@ -775,8 +852,9 @@ class TableDashboard extends React.Component {
 			solesD2, 
 			solesG90,
 			solesG95,
-			gasPrices, 
-			date} = this.state;
+			gasPrices,
+			date,
+			hasBonus} = this.state;
 		var self = this;
 	    var errors = {
 	    		submit: '',
@@ -819,7 +897,10 @@ class TableDashboard extends React.Component {
 		    motiveCd: motiveCd,
 		    motiveCdDescription: motiveCdDescription,
 		    dateOfInvoiceModified: dateOfInvoiceModified,
-	    	saveOrUpdate: 'save'
+		    igvModified: igvModified,
+			totalModified: totalModified,
+	    	saveOrUpdate: 'save',
+	    	hasBonus: hasBonus
 	    };
 
 	    if (solesD2 || solesG90 || solesG95) {
@@ -906,10 +987,18 @@ class TableDashboard extends React.Component {
 		    	invoiceVo.galsG95 = 0;
 		    	invoiceVo.solesG95 = 0;
 		    }
+		    if (!igvModified) {
+		    	invoiceVo.igvModified = 0;
+		    }
+		    if (!totalModified) {
+		    	invoiceVo.totalModified = 0;
+		    }
 	    }
 		this.setState({errors: errors}); 
 		
 		if (formIsValid) {
+			
+			self.setState({emailingGif: true});
 			
 			jQuery.ajax({
 				type: "POST",
@@ -942,8 +1031,6 @@ class TableDashboard extends React.Component {
 							self.setState({ boletaDisabled: true });
 						}
 					
-						self.setState({ showSuccess: true });
-						self.setState({submitDisabled: true});
 						var qrcode1 = new QRCode("qrcode1");
 						qrcode1.clear();
 						qrcode1.makeCode("20501568776|" + 
@@ -981,19 +1068,41 @@ class TableDashboard extends React.Component {
 								invoiceVoResp.clientDocType + "|" +
 								invoiceVoResp.clientDocNumber
 								);
+						self.setState({emailingGif: false});
+						self.setState({showSuccess: true });
+						self.setState({submitDisabled: true});
+						
+						setTimeout(function() {
+						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+				        }.bind(this), 0); 
 					} else {
 						errors["submit"] = "Recibo rechazado por Sunat. " + invoiceVoResp.sunatErrorStr;
 						self._toggleError();
+						self.setState({emailingGif: false});
+						
+						setTimeout(function() {
+						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+				        }.bind(this), 0); 
 					}
 				},
 				error: function(e){
 					errors["submit"] = "Recibo no aceptado. Intente otra vez. "  + e.responseText;
 					self._toggleError();
+					self.setState({emailingGif: false});
+					
+					setTimeout(function() {
+					    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+			        }.bind(this), 0); 
 				}	
 			});
 		} else {
 			
-			this._toggleError();
+			self._toggleError();
+			
+		    setTimeout(function() {
+			    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+	        }.bind(this), 0);  
+			
 		}
 
 	  }
@@ -1007,11 +1116,16 @@ class TableDashboard extends React.Component {
 			invoicePrefix = 'B001-';
 	  }
 	  
+	  let bonusButtonText = 'Sin Bonus';
+	  if (this.state.hasBonus) {
+		  bonusButtonText = 'Con Bonus';
+	  }
+	  
 	  return (
 			  
       <form onSubmit={this.handleSubmit}>
       	  
-	      {this.state.showError && 
+	      {/*{this.state.showError && 
 		        <div className="alert alert-danger">
 	      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
 		      	</div>
@@ -1021,28 +1135,30 @@ class TableDashboard extends React.Component {
 	      	<div className="alert alert-success">
 	      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
 	      	</div>
-	      }
+	      }*/}
 	      
-	      <div className="invoice">
-	          <div className="row invoice-logo">
-	          	  <div className="col-md-4 invoice-logo-space hidden-xs">
-	          	   {/*<img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" />*/} 
-	          	  </div>
-	          	  <div className="col-xs-6 col-md-4 invoice-logo-space">
+	      <h1 className="page-title col-xs-12 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA {this.state.invoiceNumber}</h1>
+	      
+	      <div className="invoice margin-bottom-20">
+	          {/*<div className="row invoice-logo">
+	          	  {<div className="col-md-4 invoice-logo-space hidden-xs">
+	          	   <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> 
+	          	  </div>}
+	          	  {<div className="col-xs-6 col-md-4 invoice-logo-space">
 			          <ul className="list-unstyled">
-	                  <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
-	                  <li> Av. Miguel Grau Mza B Lote 1-2 </li>
-	                  <li> Lima - Lima - Ate </li>
-	                  <li> +51 356 0345 </li>
-	              </ul>
-		          </div>
+		                  <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
+		                  <li> Av. Miguel Grau Mza B Lote 1-2 </li>
+		                  <li> Lima - Lima - Ate </li>
+		                  <li> +51 356 0345 </li>
+		              </ul>
+		          </div>}
 	              <div className="col-xs-6 col-md-4">
 	                  <p> <strong className="uppercase ">{this.state.selectedOption} ELECTRÓNICA</strong> <br/>
 	                      <span className="muted"> RUC: 20501568776  </span><br/>
 	                      <span className="muted bold"> {this.state.invoiceNumber}  </span>
 	                  </p>
 	              </div>
-	          </div>
+	          </div>*/}
 	          {/*<div className="row">
 	              <div className="col-md-12">
 	                  <ul className="list-unstyled">
@@ -1056,7 +1172,7 @@ class TableDashboard extends React.Component {
               <div className="portlet-body form">
         		
 	              <div className="row">
-		              <div className="col-md-12 col-xs-12">
+		              <div className="col-md-6 col-xs-12">
 			              <div className="form-group">
 			                  <label className="control-label">Tipo de Comprobante</label>
 		    	              <div className="clearfix">
@@ -1071,6 +1187,12 @@ class TableDashboard extends React.Component {
 		                      </div>
 		                  </div>
 			          </div>
+			          <div className="col-md-2">
+				          <div className="form-group">
+		            	  	<label className="control-label">Seleccionar</label><br></br>  
+		            	  	<a onClick={this._bonusButtonHandleClick.bind(this)} className={this.state.cssBonusButton} >{bonusButtonText}</a>
+		                  </div>
+		              </div>
 	              </div>
 	              {this.state.selectedOption == 'nota de credito' &&
 	              <div className="row">
@@ -1147,8 +1269,8 @@ class TableDashboard extends React.Component {
 	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientNameDisabled} placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
 	    	              </div>
 	    	          </div>
-	              </div>
-	              <div className="row">
+	              
+	              
 	    	          <div className="col-md-4">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Dirección</label>
@@ -1388,7 +1510,7 @@ class TableDashboard extends React.Component {
 	          </div>
 	      </div>
 	      
-	      <div className="invoice-content-2 " ref={el => (this.componentRef = el)} style={{fontFamily:"sans-serif", fontSize: 11}}>
+	      <div className="invoice-content-2" ref={el => (this.componentRef = el)} style={{fontFamily:"sans-serif", fontSize: 11}}>
 	          <div className="row invoice-head">
 	              <div className="col-md-12 col-xs-12 text-center">
 	                  <div className="invoice-logo">
@@ -1606,6 +1728,30 @@ class TableDashboard extends React.Component {
 	          	<Button bsStyle="primary" onClick={this.handleEmailModalClose.bind(this)}>Enviar</Button>
 	          </Modal.Footer>
           </Modal>
+          
+          <Modal show={this.state.showError || this.state.showSuccess} onHide={this.handleResultModalCancel.bind(this)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Status</Modal.Title>
+          </Modal.Header>
+          
+          <Modal.Body>
+		      {this.state.showError && 
+			        <div className="alert alert-danger">
+		      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+			      	</div>
+		      }
+
+		      {this.state.showSuccess && 
+		      	<div className="alert alert-success">
+		      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
+		      	</div>
+		      }
+          </Modal.Body>
+          
+          <Modal.Footer>
+          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleResultModalCancel.bind(this)}>OK</Button>
+          </Modal.Footer>
+      </Modal>
 	      
       </form>
     )

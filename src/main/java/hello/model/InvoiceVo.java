@@ -49,6 +49,9 @@ public class InvoiceVo {
 	private String motiveCd = "";
 	private String motiveCdDescription = "";
 	private Date dateOfInvoiceModified = new Date(0L);
+	private Double igvModified = 0D;
+	private Double totalModified = 0D;
+	private Boolean hasBonus = false;
 	
 	public InvoiceVo() {
 		super();
@@ -89,6 +92,9 @@ public class InvoiceVo {
 		this.motiveCd = new String(invoiceDao.getMotiveCd());
 		this.motiveCdDescription = new String(invoiceDao.getMotiveCdDescription());
 		this.dateOfInvoiceModified = new Date(invoiceDao.getDateOfInvoiceModified().getTime());
+		this.igvModified = new Double(invoiceDao.getIgvModified());
+		this.totalModified = new Double(invoiceDao.getTotalModified());
+		this.hasBonus = new Boolean(invoiceDao.getHasBonus());
 	}
 	
 	public static double roundTwo(double amt) {
@@ -336,6 +342,30 @@ public class InvoiceVo {
 
 	public void setDateOfInvoiceModified(Date dateOfInvoiceModified) {
 		this.dateOfInvoiceModified = dateOfInvoiceModified;
+	}
+
+	public Double getIgvModified() {
+		return igvModified;
+	}
+
+	public void setIgvModified(Double igvModified) {
+		this.igvModified = igvModified;
+	}
+
+	public Double getTotalModified() {
+		return totalModified;
+	}
+
+	public void setTotalModified(Double totalModified) {
+		this.totalModified = totalModified;
+	}
+
+	public Boolean getHasBonus() {
+		return hasBonus;
+	}
+
+	public void setHasBonus(Boolean hasBonus) {
+		this.hasBonus = hasBonus;
 	}
 	
 }

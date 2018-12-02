@@ -7,6 +7,7 @@ class InvoiceTableSummary extends React.Component {
 	  showError: false,
 	  showSuccess: false,
       invoicesSummaryData: null,
+      invoicesSummaryConcarData: null
     };
   }
   
@@ -46,12 +47,19 @@ class InvoiceTableSummary extends React.Component {
 					} else if (invoicesSummaryData[i].invoiceType == '07') {
 						invoiceType = 'N. CREDITO'
 					}
+					
 					var clientDocType = '';
 					if (invoicesSummaryData[i].clientDocType == '1') {
 						clientDocType = 'DNI'
 					} else {
 						clientDocType = 'RUC'
 					}
+					
+					var hasBonus = "";
+					if (invoicesSummaryData[i].hasBonus == true) {
+						hasBonus = "Bonus"
+					}
+					
 					count++;
 					var row = [
 						count,
@@ -72,7 +80,8 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].subTotal,
 						invoicesSummaryData[i].totalIGV,
 						invoicesSummaryData[i].total,
-						invoicesSummaryData[i].invoiceHash
+						invoicesSummaryData[i].invoiceHash,
+						hasBonus
 						];
 					
 					tableData[i] = row;
@@ -86,8 +95,102 @@ class InvoiceTableSummary extends React.Component {
 		});
   }
   
+  _fetchInvoiceConcarData(timeframe){
+		
+	  	var search = {};
+		search["dateEnd"] = timeframe.dateEnd;
+		search["dateBeg"] = timeframe.dateBeg;
+		
+		jQuery.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/getInvoicesSummaryData",
+			data: JSON.stringify(search),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				
+				var invoicesSummaryData = data.result;
+				var tableData = [];
+				
+				var count = 0;
+				for (var i = 0; i < invoicesSummaryData.length; i++) {
+					
+					var dateOfInvoiceModified = '';
+					var igvModified = '';
+					var totalModified = '';
+					if (invoicesSummaryData[i].invoiceType == "07") {
+						dateOfInvoiceModified = moment(invoicesSummaryData[i].dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY');
+						igvModified = invoicesSummaryData[i].igvModified; 
+						totalModified = invoicesSummaryData[i].totalModified;
+					} 
+					
+					var clientDocNumber = '';
+					if (invoicesSummaryData[i].clientDocNumber == '0') {
+						clientDocNumber = '0000';
+					} else {
+						clientDocNumber = invoicesSummaryData[i].clientDocNumber; 
+					}
+					
+					// Assuming only one product is purchased
+					var ctacble = '';
+					var glosa = '';
+					if (invoicesSummaryData[i].galsD2 > 0) {
+						ctacble = '701112';
+						glosa = 'DIESEL';
+					} else if (invoicesSummaryData[i].galsG90 > 0) {
+						ctacble = '701114';
+						glosa = 'GASOHOL-90';
+					} else if (invoicesSummaryData[i].galsG95 > 0) {
+						ctacble = '701115';
+						glosa = 'GASOHOL-95';
+					} else {
+						ctacble = '700000';
+						glosa = 'OTRO';
+					}
+					
+					
+					
+					count++;
+					var row = [
+						count,
+						moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY'),
+						invoicesSummaryData[i].invoiceType,
+						invoicesSummaryData[i].invoiceNumber,
+						"S/.",
+						clientDocNumber,
+						invoicesSummaryData[i].clientName,
+						invoicesSummaryData[i].subTotal,
+						"",
+						invoicesSummaryData[i].totalIGV,
+						"",
+						invoicesSummaryData[i].total,
+						"5",
+						"",
+						ctacble,
+						glosa,
+						invoicesSummaryData[i].invoiceTypeModified,
+						invoicesSummaryData[i].invoiceNumberModified,
+						dateOfInvoiceModified,
+						igvModified,
+						totalModified
+						];
+					
+					tableData[i] = row;
+				}
+				
+				this.setState({invoicesSummaryConcarData: tableData});
+			},
+			error: function(e){
+
+			}	
+		});
+}
+  
   componentWillMount(){
-	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-30"});
+	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-31"});
+	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-31"});
   }
   
   onKeyPress(event) {
@@ -123,6 +226,10 @@ class InvoiceTableSummary extends React.Component {
 	      
 	      {this.state && this.state.invoicesSummaryData &&
 	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>
+		  }
+	      
+	      {this.state && this.state.invoicesSummaryConcarData &&
+	    	  <InvoicesConcarTbl data={this.state.invoicesSummaryConcarData}></InvoicesConcarTbl>
 		  } 
 	      
       </form>
@@ -168,8 +275,13 @@ class InvoicesTbl extends React.Component {
 		            { title: "IGV" },
 		            { title: "Total" },
 		            { title: "Nro hash" },
+		            { title: "Bonus" }
 			]
 		});
+		
+		/*var table = this.$el.DataTable({...
+		table.column(3).visible(! table.column(3).visible());
+		table.column(6).visible(! table.column(6).visible());*/
 	}
 	
 	componentWillUnmount() {
@@ -185,6 +297,80 @@ class InvoicesTbl extends React.Component {
 									<div className="caption font-green">
 										<i className="icon-settings font-green"></i>
 										<span className="caption-subject bold uppercase">Resumen de Boletas/Facturas/Notas de Crédito</span>
+									</div>
+									<div className="tools"></div>
+								</div>
+								<div className="portlet-body table-both-scroll">
+									<table className="display table table-striped table-bordered table-hover order-column" ref={el => this.el = el}>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+			   </div>
+	}
+}
+
+class InvoicesConcarTbl extends React.Component {
+	componentDidMount() {
+		this.$el = $(this.el);
+		var table = this.$el.DataTable({
+			data: this.props.data,
+			pageLength: 5,
+			scrollY: 300,
+			deferRender: true,
+			scroller: true,
+			deferRender: true,
+			scrollX: true,
+			scrollCollapse: true,
+			
+			dom: 'Brftip',
+			buttons: [
+				{extend: 'print', className: 'btn dark btn-outline'},
+				{extend: 'pdf', className: 'btn green btn-outline'},
+				{extend: 'csv', className: 'btn purple btn-outline'}
+			],
+			columns: [
+					{ title: "ITEM" },
+				 	{ title: "FECHA" },
+				 	{ title: "TIPO" },
+				 	{ title: "NUMERO" },
+				 	{ title: "MONEDA" },
+		            { title: "CODIGO|RUC|DNI" },
+		            { title: "CLIENTE" },
+		            { title: "VALOR" },
+		            { title: "EXONERADO" },
+		            { title: "IGV" },
+		            { title: "PERCEPCION" },
+		            { title: "TOTAL" },
+		            { title: "SUB" },
+		            { title: "COSTO" },
+		            { title: "CTACBLE" },
+		            { title: "GLOSA" },
+		            { title: "TDOC REF" },
+		            { title: "NUMERO REF" },
+		            { title: "FECHA REF" },
+		            { title: "IGV REF" },
+		            { title: "BASE IMP REF" }
+		            
+			]
+		});
+				
+	}
+	
+	componentWillUnmount() {
+		
+	}
+	
+	render() {
+		return <div>
+					<div className="row">
+						<div className="col-md-12">
+							<div className="portlet light bordered">
+								<div className="portlet-title">
+									<div className="caption font-green">
+										<i className="icon-settings font-green"></i>
+										<span className="caption-subject bold uppercase">Provisión Ventas para Concar</span>
 									</div>
 									<div className="tools"></div>
 								</div>
