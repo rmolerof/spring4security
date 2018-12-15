@@ -918,7 +918,7 @@ class IncorporationForm extends React.Component {
 														      						            		</tr>
 														      					            			<tr>
 															      					            			<td>
-															      					            				<i className="fa fa-diamond"></i>
+															      					            				<i className="fa"></i>
 															                                                    <b><span className="ladda-label">{shareholder.name.toUpperCase()}</span></b>
 															      					            			</td>
 														      						            		</tr>
@@ -987,7 +987,7 @@ class IncorporationForm extends React.Component {
 														      						            		</tr>
 														      					            			<tr>
 															      					            			<td>
-															      					            				<i className="fa fa-diamond"></i>
+															      					            				<i className="fa"></i>
 															                                                    <b><span className="ladda-label">{shareholder.name.toUpperCase()}</span></b>
 															      					            			</td>
 														      						            		</tr>

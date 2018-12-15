@@ -29,6 +29,6 @@ public class TanksRepositoryImpl implements TanksRepositoryCustom {
 		List<TanksDao> latestTankStatuses = mongoTemplate.find(query, TanksDao.class);
 	    
 		
-		return latestTankStatuses.size() == 0 ? null: latestTankStatuses;
+		return latestTankStatuses;
 	}	
 }

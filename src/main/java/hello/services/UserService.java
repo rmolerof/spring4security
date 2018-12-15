@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TanksVo;
 import hello.businessModel.TotalDay;
+import hello.businessModel.TotalDayUnit;
 import hello.domain.GasPricesDao;
 import hello.domain.GasPricesRepository;
 import hello.domain.InvoiceDao;
@@ -97,9 +99,11 @@ public class UserService {
 	}
 	
 	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg) {
-		Station laJoya = new Station();
+		Station station = new Station();
 		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg);
+		Station stationVo = null;
 		StationDao stationDao = null;
+		List<Station> stations = null;
 		
 		if (null == stationDaos) {
 			stationDao = new StationDao();
@@ -112,11 +116,17 @@ public class UserService {
 			stationDao.setTotalCash(0D);
 			stationDao.setExpensesAndCredits(Arrays.asList(new ExpenseOrCredit()));
 			
+			TotalDay totalDay = new TotalDay();
+			totalDay.setTotalDayUnits(new HashMap<String, TotalDayUnit>());
+			totalDay.setTotalSolesRevenueDay(0D);
+			totalDay.setTotalProfitDay(0D);
+			stationDao.setTotalDay(totalDay);
+			
 			Tank d2 = new Tank(1L, "d2", 0D, 0D);
 			Tank g90 = new Tank(2L, "g90", 0D, 0D);
 			Tank g95 = new Tank(3L, "g95", 0D, 0D);
 			
-			Map<String, Tank> tanks = new HashMap<String, Tank>();
+			Map<String, Tank> tanks = new LinkedHashMap<String, Tank>();
 			tanks.put(d2.getFuelType(), d2);
 			tanks.put(g90.getFuelType(), g90);
 			tanks.put(g95.getFuelType(), g95);
@@ -125,17 +135,16 @@ public class UserService {
 			
 			Dispenser d2_1 = new Dispenser(1, "d2", 0,	0,	0, 9);
 			Dispenser d2_2 = new Dispenser(2, "d2", 0,	0,	0, 9);
-			Dispenser d2_3 = new Dispenser(3, "d2", 0,	0,	0, 8);
+			Dispenser d2_3 = new Dispenser(3, "d2", 0,	0,	0, 9);
 			Dispenser d2_4 = new Dispenser(4, "d2", 0,	0,	0, 9);
 			Dispenser d2_5 = new Dispenser(5, "d2", 0,	0,	0, 9);
-			Dispenser d2_6 = new Dispenser(6, "d2", 0,	0,	0, 8);
-			Dispenser g90_1 = new Dispenser(1, "g90", 0, 0,	0, 8);
-			Dispenser g90_2 = new Dispenser(2, "g90", 0, 0,	0, 8);
-			Dispenser g90_3 = new Dispenser(3, "g90", 0, 0,	0, 8);
+			Dispenser d2_6 = new Dispenser(6, "d2", 0,	0,	0, 9);
+			Dispenser g90_1 = new Dispenser(1, "g90", 0, 0,	0, 9);
+			Dispenser g90_2 = new Dispenser(2, "g90", 0, 0,	0, 9);
+			Dispenser g90_3 = new Dispenser(3, "g90", 0, 0,	0, 9);
 			Dispenser g90_4 = new Dispenser(4, "g90", 0, 0,	0, 9);
-			Dispenser g95_1 = new Dispenser(1, "g95", 0, 0,	0, 8);
-			Dispenser g95_2 = new Dispenser(2, "g95", 0, 0,	0, 8);
-
+			Dispenser g95_1 = new Dispenser(1, "g95", 0, 0,	0, 9);
+			Dispenser g95_2 = new Dispenser(2, "g95", 0, 0,	0, 9);
 			
 			
 			Map<String, Dispenser> dispensers = new LinkedHashMap<String, Dispenser>();
@@ -155,27 +164,33 @@ public class UserService {
 			
 			
 			stationDao.setDispensers(dispensers);
-		}
+			updateStatus(stationDao);
+			stationVo = new Station(stationDao);
+			
+			setCurrentStation(stationVo);
+			stations = Stream.of(stationVo).collect(Collectors.toList());
+			
+		} else {
 		
-		List<Station> stations = null;
-		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
-			updateStatus(stationDaos.get(0));
-			laJoya = new Station(stationDaos.get(0));
-			setCurrentStation(laJoya);
-			
-			stations = Stream.of(laJoya).collect(Collectors.toList());
-			
-		}  else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
-			
-			stations = stationDaos.stream().map(stationdao -> {
-				Station station = new Station(stationdao);
-				return station;
-			}).collect(Collectors.toList());
-			
-			// Update ObjectId and date from latest station status
-			stations.get(1).setId(stations.get(0).getId());
-			stations.get(1).setDate(stations.get(0).getDate());
-			setCurrentStation(stations.get(1));
+			if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
+				updateStatus(stationDaos.get(0));
+				station = new Station(stationDaos.get(0));
+				setCurrentStation(station);
+				
+				stations = Stream.of(station).collect(Collectors.toList());
+				
+			}  else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
+				
+				stations = stationDaos.stream().map(stationdao -> {
+					Station st = new Station(stationdao);
+					return st;
+				}).collect(Collectors.toList());
+				
+				// Update ObjectId and date from latest station status
+				stations.get(1).setId(stations.get(0).getId());
+				stations.get(1).setDate(stations.get(0).getDate());
+				setCurrentStation(stations.get(1));
+			}
 		}
 		
 		return stations;
@@ -225,7 +240,7 @@ public class UserService {
 		
 		StationDao stationdao = new StationDao(updatedStation);
 		stationdao.setId(new ObjectId());
-		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
+		StationDao stationDao = stationRepository.save(stationdao);
 		
 		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
 		submitTanksVo(tanksVo, "save");
@@ -342,11 +357,21 @@ public class UserService {
 	public List<TanksVo> findStockByDates(String dateEnd, String dateBeg) {
 
 		List<TanksDao> tanksDaos = tanksRepository.findLatest(dateEnd, dateBeg);
+		List<TanksVo> tanksVos = null;
 		
-		List<TanksVo> tanksVos = tanksDaos.stream().map(tanksDao -> {
-			TanksVo tanksVo = new TanksVo(tanksDao);
-			return tanksVo;
-		}).collect(Collectors.toList());
+		if (tanksDaos.size() == 0) {
+			List<Tank> defaultStock = new LinkedList<Tank>();
+			defaultStock.add(new Tank(1L, "d2", 0D, 0D));
+			defaultStock.add(new Tank(2L, "g90", 0D, 0D));
+			defaultStock.add(new Tank(3L, "g95", 0D, 0D));
+			TanksVo tanksVo = new TanksVo("", new Date(), defaultStock);
+			tanksVos = Stream.of(tanksVo).collect(Collectors.toList());
+		} else {
+			tanksVos = tanksDaos.stream().map(tanksDao -> {
+				TanksVo tanksVo = new TanksVo(tanksDao);
+				return tanksVo;
+			}).collect(Collectors.toList());
+		}
 		
 		return tanksVos;
 		
@@ -375,11 +400,21 @@ public class UserService {
 	
 	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
 		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatest(dateEnd, dateBeg);
+		List<GasPricesVo> gasPricesVos = null;
 		
-		List<GasPricesVo> gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
-			GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
-			return gasPricesVo;
-		}).collect(Collectors.toList());
+		if (gasPricesDaos.size() == 0) {
+			List<GasPrice> defaultPrices = new LinkedList<GasPrice>();
+			defaultPrices.add(new GasPrice("d2", 0D, 0D));
+			defaultPrices.add(new GasPrice("g90", 0D, 0D));
+			defaultPrices.add(new GasPrice("g95", 0D, 0D));
+			GasPricesVo gasPricesVo = new GasPricesVo("", new Date(), defaultPrices);
+			gasPricesVos = Stream.of(gasPricesVo).collect(Collectors.toList());
+		} else {
+			gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
+				GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
+				return gasPricesVo;
+			}).collect(Collectors.toList());
+		}
 		
 		return gasPricesVos;
 	}

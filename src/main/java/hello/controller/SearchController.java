@@ -162,7 +162,7 @@ public class SearchController {
 		
 		List<GasPricesVo> gasPricesVo = userService.findPricesByDates(search.getDateEnd(), search.getDateBeg());
 		if(gasPricesVo.isEmpty()) {
-			result.setMsg("No hay prices para la fecha: " + search.getDateEnd());
+			result.setMsg("No hay precios de productos en base de datos");
 		} else {
 			result.setMsg("Datos hallados");
 		}

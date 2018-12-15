@@ -29,7 +29,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		List<InvoiceDao> invoiceDaos = mongoTemplate.find(query, InvoiceDao.class);
 	    
 		
-		return invoiceDaos.size() == 0 ? null: invoiceDaos;
+		return invoiceDaos;
 	}
 
 }

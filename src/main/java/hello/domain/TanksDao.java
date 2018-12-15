@@ -43,9 +43,9 @@ public class TanksDao {
 		this.pumpAttendantNames = new String(tanksVo.getPumpAttendantNames());
 		this.date = new Date(tanksVo.getDate().getTime());
 		this.tanks = new ArrayList<Tank>(tanksVo.getTanks());
-		this.supplierRUC = new String(tanksVo.getSupplierRUC());
-		this.truckDriverName = new String(tanksVo.getTruckDriverName());
-		this.truckPlateNumber = new String(tanksVo.getTruckPlateNumber());
+		this.supplierRUC = new String(tanksVo.getSupplierRUC() == null ? "": tanksVo.getSupplierRUC());
+		this.truckDriverName = new String(tanksVo.getTruckDriverName() == null ? "": tanksVo.getTruckDriverName());
+		this.truckPlateNumber = new String(tanksVo.getTruckPlateNumber() == null ? "": tanksVo.getTruckPlateNumber());
 		this.delivery = tanksVo.isDelivery();
 	}
 

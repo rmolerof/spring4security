@@ -348,6 +348,7 @@ class TableDashboard extends React.Component {
   _fetchGasPrices(timeframe){
 		
 	  	var search = {};
+	  	var self = this;
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
 		
@@ -369,7 +370,13 @@ class TableDashboard extends React.Component {
 					this.setState({priceG95: gasPricesVo.gasPrices[2].price});
 					this.setState({gasPrices: gasPricesVo.gasPrices});
 					this.setState({date: currentDate});
-				} 
+				} else {
+					var errors = {
+			    		submit: data.msg
+				    };
+					self.setState({errors: errors}); 
+					self._toggleError();
+				}
 			},
 			error: function(e){
 
