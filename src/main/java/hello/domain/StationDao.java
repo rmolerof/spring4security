@@ -3,6 +3,7 @@ package hello.domain;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class StationDao {
 	    this.pumpAttendantNames = new String(original.getPumpAttendantNames());
 	    this.shift = new String(original.getShift());
 	    this.date = new Date(original.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(original.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());

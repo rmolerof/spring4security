@@ -39,7 +39,7 @@ public class Station {
 	    this.pumpAttendantNames = new String(original.pumpAttendantNames);
 	    this.shift = new String(original.shift);
 	    this.date = new Date(original.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(original.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
@@ -53,7 +53,7 @@ public class Station {
 	    this.pumpAttendantNames = new String(stationDao.getPumpAttendantNames());
 	    this.shift = new String(stationDao.getShift());
 	    this.date = new Date(stationDao.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(stationDao.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(stationDao.getTanks());
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
 	    this.totalCash = new Double(stationDao.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(stationDao.getExpensesAndCredits());

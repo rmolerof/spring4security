@@ -18,7 +18,11 @@ class IncorporationForm extends React.Component {
       totalExpensesAndCredits: '',
       tanks: [],
       gasPrices: [],
-      saveOrUpdate: 'save'
+      saveOrUpdate: 'save',
+      totalCredits: '',
+      totalDeposits: '',
+      totalVisas: '',
+      totalExpenses: ''
     };
   }
   
@@ -75,6 +79,10 @@ class IncorporationForm extends React.Component {
   
   _getTotalExpensesAndCredits(expensesAndCredits) {
 	  var totalExpsAndCreds = 0.0;
+	  var totalExpenses = 0.0;
+	  var totalVisas = 0.0;
+	  var totalDeposits = 0.0;
+	  var totalCredits = 0.0;
 	  var expenseOrCredit = {};
 	  for(var i = 0; i < expensesAndCredits.length; i++) {
 		  expenseOrCredit = expensesAndCredits[i];
@@ -82,9 +90,26 @@ class IncorporationForm extends React.Component {
 				//totalExpsAndCreds = totalExpsAndCreds + Math.floor(expenseOrCredit.amt * 100) / 100 ;
 				totalExpsAndCreds = totalExpsAndCreds + expenseOrCredit.amt;
 			}
+			
+			if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("visa"))) {
+				totalVisas = totalVisas + expenseOrCredit.amt
+			}
+			
+			if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("deposito") || expenseOrCredit.item.toLowerCase().includes("depósito"))) {
+				totalDeposits = totalDeposits + expenseOrCredit.amt
+			}
+			
+			if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("credito") || expenseOrCredit.item.toLowerCase().includes("crédito"))) {
+				totalCredits = totalCredits + expenseOrCredit.amt
+			}
 	  }
 	  
+	  totalExpenses = totalExpsAndCreds - totalVisas - totalDeposits - totalCredits;
 	  this.setState({totalExpensesAndCredits: totalExpsAndCreds.toFixed(2)});
+	  this.setState({totalVisas: totalVisas.toFixed(2)});
+	  this.setState({totalDeposits: totalDeposits.toFixed(2)});
+	  this.setState({totalCredits: totalCredits.toFixed(2)});
+	  this.setState({totalExpenses: totalExpenses.toFixed(2)});
   }
   
   handleNumEndChange1 = (idx) => (evt) => {
@@ -384,18 +409,39 @@ class IncorporationForm extends React.Component {
 					this.setState({totalCash: stationLatest.totalCash});
 					this.setState({totalRevenue: stationLatest.totalDay.totalSolesRevenueDay});
 					
-					// Total Expenses
+					// Total Expenses, visas, deposits, credits
 					var totalExpsAndCreds = 0.0;
+					var totalExpenses = 0.0;
+					var totalVisas = 0.0;
+					var totalDeposits = 0.0;
+					var totalCredits = 0.0;
 					var expenseOrCredit = {};
 					for(var i = 0; i < stationLatest.expensesAndCredits.length; i++) {
-						expenseOrCredit = stationLatest.expensesAndCredits[i];
-						if (!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt) {
-							totalExpsAndCreds = totalExpsAndCreds + expenseOrCredit.amt;
-						}
+						  expenseOrCredit = stationLatest.expensesAndCredits[i];
+							if (!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt) {
+								//totalExpsAndCreds = totalExpsAndCreds + Math.floor(expenseOrCredit.amt * 100) / 100 ;
+								totalExpsAndCreds = totalExpsAndCreds + expenseOrCredit.amt;
+							}
+							
+							if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("visa"))) {
+								totalVisas = totalVisas + expenseOrCredit.amt
+							}
+							
+							if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("deposito") || expenseOrCredit.item.toLowerCase().includes("depósito"))) {
+								totalDeposits = totalDeposits + expenseOrCredit.amt
+							}
+							
+							if(!isNaN(expenseOrCredit.amt) && expenseOrCredit.amt && (expenseOrCredit.item.toLowerCase().includes("credito") || expenseOrCredit.item.toLowerCase().includes("crédito"))) {
+								totalCredits = totalCredits + expenseOrCredit.amt
+							}
 					}
 					  
+					totalExpenses = totalExpsAndCreds - totalVisas - totalDeposits - totalCredits;
 					this.setState({totalExpensesAndCredits: totalExpsAndCreds.toFixed(2)});
-					
+					this.setState({totalVisas: totalVisas.toFixed(2)});
+					this.setState({totalDeposits: totalDeposits.toFixed(2)});
+					this.setState({totalCredits: totalCredits.toFixed(2)});
+					this.setState({totalExpenses: totalExpenses.toFixed(2)});
 					
 				}
 				
@@ -709,7 +755,7 @@ class IncorporationForm extends React.Component {
 					          </div>
 					      </div>
 					      
-					      <div className="col-md-3">
+					      <div className="col-md-4">
 					          <div className="portlet box green">
 					              <div className="portlet-title">
 					                  <div className="caption">
@@ -721,38 +767,85 @@ class IncorporationForm extends React.Component {
 						              	<div className="table-responsive">
 						              	
 						              	
-						              	  <table className="table table-hover table-light">
+						              	  <table className="table table-light">
 							      	        <tbody>
 									      	    <tr>
 						      	        			<td>
-						      	        				<label className="control-label" key="revenueLabel">Venta Total:</label>&nbsp;&nbsp;
-						      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
-						      	        			</td>
-						      	        		</tr>
-							      	        	<tr>
-						      	        			<td>
-						      	        				<label className="control-label" key="cashLabel">Effectivo:</label>&nbsp;&nbsp;
-						      	        				{/*<MaskedInput style={{width:'80px', textAlign: 'right'}} mask="11111.11" key="totalCash" placeholder={`Effectivo`} value={''} onChange={this.handleTotalCashChange}/>*/}
-						      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
-						      	        			</td>
-						      	        		</tr>
-						      	        		<tr>
-					      	        				<td>
-						      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos:</label>&nbsp;&nbsp;
-						      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
-						      	        			</td>
-						      	        		</tr>
-						      	        		
-						      	        		<tr>
-					      	        				<td>
-						      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
-						      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
+							      	        			<table className="table table-hover table-borderless">
+						  					            	<tbody>
+						  					            		<tr>
+						  					            			<td>
+						  					            				<label className="control-label" key="revenueLabel">Venta Total:</label>&nbsp;&nbsp;
+						  					            			</td>
+						  					            			<td>
+						  					            				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
+						  					            			</td>
+						  					            		</tr>
+						  					            		<tr>
+										      	        			<td>
+										      	        				<label className="control-label" key="cashLabel">Effectivo:</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos:</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="totalCreditsLabel">Total Créditos: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="totalDepositsLabel">Total Depósitos: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="totalVisasLabel">Total Visas: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="totalExpensesLabel">Total Gastos: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+					  					            		</tbody>
+				  					            		</table>
 						      	        			</td>
 						      	        		</tr>
 						      	        		
 						      	        		<tr>
 							      					<td>
-						  					            <table className="table table-bordered">
+						  					            <table className="table table-hover table-bordered">
 						  					            	<tbody>
 						  					            		<tr>
 						  					            			<th>
@@ -814,11 +907,11 @@ class IncorporationForm extends React.Component {
 					  
 					  <ReactToPrint trigger={() => <button type="button" className="btn btn-default mt-ladda-btn ladda-button" data-style="expand-left" data-spinner-color="#333"><a href="#"><i className="fa fa-print"></i> Print this out</a></button>} content={() => this.componentRef}></ReactToPrint>
 					  <div className="row" ref={el => (this.componentRef = el)}>
-					      <div className="col-md-6">
+					      <div className="col-md-7">
 					          <div className="portlet box red">
 					              <div className="portlet-title">
 					                  <div className="caption">
-					                      <i className="fa fa-gift"></i>Resumen De Forma Actual</div>
+					                      <i className="fa fa-gift"></i>Resumen de Forma para Impresión</div>
 					              </div>
 					              
 					              <div className="portlet-body form">
@@ -889,7 +982,7 @@ class IncorporationForm extends React.Component {
 							              	  <table>
 								              	<tbody>
 									              	<tr>
-										              	<td>
+										              	<td style={{verticalAlign: 'top'}}>
 										                  	<table>
 												      	        <tbody>
 												      				<tr>
@@ -958,7 +1051,7 @@ class IncorporationForm extends React.Component {
 											                </table>
 											            </td>
 											            
-											            <td>
+											            <td style={{verticalAlign: 'top'}}>
 										                  	<table>
 												      	        <tbody>
 												      				<tr>
@@ -1032,27 +1125,76 @@ class IncorporationForm extends React.Component {
 												      	        <tbody>
 														      	    <tr>
 											      	        			<td>
-											      	        				<label className="control-label" key="revenueLabel">Venta Total: S/.</label>&nbsp;&nbsp;
-											      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
-											      	        			</td>
-											      	        		</tr>
-												      	        	<tr>
-											      	        			<td>
-											      	        				<label className="control-label" key="cashLabel">Effectivo: S/.</label>&nbsp;&nbsp;
-											      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} readOnly/>
-											      	        			</td>
-											      	        		</tr>
-											      	        		<tr>
-										      	        				<td>
-											      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos: S/.</label>&nbsp;&nbsp;
-											      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
-											      	        			</td>
-											      	        		</tr>
-											      	        		
-											      	        		<tr>
-										      	        				<td>
-											      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
-											      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
+												      	        			<table className="table table-hover table-borderless">
+											  					            	<tbody>
+											  					            		<tr>
+											  					            			<td>
+											  					            				<label className="control-label" key="revenueLabel">Venta Total: S/.</label>&nbsp;&nbsp;
+											  					            			</td>
+											  					            			<td>
+											  					            				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
+											  					            			</td>
+										  					            			</tr>
+										  					            			<tr>
+															      	        			<td>
+															      	        				<label className="control-label" key="cashLabel">Effectivo: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="totalCreditsLabel">Total Créditos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="totalDepositsLabel">Total Depósitos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="totalVisasLabel">Total Visas: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="totalExpensesLabel">Total Gastos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+										  					            		</tbody>
+									  					            		</table>
 											      	        			</td>
 											      	        		</tr>
 											      	        		

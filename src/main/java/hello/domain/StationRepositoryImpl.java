@@ -1,12 +1,16 @@
 package hello.domain;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+
+import hello.businessModel.Tank;
 
 public class StationRepositoryImpl implements StationRepositoryCustom {
 	
@@ -27,6 +31,26 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 		
 		List<StationDao> latestStationStatuses = mongoTemplate.find(query, StationDao.class);
 	    
+		// Order Tanks
+		Map<String, Tank> newTanks = new LinkedHashMap<String, Tank>();
+		for (StationDao station: latestStationStatuses) {
+			Map<String, Tank> tanks = station.getTanks();
+			
+			String key = "d2";
+			if (tanks.containsKey(key)) {
+				newTanks.put(key, tanks.get(key));
+			}
+			key = "g90";
+			if (tanks.containsKey(key)) {
+				newTanks.put(key, tanks.get(key));
+			}
+			key = "g95";
+			if (tanks.containsKey(key)) {
+				newTanks.put(key, tanks.get(key));
+			}
+			
+			station.setTanks(newTanks);
+		}
 		
 		return latestStationStatuses.size() == 0 ? null: latestStationStatuses;
 	}

@@ -184,6 +184,8 @@ public class SearchController {
 		}
 		
 		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria, tanksVoCriteria.getSaveOrUpdate());
+		userService.updateTanksToStation(tanksVoCriteria);
+		
 		if(TanksVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + tanksVoCriteria.getDate());
 		} else {
@@ -207,6 +209,7 @@ public class SearchController {
 		}
 		
 		List<GasPricesVo> gasPricesVos = userService.submitGasPricesVo(gasPricesVoCriteria, gasPricesVoCriteria.getSaveOrUpdate());
+		userService.updateGasPricesToStation(gasPricesVoCriteria);
 		if(gasPricesVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + gasPricesVoCriteria.getDate());
 		} else {

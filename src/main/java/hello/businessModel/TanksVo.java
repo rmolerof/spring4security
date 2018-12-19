@@ -1,8 +1,8 @@
 package hello.businessModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import hello.domain.TanksDao;
@@ -30,7 +30,7 @@ public class TanksVo {
 	public TanksVo(TanksDao tanksDao) {
 		this.pumpAttendantNames = new String(null == tanksDao ? "": tanksDao.getPumpAttendantNames());
 		this.date = null == tanksDao ? new Date(): new Date(tanksDao.getDate().getTime());
-		this.tanks = new ArrayList<Tank>(null == tanksDao ? Arrays.asList(new Tank(1L, "d2", 0D, 0D), new Tank(2L, "g90", 0D, 0D), new Tank(3L, "g95", 0D, 0D)): tanksDao.getTanks());
+		this.tanks = new LinkedList<Tank>(null == tanksDao ? Arrays.asList(new Tank(1L, "d2", 0D, 0D), new Tank(2L, "g90", 0D, 0D), new Tank(3L, "g95", 0D, 0D)): tanksDao.getTanks());
 		this.supplierRUC = new String(null == tanksDao || null == tanksDao.getSupplierRUC() ? "": tanksDao.getSupplierRUC());
 		this.truckDriverName = new String(null == tanksDao || null == tanksDao.getTruckDriverName() ? "": tanksDao.getTruckDriverName());
 		this.truckPlateNumber = new String(null == tanksDao || null == tanksDao.getTruckPlateNumber() ? "": tanksDao.getTruckPlateNumber());
