@@ -10,6 +10,7 @@ public class DayDataCriteria {
 	private String pumpAttendantNames;
 	private Date date;
 	private String shift;
+	private String shiftDate;
 	private Map<String, Double> dayData;
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
@@ -56,6 +57,12 @@ public class DayDataCriteria {
 	}
 	public void setSaveOrUpdate(String saveOrUpdate) {
 		this.saveOrUpdate = saveOrUpdate;
+	}
+	public String getShiftDate() {
+		return shiftDate;
+	}
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
 	}
 	
 }

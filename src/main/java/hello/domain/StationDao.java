@@ -28,6 +28,7 @@ public class StationDao {
 	private String name;
 	private String pumpAttendantNames;
 	private String shift;
+	private String shiftDate = "";
 	@Indexed(unique = true)
 	private Date date;
 	private Map<String, Tank> tanks;
@@ -46,6 +47,7 @@ public class StationDao {
 	    this.name = new String(original.getName());
 	    this.pumpAttendantNames = new String(original.getPumpAttendantNames());
 	    this.shift = new String(original.getShift());
+	    this.shiftDate = new String(original.getShiftDate());
 	    this.date = new Date(original.getDate().getTime());
 	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
@@ -146,6 +148,14 @@ public class StationDao {
 
 	public void setTotalDay(TotalDay totalDay) {
 		this.totalDay = totalDay;
+	}
+
+	public String getShiftDate() {
+		return shiftDate;
+	}
+
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
 	}
 	
 }

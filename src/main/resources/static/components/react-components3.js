@@ -9,6 +9,7 @@ class IncorporationForm extends React.Component {
       name: '',
       pumpAttendantNames: '',
       date: '',
+      shiftDate: '',
       shift: '',
       totalRevenue: '',
       totalCash: '', 
@@ -22,7 +23,9 @@ class IncorporationForm extends React.Component {
       totalCredits: '',
       totalDeposits: '',
       totalVisas: '',
-      totalExpenses: ''
+      totalExpenses: '',
+      inputStyle: {color: 'black'},
+      excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}
     };
   }
   
@@ -46,6 +49,42 @@ class IncorporationForm extends React.Component {
   handlePumpAttendantNamesChange = (evt) => {
     this.setState({ pumpAttendantNames: evt.target.value });
   }
+  
+  handleShiftDateChange = evt => {
+	  this.setState({shiftDate: evt.target.value.trim()});
+	  
+	  if (this._isValidDate(evt.target.value.trim())) {
+		  this.setState({inputStyle: {color: 'black'}});
+	  } else {
+		  this.setState({inputStyle: {color: 'red'}});
+	  }
+  }
+  
+  _isValidDate(dateString)
+  {
+      // First check for the pattern
+      if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+          return false;
+
+      // Parse the date parts to integers
+      var parts = dateString.split("/");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+
+      // Check the ranges of month and year
+      if(year < 1000 || year > 3000 || month == 0 || month > 12)
+          return false;
+
+      var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+      // Adjust for leap years
+      if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+          monthLength[1] = 29;
+
+      // Check the range of the day
+      return day > 0 && day <= monthLength[month - 1];
+  };
   
   handleTotalCashChange = (evt) => {
 	  this.setState({ totalCash: evt.target.value == '' ? '': ((evt.target.value * 100).toFixed() / 100) }); 
@@ -105,11 +144,18 @@ class IncorporationForm extends React.Component {
 	  }
 	  
 	  totalExpenses = totalExpsAndCreds - totalVisas - totalDeposits - totalCredits;
+	  var exessOrMissing = this.state.totalRevenue - this.state.totalCash - totalExpsAndCreds;
 	  this.setState({totalExpensesAndCredits: totalExpsAndCreds.toFixed(2)});
 	  this.setState({totalVisas: totalVisas.toFixed(2)});
 	  this.setState({totalDeposits: totalDeposits.toFixed(2)});
 	  this.setState({totalCredits: totalCredits.toFixed(2)});
 	  this.setState({totalExpenses: totalExpenses.toFixed(2)});
+	  
+	  if (exessOrMissing && exessOrMissing.toFixed(2) <= 0) {
+		  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
+	  } else {
+		  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'red'}});
+	  }
   }
   
   handleNumEndChange1 = (idx) => (evt) => {
@@ -154,7 +200,7 @@ class IncorporationForm extends React.Component {
 	
 	evt.preventDefault();
     
-	const { pumpAttendantNames, date, shift, shareholders1, shareholders2, totalCash, expensesAndCredits, saveOrUpdate} = this.state;
+	const { pumpAttendantNames, date, shift, shiftDate, shareholders1, shareholders2, totalCash, expensesAndCredits, saveOrUpdate} = this.state;
     var self = this;
     var errors = {
     		numEnd: '',
@@ -172,6 +218,7 @@ class IncorporationForm extends React.Component {
     	pumpAttendantNames: pumpAttendantNames,
     	date: date,
     	shift: shift,
+    	shiftDate: shiftDate,
     	dayData: {},
     	totalCash: totalCash,
     	expensesAndCredits: expensesAndCredits,
@@ -183,6 +230,14 @@ class IncorporationForm extends React.Component {
     
     } else {
     	errors["pumpAttendantNames"] = "Falta nombre(s) de grifer@(s)";
+		formIsValid = false;
+    }
+    
+    // Validation shift date
+    if (shiftDate && shiftDate.trim().length >= 0 && this.state.inputStyle.color == 'black') {
+    
+    } else {
+    	errors["submit"] = "Falta o corregir fecha";
 		formIsValid = false;
     }
     
@@ -346,6 +401,7 @@ class IncorporationForm extends React.Component {
 					this.setState({shareholders2: this.state.shareholders2.concat(shareholdersResponse2)});
 					this.setState({name: station.name});
 					this.setState({date: currentDate});
+					this.setState({shiftDate: ''});
 					this.setState({shift: currentShift});
 					this.setState({tanks: tanks});
 					this.setState({gasPrices: gasPrices});
@@ -402,6 +458,7 @@ class IncorporationForm extends React.Component {
 					this.setState({name: stationLatest.name});
 					this.setState({pumpAttendantNames: stationLatest.pumpAttendantNames});
 					this.setState({date: stationLatest.date});
+					this.setState({shiftDate: stationLatest.shiftDate});
 					this.setState({shift: stationLatest.shift});
 					this.setState({tanks: tanks});
 					this.setState({gasPrices: gasPrices});
@@ -437,11 +494,18 @@ class IncorporationForm extends React.Component {
 					}
 					  
 					totalExpenses = totalExpsAndCreds - totalVisas - totalDeposits - totalCredits;
+					var exessOrMissing = stationLatest.totalDay.totalSolesRevenueDay - stationLatest.totalCash - totalExpsAndCreds;
 					this.setState({totalExpensesAndCredits: totalExpsAndCreds.toFixed(2)});
 					this.setState({totalVisas: totalVisas.toFixed(2)});
 					this.setState({totalDeposits: totalDeposits.toFixed(2)});
 					this.setState({totalCredits: totalCredits.toFixed(2)});
 					this.setState({totalExpenses: totalExpenses.toFixed(2)});
+					
+					if (exessOrMissing && exessOrMissing.toFixed(2) <= 0) {
+						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
+					  } else {
+						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'red'}});
+					  }
 					
 				}
 				
@@ -543,7 +607,7 @@ class IncorporationForm extends React.Component {
 	                </div>
 				    <div className="form-body">
 				      <div className="row">
-				          <div className="col-md-4">
+				          <div className="col-md-3">
 				              <div className="form-group">
 				                  <label className="control-label">Nombres de Grifero(s)</label>
 				                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
@@ -551,14 +615,20 @@ class IncorporationForm extends React.Component {
 				          </div>
 				          <div className="col-md-2">
 				              <div className="form-group">
-				                  <label className="control-label">Fecha</label>
-				                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+				                  <label className="control-label">Marca Horaria</label>
+				                  <input type="text" id="date" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`} readOnly/>
 				              </div>
 				          </div>
-				          <div className="col-md-2">
+				          <div className="col-md-1">
+				              <div className="form-group">
+				                  <label className="control-label">Fecha Turno</label>
+				                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>
+				              </div>
+				          </div>
+				          <div className="col-md-1">
 				              <div className="form-group">
 				                  <label className="control-label">Turno</label>
-				                  <input type="text" id="lastName" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
+				                  <input type="text" id="shift" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
 				              </div>
 				          </div>
 				          <div className="col-md-2">
@@ -791,7 +861,7 @@ class IncorporationForm extends React.Component {
 										      	        		</tr>
 										      	        		<tr>
 									      	        				<td>
-										      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos:</label>&nbsp;&nbsp;
+										      	        				<label className="control-label" key="gastosOrCreditsLabel">VDCG:</label>&nbsp;&nbsp;
 									      	        				</td>
 									      	        				<td>
 										      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
@@ -799,32 +869,7 @@ class IncorporationForm extends React.Component {
 										      	        		</tr>
 										      	        		<tr>
 									      	        				<td>
-										      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		
-										      	        		<tr>
-									      	        				<td>
-										      	        				<label className="control-label" key="totalCreditsLabel">Total Créditos: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-										      	        				<label className="control-label" key="totalDepositsLabel">Total Depósitos: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-										      	        				<label className="control-label" key="totalVisasLabel">Total Visas: S/.</label>&nbsp;&nbsp;
+									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalVisasLabel">Solo Visas: S/.</label>&nbsp;&nbsp;
 									      	        				</td>
 									      	        				<td>
 										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
@@ -832,10 +877,34 @@ class IncorporationForm extends React.Component {
 										      	        		</tr>
 										      	        		<tr>
 									      	        				<td>
-										      	        				<label className="control-label" key="totalExpensesLabel">Total Gastos: S/.</label>&nbsp;&nbsp;
+									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalDepositsLabel">Solo Depósitos: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalCreditsLabel">Solo Créditos: S/.</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalExpensesLabel">Solo Gastos: S/.</label>&nbsp;&nbsp;
 									      	        				</td>
 									      	        				<td>
 										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
+										      	        			</td>
+										      	        		</tr>
+										      	        		<tr>
+									      	        				<td>
+										      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
+									      	        				</td>
+									      	        				<td>
+										      	        				<input style={this.state.excessOrMissingStyle} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
 										      	        			</td>
 										      	        		</tr>
 					  					            		</tbody>
@@ -923,13 +992,19 @@ class IncorporationForm extends React.Component {
 											          <td>
 											              <div className="form-group">
 											                  <label className="control-label">Nombres de Grifero(s)</label>
-											                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
+											                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." value={this.state.pumpAttendantNames} readOnly/>
 											              </div>
 											          </td>
 											          <td>
 											              <div className="form-group">
-											                  <label className="control-label">Fecha</label>
+											                  <label className="control-label">Marca Horaria</label>
 											                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+											              </div>
+											          </td>
+											          <td>
+											              <div className="form-group">
+											                  <label className="control-label">Fecha Turno</label>
+											                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} readOnly/>
 											              </div>
 											          </td>
 											          <td>
@@ -1145,41 +1220,15 @@ class IncorporationForm extends React.Component {
 															      	        		</tr>
 															      	        		<tr>
 														      	        				<td>
-															      	        				<label className="control-label" key="gastosOrCreditsLabel">Total Gastos/Créditos: S/.</label>&nbsp;&nbsp;
+															      	        				<label className="control-label" key="gastosOrCreditsLabel">VDCG: S/.</label>&nbsp;&nbsp;
 														      	        				</td>
 											  					            			<td>
 															      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
 															      	        			</td>
 															      	        		</tr>
-															      	        		
 															      	        		<tr>
 														      	        				<td>
-															      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
-														      	        				</td>
-											  					            			<td>
-															      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
-															      	        			</td>
-															      	        		</tr>
-															      	        		
-															      	        		<tr>
-														      	        				<td>
-															      	        				<label className="control-label" key="totalCreditsLabel">Total Créditos: S/.</label>&nbsp;&nbsp;
-														      	        				</td>
-											  					            			<td>
-															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
-															      	        			</td>
-															      	        		</tr>
-															      	        		<tr>
-														      	        				<td>
-															      	        				<label className="control-label" key="totalDepositsLabel">Total Depósitos: S/.</label>&nbsp;&nbsp;
-														      	        				</td>
-											  					            			<td>
-															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
-															      	        			</td>
-															      	        		</tr>
-															      	        		<tr>
-														      	        				<td>
-															      	        				<label className="control-label" key="totalVisasLabel">Total Visas: S/.</label>&nbsp;&nbsp;
+														      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalVisasLabel">Solo Visas: S/.</label>&nbsp;&nbsp;
 														      	        				</td>
 											  					            			<td>
 															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
@@ -1187,10 +1236,34 @@ class IncorporationForm extends React.Component {
 															      	        		</tr>
 															      	        		<tr>
 														      	        				<td>
-															      	        				<label className="control-label" key="totalExpensesLabel">Total Gastos: S/.</label>&nbsp;&nbsp;
+														      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalDepositsLabel">Solo Depósitos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+														      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalCreditsLabel">Solo Créditos: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+														      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalExpensesLabel">Solo Gastos: S/.</label>&nbsp;&nbsp;
 														      	        				</td>
 											  					            			<td>
 															      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
+															      	        			</td>
+															      	        		</tr>
+															      	        		<tr>
+														      	        				<td>
+															      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
+														      	        				</td>
+											  					            			<td>
+															      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
 															      	        			</td>
 															      	        		</tr>
 										  					            		</tbody>

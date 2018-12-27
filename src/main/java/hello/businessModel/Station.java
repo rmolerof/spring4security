@@ -18,6 +18,7 @@ public class Station {
 	private String name;
 	private String pumpAttendantNames;
 	private String shift;
+	private String shiftDate = "";
 	private Date date;
 	private Map<String, Tank> tanks;
 	private Map<String, Dispenser> dispensers;
@@ -38,6 +39,7 @@ public class Station {
 	    this.name = new String(original.name);
 	    this.pumpAttendantNames = new String(original.pumpAttendantNames);
 	    this.shift = new String(original.shift);
+	    this.shiftDate = new String(original.shiftDate);
 	    this.date = new Date(original.getDate().getTime());
 	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
@@ -52,6 +54,7 @@ public class Station {
 	    this.name = new String(stationDao.getName());
 	    this.pumpAttendantNames = new String(stationDao.getPumpAttendantNames());
 	    this.shift = new String(stationDao.getShift());
+	    this.shiftDate = new String(stationDao.getShiftDate());
 	    this.date = new Date(stationDao.getDate().getTime());
 	    this.tanks = new LinkedHashMap<String, Tank>(stationDao.getTanks());
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
@@ -162,6 +165,14 @@ public class Station {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+	public String getShiftDate() {
+		return shiftDate;
+	}
+
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
 	}
 	
 }

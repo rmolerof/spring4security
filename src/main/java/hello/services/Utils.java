@@ -80,6 +80,7 @@ public class Utils {
 		String pumpAttendantNames = dayDataCriteria.getPumpAttendantNames();
 		Date date = dayDataCriteria.getDate();
 		String shift = dayDataCriteria.getShift();
+		String shiftDate = dayDataCriteria.getShiftDate();
 		Double totalCash = dayDataCriteria.getTotalCash();
 		List<ExpenseOrCredit> expensesAndCredits = dayDataCriteria.getExpensesAndCredits(); 
 		
@@ -104,6 +105,7 @@ public class Utils {
 		newCurrentStation.setPumpAttendantNames(pumpAttendantNames);
 		newCurrentStation.setDate(date);
 		newCurrentStation.setShift(shift);
+		newCurrentStation.setShiftDate(shiftDate);
 		newCurrentStation.setTotalCash(totalCash);
 		newCurrentStation.setExpensesAndCredits(expensesAndCredits);
 		newCurrentStation.setTotalDay(totalDay);

@@ -42,49 +42,55 @@ class TableDashboard extends React.Component {
 				for (var i = 0; i < stationSummaryData.length - 1; i++) {
 					
 					var expenseOrCredit = {};
-					var visaCredits = 0.0;
+					var visas = 0.0;
+					var credits = 0.0;
 					var deposits = 0.0;
 					var expensesOnly = 0.0;
 					var expensesAndCredits = 0.0;
 					for(var j = 0; j < stationSummaryData[i].expensesAndCredits.length; j++) {
 						expenseOrCredit = stationSummaryData[i].expensesAndCredits[j];
 						if (expenseOrCredit.item.toLowerCase().includes("visa")) {
-							visaCredits += expenseOrCredit.amt;
+							visas += expenseOrCredit.amt;
 						}
-						if (expenseOrCredit.item.toLowerCase().includes("deposit")) {
+						if (expenseOrCredit.item.toLowerCase().includes("deposito") || expenseOrCredit.item.toLowerCase().includes("depósito")) {
 							deposits += expenseOrCredit.amt;
+						}
+						if (expenseOrCredit.item.toLowerCase().includes("credito") || expenseOrCredit.item.toLowerCase().includes("crédito")) {
+							credits += expenseOrCredit.amt;
 						}
 						expensesAndCredits += expenseOrCredit.amt;
 					}
 					expensesAndCredits = expensesAndCredits.toFixed(2);
-					expensesOnly = (expensesAndCredits - visaCredits - deposits).toFixed(2);
+					expensesOnly = (expensesAndCredits - visas - deposits - credits).toFixed(2);
 					deposits = deposits.toFixed(2);
-					visaCredits = visaCredits.toFixed(2);
+					visas = visas.toFixed(2);
 					
 					count++;
 					var row = [
 						count,
 						moment(stationSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
 						stationSummaryData[i].pumpAttendantNames,
+						stationSummaryData[i].shiftDate,
 						stationSummaryData[i].shift,
 						stationSummaryData[i].tanks["d2"].gals,
 						stationSummaryData[i].tanks["g90"].gals,
 						stationSummaryData[i].tanks["g95"].gals,
-						stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay,
-						stationSummaryData[i].totalDay.totalDayUnits.d2.totalSolesRevenueDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g90.totalSolesRevenueDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g95.totalSolesRevenueDay,
-						stationSummaryData[i].totalDay.totalDayUnits.d2.totalProfitDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g90.totalProfitDay,
-						stationSummaryData[i].totalDay.totalDayUnits.g95.totalProfitDay,
+						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalSolesRevenueDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalSolesRevenueDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalSolesRevenueDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalProfitDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalProfitDay: '',
+						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalProfitDay: '',
 						stationSummaryData[i].totalDay.totalSolesRevenueDay,
 						stationSummaryData[i].totalCash,
-						expensesOnly,
-						visaCredits,
-						deposits,
 						expensesAndCredits,
+						visas,
+						deposits,
+						credits,
+						expensesOnly,
 						(stationSummaryData[i].totalDay.totalSolesRevenueDay - stationSummaryData[i].totalCash - expensesAndCredits).toFixed(2),
 						stationSummaryData[i].totalDay.totalProfitDay
 						];
@@ -140,6 +146,7 @@ class TableDashboard extends React.Component {
 							count,
 							moment(stationSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
 							stationSummaryData[i].pumpAttendantNames,
+							stationSummaryData[i].shiftDate,
 							stationSummaryData[i].shift,
 							type,
 							expenseOrCredit.item,
@@ -482,9 +489,10 @@ class CreditsOrExpensesTbl extends React.Component {
 			],
 			columns: [
 					{ title: "Nro" },
-				 	{ title: "Fecha" },
-		            { title: "Autor" },
-		            { title: "Trno" },
+					{ title: "Marca Horaria" },
+					{ title: "Autor" },
+					{ title: "Fecha" },
+		            { title: "Turno" },
 		            { title: "Tipo" },
 		            { title: "Concepto" },
 		            { title: "Cantidad" }
@@ -540,9 +548,10 @@ class StationTbl extends React.Component {
 			],
 			columns: [
 					{ title: "Nro" },
-				 	{ title: "Fecha" },
-		            { title: "Autor" },
-		            { title: "Trno" },
+					{ title: "Marca Horaria" },
+					{ title: "Autor" },
+					{ title: "Fecha" },
+		            { title: "Turno" },
 		            { title: "Stk D2" },
 		            { title: "Stk G90" },
 		            { title: "Stk G95" },
@@ -557,11 +566,12 @@ class StationTbl extends React.Component {
 		            { title: "Util G95" },
 		            { title: "Ventas" },
 		            { title: "Efectivo" },
-		            { title: "Solo Gasto" },
-		            { title: "Visas" },
-		            { title: "Deposits" },
-		            { title: "Gsts y Crdts" },
-		            { title: "Falta" },
+		            { title: "VDCG" },
+		            { title: "Solo Visas" },
+		            { title: "Solo Depositos" },
+		            { title: "Solo Créditos" },
+		            { title: "Solo Gastos" },
+		            { title: "Falta/Sobra" },
 		            { title: "Util Bruta" },
 			]
 		});

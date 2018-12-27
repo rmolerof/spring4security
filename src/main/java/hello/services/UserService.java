@@ -331,31 +331,35 @@ public class UserService {
 	public Station updateTanksToStation(TanksVo tanksVoCriteria) {
 		// Find latest station
 		List<StationDao> stationDaos = stationRepository.findLatest("latest", "");
-
-		// Update Stock
-		for (Entry<String, Tank> entry: stationDaos.get(0).getTanks().entrySet()) {
-			for (Tank tank: tanksVoCriteria.getTanks()) {
-				if (entry.getKey().contains(tank.getFuelType())) {
-					entry.getValue().setGals(tank.getGals());
-					entry.getValue().setTankId(tank.getTankId());
+		Station station = null;
+		
+		if (null != stationDaos) {
+		
+			// Update Stock
+			for (Entry<String, Tank> entry: stationDaos.get(0).getTanks().entrySet()) {
+				for (Tank tank: tanksVoCriteria.getTanks()) {
+					if (entry.getKey().contains(tank.getFuelType())) {
+						entry.getValue().setGals(tank.getGals());
+						entry.getValue().setTankId(tank.getTankId());
+					}
 				}
 			}
+			
+			// save station
+			StationDao stationDao = stationDaos.get(0);
+			stationDao.setId(new ObjectId());
+			stationDao.setDate(new Date());
+			stationDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
+				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
+				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
+				totalDayUnit.getValue().setTotalProfitDay(0D);
+				totalDayUnit.getValue().setStockGals(0D);
+			}
+			
+			station = new Station(stationRepository.save(stationDao));
+			setCurrentStation(station);
 		}
-		
-		// save station
-		StationDao stationDao = stationDaos.get(0);
-		stationDao.setId(new ObjectId());
-		stationDao.setDate(new Date());
-		stationDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
-		for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
-			totalDayUnit.getValue().setTotalGalsSoldDay(0D);
-			totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
-			totalDayUnit.getValue().setTotalProfitDay(0D);
-			totalDayUnit.getValue().setStockGals(0D);
-		}
-		
-		Station station = new Station(stationRepository.save(stationDao));
-		setCurrentStation(station);
 		
 		return station;
 	}
@@ -405,31 +409,34 @@ public class UserService {
 	public Station updateGasPricesToStation(GasPricesVo gasPricesVoCriteria) {
 		// Find latest station
 		List<StationDao> stationDaos = stationRepository.findLatest("latest", "");
-
-		// update prices
-		for (Entry<String, Dispenser> entry: stationDaos.get(0).getDispensers().entrySet()) {
-			for (GasPrice gasPrice: gasPricesVoCriteria.getGasPrices()) {
-				if (entry.getKey().contains(gasPrice.getFuelType())) {
-					entry.getValue().setPrice(gasPrice.getPrice());
-					entry.getValue().setCost(gasPrice.getCost());
+		Station station = null; 
+		
+		if (null != stationDaos) {
+			// update prices
+			for (Entry<String, Dispenser> entry: stationDaos.get(0).getDispensers().entrySet()) {
+				for (GasPrice gasPrice: gasPricesVoCriteria.getGasPrices()) {
+					if (entry.getKey().contains(gasPrice.getFuelType())) {
+						entry.getValue().setPrice(gasPrice.getPrice());
+						entry.getValue().setCost(gasPrice.getCost());
+					}
 				}
 			}
+			
+			// save station
+			StationDao stationDao = stationDaos.get(0);
+			stationDao.setId(new ObjectId());
+			stationDao.setDate(new Date());
+			stationDao.setPumpAttendantNames(gasPricesVoCriteria.getPumpAttendantNames());
+			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
+				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
+				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
+				totalDayUnit.getValue().setTotalProfitDay(0D);
+				totalDayUnit.getValue().setStockGals(0D);
+			}
+			
+			station = new Station(stationRepository.save(stationDao));
+			setCurrentStation(station);
 		}
-		
-		// save station
-		StationDao stationDao = stationDaos.get(0);
-		stationDao.setId(new ObjectId());
-		stationDao.setDate(new Date());
-		stationDao.setPumpAttendantNames(gasPricesVoCriteria.getPumpAttendantNames());
-		for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
-			totalDayUnit.getValue().setTotalGalsSoldDay(0D);
-			totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
-			totalDayUnit.getValue().setTotalProfitDay(0D);
-			totalDayUnit.getValue().setStockGals(0D);
-		}
-		
-		Station station = new Station(stationRepository.save(stationDao));
-		setCurrentStation(station);
 		
 		return station;
 	}
