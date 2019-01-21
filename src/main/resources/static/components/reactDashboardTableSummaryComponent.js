@@ -63,6 +63,7 @@ class TableDashboard extends React.Component {
 					expensesAndCredits = expensesAndCredits.toFixed(2);
 					expensesOnly = (expensesAndCredits - visas - deposits - credits).toFixed(2);
 					deposits = deposits.toFixed(2);
+					credits = credits.toFixed(2);
 					visas = visas.toFixed(2);
 					
 					count++;
@@ -134,9 +135,11 @@ class TableDashboard extends React.Component {
 					for(var j = 0; j < stationSummaryData[i].expensesAndCredits.length; j++) {
 						expenseOrCredit = stationSummaryData[i].expensesAndCredits[j];
 						if (expenseOrCredit.item.toLowerCase().includes("visa")) {
-							type = "CREDITO/VISA"
-						} else if (expenseOrCredit.item.toLowerCase().includes("deposit")) {
+							type = "VISA"
+						} else if (expenseOrCredit.item.toLowerCase().includes("deposito")) {
 							type = "DEPOSITO"
+						} else if (expenseOrCredit.item.toLowerCase().includes("credito")) {
+							type = "CREDITO"
 						} else {
 							type = "GASTO"
 						}
@@ -512,7 +515,7 @@ class CreditsOrExpensesTbl extends React.Component {
 								<div className="portlet-title">
 									<div className="caption font-green">
 										<i className="icon-settings font-green"></i>
-										<span className="caption-subject bold uppercase">Tabla de Gastos/Creditos/Depositos</span>
+										<span className="caption-subject bold uppercase">Tabla de Visas/Depositos/Creditos/Gastos</span>
 									</div>
 									<div className="tools"></div>
 								</div>

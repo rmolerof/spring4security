@@ -98,9 +98,9 @@ public class UserService {
 		
 	}
 	
-	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg) {
+	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg, int backDataCount) {
 		Station station = new Station();
-		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg);
+		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg, backDataCount);
 		Station stationVo = null;
 		StationDao stationDao = null;
 		List<Station> stations = null;
@@ -173,7 +173,7 @@ public class UserService {
 		} else {
 		
 			if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
-				//updateStatus(stationDaos.get(0));
+
 				station = new Station(stationDaos.get(0));
 				setCurrentStation(station);
 				
@@ -251,19 +251,54 @@ public class UserService {
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
 	}
 	
-	public List<Station> updateLatestDayData(DayDataCriteria dateDataCriteria) {
+	public List<Station> updateLatestDayData(DayDataCriteria dayDataCriteria) {
 		
-		Station updatedStation = utils.updateStation(getCurrentStation(), dateDataCriteria);
+		Station updatedStation = utils.updateStation(getCurrentStation(), dayDataCriteria);
 		
 		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
 		
 		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
 		submitTanksVo(tanksVo, "update");
 		
+		//recalculateUpOf(dayDataCriteria.getShiftDate(), dayDataCriteria.getShift());
+		
 		Station resetStationFromDB = new Station(stationDao);
 		setCurrentStation(resetStationFromDB);
 		
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
+	}
+	
+	public void recalculateUpOf(String shiftDate, String shift) {
+		
+		// Find all later stations
+		List<StationDao> stationDaos = stationRepository.findLatestMonth();
+		
+		int index = 0;
+		for (StationDao stationDao: stationDaos) {
+			
+			if (stationDao.getShiftDate().trim().equals(shiftDate) && stationDao.getShift().trim().equals(shift)) {
+				break;
+			}
+			
+			index++;
+		}
+		
+		stationDaos = stationDaos.subList(0, index + 2);
+		
+		for (int i = stationDaos.size()-1; i >= 0 ; i--) {
+			
+			if (i > 0) {
+				DayDataCriteria dayDataCriteria = new DayDataCriteria(stationDaos.get(i - 1));
+				StationDao updatedStation = utils.updateStationDao(stationDaos.get(i), dayDataCriteria);
+				StationDao stationDao = stationRepository.save(updatedStation);
+			}
+		}
+		
+		/*
+		 *  change the update station to StationDao and make sure the save becomes update
+		 */
+		
+		
 	}
 	
 	public List<Station> resetStatus(DayDataCriteria dateDataCriteria) {
@@ -330,7 +365,15 @@ public class UserService {
 	
 	public Station updateTanksToStation(TanksVo tanksVoCriteria) {
 		// Find latest station
-		List<StationDao> stationDaos = stationRepository.findLatest("latest", "");
+		//List<StationDao> stationDaos = stationRepository.findLatest("latest", "", 0);
+		
+		StationDao sD = stationRepository.findFirsByShiftDateAndShift(tanksVoCriteria.getShiftDate(), "2");
+		if (null == sD) {
+			sD = stationRepository.findFirsByShiftDateAndShift(tanksVoCriteria.getShiftDate(), "1");
+		}
+		
+		List<StationDao> stationDaos = Arrays.asList(sD);
+		
 		Station station = null;
 		
 		if (null != stationDaos) {
@@ -341,6 +384,14 @@ public class UserService {
 					if (entry.getKey().contains(tank.getFuelType())) {
 						entry.getValue().setGals(tank.getGals());
 						entry.getValue().setTankId(tank.getTankId());
+						entry.getValue().setCost(tank.getCost());
+						entry.getValue().setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+						entry.getValue().setSaveOrUpdate(tanksVoCriteria.getSaveOrUpdate());
+						entry.getValue().setSupplierRUC(tanksVoCriteria.getSupplierRUC());
+						entry.getValue().setTruckDriverName(tanksVoCriteria.getTruckDriverName());
+						entry.getValue().setDelivery(tanksVoCriteria.isDelivery());
+						entry.getValue().setDate(tanksVoCriteria.getDate());
+						entry.getValue().setShiftDate(tanksVoCriteria.getShiftDate());
 					}
 				}
 			}
@@ -348,14 +399,20 @@ public class UserService {
 			// save station
 			StationDao stationDao = stationDaos.get(0);
 			stationDao.setId(new ObjectId());
-			stationDao.setDate(new Date());
+			stationDao.setDate(new Date(stationDao.getDate().getTime() + 1L));
 			stationDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+			stationDao.setTotalCash(0D);
 			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
 				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
 				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
 				totalDayUnit.getValue().setTotalProfitDay(0D);
 				totalDayUnit.getValue().setStockGals(0D);
 			}
+			stationDao.getTotalDay().setTotalSolesRevenueDay(0D);
+			stationDao.getTotalDay().setTotalProfitDay(0D);
+			stationDao.setExpensesAndCredits(new ArrayList<ExpenseOrCredit>());
+			
+			//recalculateUpOf(tanksVoCriteria.getShiftDate(), "1");
 			
 			station = new Station(stationRepository.save(stationDao));
 			setCurrentStation(station);
@@ -408,7 +465,7 @@ public class UserService {
 	
 	public Station updateGasPricesToStation(GasPricesVo gasPricesVoCriteria) {
 		// Find latest station
-		List<StationDao> stationDaos = stationRepository.findLatest("latest", "");
+		List<StationDao> stationDaos = stationRepository.findLatest("latest", "", 0);
 		Station station = null; 
 		
 		if (null != stationDaos) {

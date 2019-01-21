@@ -45,6 +45,7 @@ import hello.domain.InvoiceDao;
 import hello.domain.InvoicesRepository;
 import hello.domain.RUCDao;
 import hello.domain.RUCsRepository;
+import hello.domain.StationDao;
 import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
 import hello.reports.CustomJRDataSource;
@@ -74,46 +75,74 @@ public class Utils {
 	@Autowired
 	private GlobalProperties globalProperties;
 
-	public Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
+	public StationDao updateStationDao(StationDao currentStation, DayDataCriteria dayDataCriteria) {
 		
-		Map<String, Double> dayData = dayDataCriteria.getDayData();
-		String pumpAttendantNames = dayDataCriteria.getPumpAttendantNames();
-		Date date = dayDataCriteria.getDate();
-		String shift = dayDataCriteria.getShift();
-		String shiftDate = dayDataCriteria.getShiftDate();
-		Double totalCash = dayDataCriteria.getTotalCash();
-		List<ExpenseOrCredit> expensesAndCredits = dayDataCriteria.getExpensesAndCredits(); 
+		TotalDay totalDay = processShift(currentStation.getDispensers(), currentStation.getTanks(), dayDataCriteria);
+		
+		// Update Station numbers
+		StationDao newCurrentStationDao = currentStation;
+		
+		newCurrentStationDao.setPumpAttendantNames(dayDataCriteria.getPumpAttendantNames());
+		newCurrentStationDao.setDate(dayDataCriteria.getDate());
+		newCurrentStationDao.setShift(dayDataCriteria.getShift());
+		newCurrentStationDao.setShiftDate(dayDataCriteria.getShiftDate());
+		newCurrentStationDao.setTotalCash(dayDataCriteria.getTotalCash());
+		newCurrentStationDao.setExpensesAndCredits(dayDataCriteria.getExpensesAndCredits());
+		newCurrentStationDao.setTotalDay(totalDay);
+		
+		
+		// Update gallons counter
+		for (Entry<String, Dispenser> entry: newCurrentStationDao.getDispensers().entrySet()) {
+			entry.getValue().setGallons(dayDataCriteria.getDayData().get(entry.getKey()));
+		}
+		
+		// Update tanks' stock
+		for (Entry<String, Tank> entry: newCurrentStationDao.getTanks().entrySet()) {
+			entry.getValue().setGals(totalDay.getStockGals(entry.getKey()));
+		}
+		
+		return newCurrentStationDao;
+	}
+	
+	public TotalDay processShift(Map<String, Dispenser> dispensers, Map<String, Tank> tanks, DayDataCriteria dayDataCriteria) {
 		
 		TotalDay totalDay = new TotalDay();
 		
-		for (Entry<String, Dispenser> entry: currentStation.getDispensers().entrySet()) {
+		for (Entry<String, Dispenser> entry: dispensers.entrySet()) {
 			
-			double gallonsDiff = roundTwo((dayData.get(entry.getKey()) - entry.getValue().getGallons()));
+			double gallonsDiff = roundTwo((dayDataCriteria.getDayData().get(entry.getKey()) - entry.getValue().getGallons()));
 			String name = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));
-			totalDay.setTotalGalsSoldDay(name, toFixedTwo(totalDay.getTotalGalsSoldDay(name) + roundTwo(dayData.get(entry.getKey()) - entry.getValue().getGallons())));
+			totalDay.setTotalGalsSoldDay(name, toFixedTwo(totalDay.getTotalGalsSoldDay(name) + roundTwo(dayDataCriteria.getDayData().get(entry.getKey()) - entry.getValue().getGallons())));
 			totalDay.setTotalSolesRevenueDay(name, toFixedTwo(totalDay.getTotalSolesRevenueDay(name) + toFixedTwo(gallonsDiff * entry.getValue().getPrice())));
 			totalDay.setTotalSolesRevenueDay(roundTwo(totalDay.getTotalSolesRevenueDay() + toFixedTwo(gallonsDiff * entry.getValue().getPrice())));
 			double priceDiff = roundTwo(entry.getValue().getPrice() - entry.getValue().getCost());
 			totalDay.setTotalProfitDay(name, roundTwo(totalDay.getTotalProfitDay(name) + toFixedTwo(gallonsDiff * priceDiff)));
 			totalDay.setTotalProfitDay(roundTwo(totalDay.getTotalProfitDay() + toFixedTwo(gallonsDiff * priceDiff)));
-			totalDay.setStockGals(name, toFixedTwo(currentStation.getTanks().get(name).getGals() - totalDay.getTotalGalsSoldDay(name)));
+			totalDay.setStockGals(name, toFixedTwo(tanks.get(name).getGals() - totalDay.getTotalGalsSoldDay(name)));
 		}
+		
+		return totalDay;
+	}
+	
+	public Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
+		
+		TotalDay totalDay = processShift(currentStation.getDispensers(), currentStation.getTanks(), dayDataCriteria);
 		
 		// Update Station numbers
 		Station newCurrentStation = new Station(currentStation);
 		
-		newCurrentStation.setPumpAttendantNames(pumpAttendantNames);
-		newCurrentStation.setDate(date);
-		newCurrentStation.setShift(shift);
-		newCurrentStation.setShiftDate(shiftDate);
-		newCurrentStation.setTotalCash(totalCash);
-		newCurrentStation.setExpensesAndCredits(expensesAndCredits);
+		newCurrentStation.setPumpAttendantNames(dayDataCriteria.getPumpAttendantNames());
+		newCurrentStation.setDate(dayDataCriteria.getDate());
+		newCurrentStation.setShift(dayDataCriteria.getShift());
+		newCurrentStation.setShiftDate(dayDataCriteria.getShiftDate());
+		newCurrentStation.setTotalCash(dayDataCriteria.getTotalCash());
+		newCurrentStation.setExpensesAndCredits(dayDataCriteria.getExpensesAndCredits());
 		newCurrentStation.setTotalDay(totalDay);
 		
 		
 		// Update gallons counter
 		for (Entry<String, Dispenser> entry: newCurrentStation.getDispensers().entrySet()) {
-			entry.getValue().setGallons(dayData.get(entry.getKey()));
+			entry.getValue().setGallons(dayDataCriteria.getDayData().get(entry.getKey()));
 		}
 		
 		// Update tanks' stock

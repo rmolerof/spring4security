@@ -18,19 +18,23 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 	MongoTemplate mongoTemplate;
 	
 	@Override
-	public List<StationDao> findLatest(String dateEnd, String dateBeg) {
+	public List<StationDao> findLatest(String dateEnd, String dateBeg, int backDataCount) {
 		
 		Query query = new Query();
 		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) { 
 			query.limit(1);
-		} else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
-			query.limit(2);
+		} else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous") && backDataCount >=0) {
+			query.limit(backDataCount + 2);
 		}
 		//query.with(new Sort(Direction.DESC, "$natural"));
 		query.with(new Sort(Direction.DESC, "date"));
 		
 		List<StationDao> latestStationStatuses = mongoTemplate.find(query, StationDao.class);
-	    
+		
+		if (latestStationStatuses.size() > 1) {
+			latestStationStatuses = latestStationStatuses.subList(backDataCount, backDataCount + 2);
+		}
+		
 		// Order Tanks
 		Map<String, Tank> newTanks = new LinkedHashMap<String, Tank>();
 		for (StationDao station: latestStationStatuses) {

@@ -56,10 +56,14 @@ public class StationDao {
 	    this.totalDay = new TotalDay(original.getTotalDay());
 	}
 	
+	
+
 	@Override
 	public String toString() {
-		return "Station [id=" + stationId + ", \nname=" + name + ", \npumpAttendantNames=" + pumpAttendantNames + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
-				+ ", \ndispensers=" + dispensers + "]";
+		return "StationDao [id=" + id + ", stationId=" + stationId + ", name=" + name + ", pumpAttendantNames="
+				+ pumpAttendantNames + ", shift=" + shift + ", shiftDate=" + shiftDate + ", date=" + date + ", tanks="
+				+ tanks + ", dispensers=" + dispensers + ", totalCash=" + totalCash + ", expensesAndCredits="
+				+ expensesAndCredits + ", totalDay=" + totalDay + "]";
 	}
 
 	public ObjectId getId() {

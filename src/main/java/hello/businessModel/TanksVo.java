@@ -10,6 +10,7 @@ import hello.domain.TanksDao;
 public class TanksVo {
 	private String pumpAttendantNames;
 	private Date date;
+	private String shiftDate;
 	private List<Tank> tanks;
 	private String saveOrUpdate;
 	public String supplierRUC;
@@ -96,6 +97,14 @@ public class TanksVo {
 
 	public void setDelivery(boolean delivery) {
 		this.delivery = delivery;
+	}
+
+	public String getShiftDate() {
+		return shiftDate;
+	}
+
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
 	}
 
 }

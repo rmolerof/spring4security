@@ -13,6 +13,7 @@ import hello.rucdnisearch.RUCVo;
 public class RUCDao {
 	@Id 
 	private ObjectId id;
+	@Indexed(unique = true)
 	private String ruc;
 	private String razonSocial;
 	private String nombreComercial;

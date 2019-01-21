@@ -7,6 +7,7 @@ public class SearchDateCriteria {
 	@NotBlank(message = "Fecha no puede ser nula")
 	String dateEnd;
 	String dateBeg;
+	int backDataCount;
 	
 	public String getDateEnd() {
 		return dateEnd;
@@ -20,5 +21,12 @@ public class SearchDateCriteria {
 	public void setDateBeg(String dateBeg) {
 		this.dateBeg = dateBeg;
 	}
+	public int getBackDataCount() {
+		return backDataCount;
+	}
+	public void setBackDataCount(int backDataCount) {
+		this.backDataCount = backDataCount;
+	}
+	
 	
 }

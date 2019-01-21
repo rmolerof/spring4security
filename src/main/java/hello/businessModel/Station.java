@@ -25,6 +25,7 @@ public class Station {
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
 	private TotalDay totalDay;
+	private String process; // SC, PC, KC
 	
 	public Station() {
 		super();
@@ -85,10 +86,11 @@ public class Station {
 	
 	@Override
 	public String toString() {
-		return "Station [id=" + stationId + ", \nname=" + name + ", \npumpAttendantNames=" + pumpAttendantNames + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
-				+ ", \ndispensers=" + dispensers + "]";
+		return "Station [id=" + id + ", stationId=" + stationId + ", name=" + name + ", pumpAttendantNames="
+				+ pumpAttendantNames + ", shift=" + shift + ", shiftDate=" + shiftDate + ", date=" + date + ", tanks="
+				+ tanks + ", dispensers=" + dispensers + ", totalCash=" + totalCash + ", expensesAndCredits="
+				+ expensesAndCredits + ", totalDay=" + totalDay + "]";
 	}
-
 
 	public Long getStationId() {
 		return stationId;
@@ -173,6 +175,14 @@ public class Station {
 
 	public void setShiftDate(String shiftDate) {
 		this.shiftDate = shiftDate;
+	}
+
+	public String getProcess() {
+		return process;
+	}
+
+	public void setProcess(String process) {
+		this.process = process;
 	}
 	
 }

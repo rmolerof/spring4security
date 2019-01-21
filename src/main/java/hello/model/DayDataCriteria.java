@@ -1,10 +1,13 @@
 package hello.model;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import hello.businessModel.Dispenser;
 import hello.businessModel.ExpenseOrCredit;
+import hello.domain.StationDao;
 
 public class DayDataCriteria {
 	private String pumpAttendantNames;
@@ -16,6 +19,27 @@ public class DayDataCriteria {
 	private List<ExpenseOrCredit> expensesAndCredits;
 	private String saveOrUpdate;
 	
+	public DayDataCriteria() {
+		
+	}
+	
+	public DayDataCriteria(StationDao stationDao) {
+		super();
+		
+		this.pumpAttendantNames = stationDao.getPumpAttendantNames();
+		this.date = stationDao.getDate();
+		this.shift = stationDao.getShift();
+		this.shiftDate = stationDao.getShiftDate();
+		
+		Map<String, Double> dayData = new LinkedHashMap<String, Double>();
+		for (Map.Entry<String, Dispenser> entry: stationDao.getDispensers().entrySet()) {
+			dayData.put(entry.getKey(), entry.getValue().getGallons());
+		}
+		this.dayData = dayData;
+		
+		this.totalCash = stationDao.getTotalCash();
+		this.expensesAndCredits = stationDao.getExpensesAndCredits();
+	}
 	public Date getDate() {
 		return date;
 	}

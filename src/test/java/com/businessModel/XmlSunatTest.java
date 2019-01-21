@@ -125,7 +125,6 @@ public class XmlSunatTest {
 	}
 	
 	public static void envio() {
-        // TODO code application logic here
         String ruc = "20501568776";
         String UsuSol = "MODDATOS";// pruebas de sunat
         String PassSol = "moddatos";// password de prueba de sunat

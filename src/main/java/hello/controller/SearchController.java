@@ -85,7 +85,7 @@ public class SearchController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<Station> users = userService.findLatestStationStatus(search.getDateEnd(), search.getDateBeg());
+		List<Station> users = userService.findLatestStationStatus(search.getDateEnd(), search.getDateBeg(), search.getBackDataCount());
 		if(users.isEmpty()) {
 			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
 		} else {
@@ -184,12 +184,12 @@ public class SearchController {
 		}
 		
 		List<TanksVo> TanksVos = userService.submitTanksVo(tanksVoCriteria, tanksVoCriteria.getSaveOrUpdate());
-		userService.updateTanksToStation(tanksVoCriteria);
+		Station station = userService.updateTanksToStation(tanksVoCriteria);
 		
-		if(TanksVos.isEmpty()) {
-			result.setMsg("No hay Stock para la fecha: " + tanksVoCriteria.getDate());
+		if(null != station) {
+			result.setMsg("Se actualizó Stock para la fecha " + tanksVoCriteria.getDate());
 		} else {
-			result.setMsg("Datos hallados");
+			result.setMsg("Actualización de Stock falló");
 		}
 		result.setResult(TanksVos);
 		

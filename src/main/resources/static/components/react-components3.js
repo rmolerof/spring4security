@@ -25,7 +25,8 @@ class IncorporationForm extends React.Component {
       totalVisas: '',
       totalExpenses: '',
       inputStyle: {color: 'black'},
-      excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}
+      excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'},
+      fetchBackDataCount: 0
     };
   }
   
@@ -332,7 +333,8 @@ class IncorporationForm extends React.Component {
   
   loadPrevious = () => {
 	  this.setState({saveOrUpdate:  'update'});
-	  this._fetchData({dateEnd: "latest", dateBeg: "previous"});
+	  this._fetchData({dateEnd: "latest", dateBeg: "previous", backDataCount: this.state.fetchBackDataCount});
+	  this.setState({fetchBackDataCount: this.state.fetchBackDataCount + 1});
   }
   
   _fetchData(timeframe){
@@ -340,6 +342,7 @@ class IncorporationForm extends React.Component {
 		var search = {};
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
+		search["backDataCount"] = timeframe.backDataCount;
 		
 		jQuery.ajax({
 			type: "POST",
@@ -995,12 +998,12 @@ class IncorporationForm extends React.Component {
 											                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." value={this.state.pumpAttendantNames} readOnly/>
 											              </div>
 											          </td>
-											          <td>
+											         {/* <td>
 											              <div className="form-group">
 											                  <label className="control-label">Marca Horaria</label>
 											                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 											              </div>
-											          </td>
+											          </td>*/}
 											          <td>
 											              <div className="form-group">
 											                  <label className="control-label">Fecha Turno</label>
