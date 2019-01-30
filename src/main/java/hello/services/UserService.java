@@ -605,6 +605,20 @@ public class UserService {
 		}
 	}
 	
+	public String deleteInvoice(String invoiceNbr) {
+
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		invoicesRepository.delete(invoiceDao);
+		
+		invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		if (null != invoiceDao) {
+		
+			return "0";
+		} else {
+			return "1";
+		}
+	}
+	
 	public TanksVo getCurrentTanksVo() {
 		return currentTanksVo;
 	}

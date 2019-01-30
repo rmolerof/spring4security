@@ -252,7 +252,8 @@ class InvoicesTbl extends React.Component {
 	constructor() {
 	    super();
 	    this.state = {
-		  showModal: false
+		  showModal: false,
+		  loadingGif: false
 	    }
 	}
 	    
@@ -261,6 +262,7 @@ class InvoicesTbl extends React.Component {
 	}
 	
 	componentDidMount() {
+		var self = this;
 		this.$el = $(this.el);
 		var table = this.$el;
 		var oTable = table.dataTable({
@@ -398,13 +400,37 @@ class InvoicesTbl extends React.Component {
         table.on('click', '.delete', function (e) {
             e.preventDefault();
             
-            if (confirm("¿Estás seguro de borrar esta fila?") == false) {
+            var nRow = $(this).parents('tr')[0];
+            var invoiceNumber = nRow.cells[4].innerText;
+            
+            if (confirm("¿Está seguro de borrar comprobante " + invoiceNumber + "?") == false) {
                 return;
             }
-
-            var nRow = $(this).parents('tr')[0];
+            
             oTable.fnDeleteRow(nRow);
-            alert("Deleted! Do not forget to do some ajax to sync with backend :)");
+            //alert("Deleted! Do not forget to do some ajax to sync with backend :)");
+            
+            var search = {};
+    	    search["invoiceNumber"] = invoiceNumber;
+    	    self.setState({loadingGif: true});
+    	    
+    		$.ajax({
+    			type: "POST",
+    			contentType: "application/json", 
+    			url:"/api/deleteInvoice",
+    			data: JSON.stringify(search),
+    			datatype: 'json',
+    			cache: false,
+    			timeout: 600000,
+    			success: function(data) {
+    				
+    			   self.setState({loadingGif: false});	  
+    			      		
+    			}, error: function(e){
+    				console.log("ERROR: ", e);
+    				self.setState({loadingGif: false});
+    			}	
+    		});  
         });
         
         table.on('click', '.cancel', function (e) {

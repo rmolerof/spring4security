@@ -336,6 +336,29 @@ public class SearchController {
 		
 	}
 	
+	@PostMapping("/api/deleteInvoice")
+	public ResponseEntity<?> deleteInvoice(@Valid @RequestBody SearchInvoiceCriteria search, Errors errors){
+		AjaxGetInvoicesResponse result = new AjaxGetInvoicesResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		String status = userService.deleteInvoice(search.getInvoiceNumber());
+		if(status.equals("0")) {
+			result.setMsg("No se pudo borrar recibo Nro " + search.getInvoiceNumber());
+		} else {
+			result.setMsg("Comprobante " + search.getInvoiceNumber() + " borrado");
+		}
+		result.setResult(null);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
 	@PostMapping("/api/findRuc")
 	public ResponseEntity<?> findRuc(@Valid @RequestBody SearchDocIdCriteria search, Errors errors){
 		AjaxGetRucResponse result = new AjaxGetRucResponse();
