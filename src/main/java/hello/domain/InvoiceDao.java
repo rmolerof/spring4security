@@ -65,7 +65,7 @@ public class InvoiceDao {
 	}
 	
 	public InvoiceDao(InvoiceVo invoiceVo) {
-		this.id = new ObjectId();
+		this.id = invoiceVo.getId().getTimestamp() > 0 ? invoiceVo.getId(): new ObjectId();  
 		this.invoiceNumber = new String(invoiceVo.getInvoiceNumber());
 		this.clientDocNumber = new String(invoiceVo.getClientDocNumber());
 		this.clientName = new String(invoiceVo.getClientName());

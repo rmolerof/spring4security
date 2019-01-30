@@ -565,6 +565,13 @@ public class UserService {
 				invoiceVo.setStatus("1");
 			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
 				
+				// Reset amount verbiage
+				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
+				
+				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
+				invoicesRepository.save(invoiceDao);
+				invoiceVo.setSunatErrorStr("1|Updated");
+				invoiceVo.setStatus("1");
 			}
 		} catch (Exception e) {
 			invoiceVo.setStatus("0");

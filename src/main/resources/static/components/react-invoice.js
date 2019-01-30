@@ -6,6 +6,7 @@ class TableDashboard extends React.Component {
     super();
     this.state = {
       errors: {},
+      id: '',
 	  showError: false,
 	  showSuccess: false,
 	  showEmailModal: false, 
@@ -384,8 +385,25 @@ class TableDashboard extends React.Component {
 		});
 	}
   
+  _getQueryVariable(variable)
+  {
+         var query = window.location.search.substring(1);
+         var vars = query.split("&");
+         for (var i=0;i<vars.length;i++) {
+                 var pair = vars[i].split("=");
+                 if(pair[0] == variable){return pair[1];}
+         }
+         return(false);
+  } 
+  
   componentWillMount(){
-	  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});
+	  var invoiceNumber = this._getQueryVariable('id');
+	  if (invoiceNumber) {
+		  this._invoiceSearchAjax(invoiceNumber);
+	  } else {
+		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
+	  }
+	  
   }
   
   onKeyPress(event) {
@@ -589,7 +607,106 @@ class TableDashboard extends React.Component {
 	
   }
   
-  invoiceSearch(event) {
+  _invoiceSearchAjax(invoiceNumber) {
+	    var self = this;
+	  	var search = {};
+	  	self.setState({ showError: false, clientDocNumberDisabled: false, clientNameDisabled: false, clientAddressDisabled: false});
+	    
+	    search["invoiceNumber"] = invoiceNumber;
+	    self.setState({loadingGif: true});
+	    
+		$.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/findInvoice",
+			data: JSON.stringify(search),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: function(data) {
+				
+			  if (data.result[0].clientDocNumber) {	
+				  self.setState({
+					  id: data.result[0].id,
+					  invoiceNumber: data.result[0].invoiceNumber,
+					  date: data.result[0].date,
+					  clientDocNumber: data.result[0].clientDocNumber,
+					  clientName: data.result[0].clientName,
+					  clientDocType: data.result[0].clientDocType,
+					  clientAddress: data.result[0].clientAddress,
+					  truckPlateNumber: data.result[0].truckPlateNumber,
+					  dateOfInvoiceModified: data.result[0].date,
+					  galsD2: data.result[0].galsD2,
+					  galsG90: data.result[0].galsG90,
+					  galsG95: data.result[0].galsG95,
+					  priceD2: data.result[0].priceD2,
+					  priceG90: data.result[0].priceG90,
+					  priceG95: data.result[0].priceG95,
+					  solesD2: data.result[0].solesD2,
+					  solesG90: data.result[0].solesG90,
+					  solesG95: data.result[0].solesG95,
+					  subTotal: data.result[0].subTotal,
+					  discount: data.result[0].discount,
+					  totalIGV: data.result[0].totalIGV,
+					  total: data.result[0].total,
+					  electronicPmt: data.result[0].electronicPmt,
+					  cashPmt: data.result[0].cashPmt,
+					  cashGiven: data.result[0].cashGiven,
+					  change: data.result[0].change,
+					  clientDocNumberDisabled: true,
+					  clientNameDisabled: true, 
+					  clientAddressDisabled: true,
+					  invoiceTypeModified: data.result[0].invoiceType,
+					  igvModified: data.result[0].totalIGV,
+					  totalModified: data.result[0].total,
+					  hasBonus: data.result[0].hasBonus,
+					  cssBonusButton: data.result[0].hasBonus == true ? 'btn green-meadow': 'btn btn-default',
+					  clientDocNumberDisabled: false,
+					  clientNameDisabled: false,
+					  clientAddressDisabled: false,
+					  saveOrUpdate: 'update',
+					  invoiceHash: data.result[0].invoiceHash
+				  });
+				  
+				  // Select typo of invoice
+				  if (data.result[0].invoiceType == '01') {
+					  self.setState({selectedOption: "factura", facturaDisabled: false, boletaDisabled: true, notaDeCreditoDisabled: true });
+				  } else if (data.result[0].invoiceType == '03') {
+					  self.setState({selectedOption: "boleta", facturaDisabled: true, boletaDisabled: false, notaDeCreditoDisabled: true });
+				  } else if (data.result[0].invoiceType == '07')  {
+					  self.setState({selectedOption: "nota de credito", facturaDisabled: true, boletaDisabled: true, notaDeCreditoDisabled: false });
+				  }
+
+				  // Select button behind radio button 
+				  var cssB = (data.result[0].invoiceType == '03') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  self.setState({showBoletaRadioButton: cssB});
+				  var cssF = (data.result[0].invoiceType == '01') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  self.setState({showFacturaRadioButton: cssF});
+				  var cssNV = (data.result[0].invoiceType == '07') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  self.setState({showNotaDeCreditoRadioButton: cssNV});
+				  
+			  } else {
+			  	  var errors = {
+		  			  submit: 'Numero de Comprobante no fue encontrado o es incorrecto.'
+			  	  };
+			  	  self.setState({errors: errors, clientDocNumber: '', clientName: '', clientAddress: '', clientDocNumberDisabled: false, clientNameDisabled: false, clientAddressDisabled: false}); 
+			  	  self._toggleError();
+			  	  
+				  setTimeout(function() {
+					  ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+			      }.bind(this), 0);
+			  }
+			  
+			  self.setState({loadingGif: false});
+		
+			}, error: function(e){
+				console.log("ERROR: ", e);
+				self.setState({loadingGif: false});
+			}	
+		});  
+  }
+  
+  invoiceSearchForCreditNote(event) {
 	  	
 	  	var self = this;
 	  	var search = {};
@@ -621,6 +738,7 @@ class TableDashboard extends React.Component {
 					  galsG95: data.result[0].galsG95,
 					  priceD2: data.result[0].priceD2,
 					  priceG90: data.result[0].priceG90,
+					  priceG95: data.result[0].priceG95,
 					  solesD2: data.result[0].solesD2,
 					  solesG90: data.result[0].solesG90,
 					  solesG95: data.result[0].solesG95,
@@ -828,7 +946,8 @@ class TableDashboard extends React.Component {
 		
 		evt.preventDefault();
 		
-		const {subTotal, 
+		const {id, 
+			subTotal, 
 			discount, 
 			totalIGV, 
 			total, 
@@ -861,6 +980,8 @@ class TableDashboard extends React.Component {
 			solesG95,
 			gasPrices,
 			date,
+			saveOrUpdate,
+			invoiceHash,
 			hasBonus} = this.state;
 		var self = this;
 	    var errors = {
@@ -874,6 +995,7 @@ class TableDashboard extends React.Component {
 	    this.setState({ showError: false, showSuccess: false });
 	    
 	    var invoiceVo = {
+	    	id: id,
 	    	invoiceNumber: invoiceNumber,  
 		    clientDocNumber: clientDocNumber,
 		    clientName: clientName,
@@ -906,8 +1028,9 @@ class TableDashboard extends React.Component {
 		    dateOfInvoiceModified: dateOfInvoiceModified,
 		    igvModified: igvModified,
 			totalModified: totalModified,
-	    	saveOrUpdate: 'save',
-	    	hasBonus: hasBonus
+	    	saveOrUpdate: saveOrUpdate,
+	    	hasBonus: hasBonus,
+	    	invoiceHash: invoiceHash
 	    };
 
 	    if (solesD2 || solesG90 || solesG95) {
@@ -1144,7 +1267,7 @@ class TableDashboard extends React.Component {
 	      	</div>
 	      }*/}
 	      
-	      <h1 className="page-title col-xs-12 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA {this.state.invoiceNumber}</h1>
+	      <h1 className="page-title col-xs-10 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA {this.state.invoiceNumber}</h1>
 	      
 	      <div className="invoice margin-bottom-20">
 	          {/*<div className="row invoice-logo">
@@ -1179,7 +1302,7 @@ class TableDashboard extends React.Component {
               <div className="portlet-body form">
         		
 	              <div className="row">
-		              <div className="col-md-6 col-xs-12">
+	              	  <div style={{marginLeft: '15px'}}>
 			              <div className="form-group">
 			                  <label className="control-label">Tipo de Comprobante</label>
 		    	              <div className="clearfix">
@@ -1193,7 +1316,7 @@ class TableDashboard extends React.Component {
 			                      </div>
 		                      </div>
 		                  </div>
-			          </div>
+	                  </div>
 			          <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">Seleccionar</label><br></br>  
@@ -1220,7 +1343,7 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onBlur={this.invoiceSearch.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
+	    	                  <input type="number" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onBlur={this.invoiceSearchForCreditNote.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
 		                  </div>
 	    	          </div>
 		    	      <div className="col-md-2">
@@ -1737,28 +1860,28 @@ class TableDashboard extends React.Component {
           </Modal>
           
           <Modal show={this.state.showError || this.state.showSuccess} onHide={this.handleResultModalCancel.bind(this)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Status</Modal.Title>
-          </Modal.Header>
-          
-          <Modal.Body>
-		      {this.state.showError && 
-			        <div className="alert alert-danger">
-		      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+	          <Modal.Header closeButton>
+	            <Modal.Title>Status</Modal.Title>
+	          </Modal.Header>
+	          
+	          <Modal.Body>
+			      {this.state.showError && 
+				        <div className="alert alert-danger">
+			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+				      	</div>
+			      }
+	
+			      {this.state.showSuccess && 
+			      	<div className="alert alert-success">
+			      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
 			      	</div>
-		      }
-
-		      {this.state.showSuccess && 
-		      	<div className="alert alert-success">
-		      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
-		      	</div>
-		      }
-          </Modal.Body>
-          
-          <Modal.Footer>
-          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleResultModalCancel.bind(this)}>OK</Button>
-          </Modal.Footer>
-      </Modal>
+			      }
+	          </Modal.Body>
+	          
+	          <Modal.Footer>
+	          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleResultModalCancel.bind(this)}>OK</Button>
+	          </Modal.Footer>
+	      </Modal>
 	      
       </form>
     )
