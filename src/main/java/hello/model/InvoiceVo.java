@@ -51,7 +51,8 @@ public class InvoiceVo {
 	private Date dateOfInvoiceModified = new Date(0L);
 	private Double igvModified = 0D;
 	private Double totalModified = 0D;
-	private Boolean hasBonus = false;
+	private String bonusNbr = "";
+	private String sunatStatus = "";
 	
 	public InvoiceVo() {
 		super();
@@ -94,7 +95,8 @@ public class InvoiceVo {
 		this.dateOfInvoiceModified = new Date(invoiceDao.getDateOfInvoiceModified().getTime());
 		this.igvModified = new Double(invoiceDao.getIgvModified());
 		this.totalModified = new Double(invoiceDao.getTotalModified());
-		this.hasBonus = new Boolean(invoiceDao.getHasBonus());
+		this.bonusNbr = new String(invoiceDao.getBonusNbr());
+		this.sunatStatus = new String(invoiceDao.getSunatStatus());
 	}
 	
 	public static double roundTwo(double amt) {
@@ -360,12 +362,20 @@ public class InvoiceVo {
 		this.totalModified = totalModified;
 	}
 
-	public Boolean getHasBonus() {
-		return hasBonus;
+	public String getBonusNbr() {
+		return bonusNbr;
 	}
 
-	public void setHasBonus(Boolean hasBonus) {
-		this.hasBonus = hasBonus;
+	public void setBonusNbr(String bonusNbr) {
+		this.bonusNbr = bonusNbr;
+	}
+
+	public String getSunatStatus() {
+		return sunatStatus;
+	}
+
+	public void setSunatStatus(String sunatStatus) {
+		this.sunatStatus = sunatStatus;
 	}
 	
 }

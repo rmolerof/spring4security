@@ -58,14 +58,19 @@ public class InvoiceDao {
 	private Date dateOfInvoiceModified = new Date(0L);
 	private Double igvModified = 0D;
 	private Double totalModified = 0D;
-	private Boolean hasBonus = false;
+	private String bonusNbr = "";
+	private String sunatStatus = "";
 
 	public InvoiceDao() {
 		super();
 	}
 	
 	public InvoiceDao(InvoiceVo invoiceVo) {
-		this.id = invoiceVo.getId().getTimestamp() > 0 ? invoiceVo.getId(): new ObjectId();  
+		if (null == invoiceVo.getId() ) {
+			this.id = new ObjectId();
+		} else {
+			this.id = invoiceVo.getId().getTimestamp() > 0 ? invoiceVo.getId(): new ObjectId();
+		}
 		this.invoiceNumber = new String(invoiceVo.getInvoiceNumber());
 		this.clientDocNumber = new String(invoiceVo.getClientDocNumber());
 		this.clientName = new String(invoiceVo.getClientName());
@@ -101,15 +106,15 @@ public class InvoiceDao {
 		this.dateOfInvoiceModified = new Date(invoiceVo.getDateOfInvoiceModified().getTime());
 		this.igvModified = new Double(invoiceVo.getIgvModified());
 		this.totalModified = new Double(invoiceVo.getTotalModified());
-		this.hasBonus = new Boolean(invoiceVo.getHasBonus());
-		
+		this.bonusNbr = new String(invoiceVo.getBonusNbr());
+		this.sunatStatus = new String(invoiceVo.getSunatStatus());
 	}
 
 	public InvoiceDao(ObjectId id, String invoiceNumber, String clientDocNumber, String clientName,
 			String clientDocType, String clientAddress, String truckPlateNumber, Date date, String invoiceType,
 			Double galsD2, Double galsG90, Double galsG95, Double priceD2, Double priceG90, Double priceG95,
 			Double solesD2, Double solesG90, Double solesG95, Double total, Double subTotal, Double totalIGV,
-			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, Boolean hasBonus) {
+			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, String bonusNbr) {
 		super();
 		this.id = id;
 		this.invoiceNumber = invoiceNumber;
@@ -138,7 +143,7 @@ public class InvoiceDao {
 		this.sunatErrorStr = sunatErrorStr;
 		this.igvModified = igvModified;
 		this.totalModified = totalModified;
-		this.hasBonus = hasBonus;
+		this.bonusNbr = bonusNbr;
 	}
 
 	public ObjectId getId() {
@@ -437,12 +442,20 @@ public class InvoiceDao {
 		this.totalModified = totalModified;
 	}
 
-	public Boolean getHasBonus() {
-		return hasBonus;
+	public String getBonusNbr() {
+		return bonusNbr;
 	}
 
-	public void setHasBonus(Boolean hasBonus) {
-		this.hasBonus = hasBonus;
+	public void setBonusNbr(String bonusNbr) {
+		this.bonusNbr = bonusNbr;
+	}
+
+	public String getSunatStatus() {
+		return sunatStatus;
+	}
+
+	public void setSunatStatus(String sunatStatus) {
+		this.sunatStatus = sunatStatus;
 	}
 	
 }

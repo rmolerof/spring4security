@@ -55,11 +55,6 @@ class InvoiceTableSummary extends React.Component {
 						clientDocType = 'RUC'
 					}
 					
-					var hasBonus = "";
-					if (invoicesSummaryData[i].hasBonus == true) {
-						hasBonus = "Bonus"
-					}
-					
 					count++;
 					var row = [
 						count,
@@ -81,7 +76,8 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].totalIGV,
 						invoicesSummaryData[i].total,
 						invoicesSummaryData[i].invoiceHash,
-						hasBonus,
+						invoicesSummaryData[i].bonusNbr,
+						invoicesSummaryData[i].sunatStatus,
 						"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Edit</a>",
 						'<a class="delete" href="">Delete</a>'
 						];
@@ -226,9 +222,14 @@ class InvoiceTableSummary extends React.Component {
 	          </div>
 	      </div>
 	      
-	      <button id="sample_editable_1_new" className="btn green"> Add New
+	      {/*<button id="sample_editable_1_new" className="btn green"> Nuevo Comprobante
 	          <i className="fa fa-plus"></i>
-	      </button>
+	      </button>*/}
+	      <div style={{textAlign: 'right'}}>
+		      <button className="btn green"> 
+		      	<a className='view' href='/invoice-page'>Nuevo Comprobante</a>&nbsp;<i className="fa fa-plus"></i>
+		      </button>
+	      </div>
 	      
 	      {this.state && this.state.invoicesSummaryData &&
 	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>
@@ -301,6 +302,7 @@ class InvoicesTbl extends React.Component {
 		            { title: "Total" },
 		            { title: "Nro hash" },
 		            { title: "Bonus" },
+		            { title: "Sunat Status" },
 		            { title: "Edit" },
 		            { title: "Cancel" }
 			]

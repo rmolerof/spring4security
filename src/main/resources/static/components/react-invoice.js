@@ -6,7 +6,7 @@ class TableDashboard extends React.Component {
     super();
     this.state = {
       errors: {},
-      id: '',
+      id: ' ',
 	  showError: false,
 	  showSuccess: false,
 	  showEmailModal: false, 
@@ -75,8 +75,8 @@ class TableDashboard extends React.Component {
       motiveCdDescription: '',
 	  igvModified: '',
 	  totalModified: '',
-	  hasBonus: false,
-	  cssBonusButton: 'btn btn-default'
+	  bonusNbr: '',
+	  sunatStatus: 'PENDIENTE'
     };
   }
   
@@ -249,6 +249,10 @@ class TableDashboard extends React.Component {
     if (evt.target.value == '0' && this.state.selectedOption == 'boleta') {
     	this.setState({ clientName: 'CLIENTES VARIOS' });
     }
+  }
+  
+  bonusNbrChange = (evt) => {
+    this.setState({ bonusNbr: evt.target.value.trim() }); 
   }
   
   invoiceNumberModifiedDispChange = (evt) => {
@@ -446,16 +450,6 @@ class TableDashboard extends React.Component {
 		this.setState({invoiceTypeModified: "03"});
 		this.setState({ invoiceNumber: "B001-XXXXXXXX" });
 	}
-  }
-  
-  _bonusButtonHandleClick(){
-		this.setState({hasBonus: !this.state.hasBonus});
-		
-		if (!this.state.hasBonus) {
-			this.setState({cssBonusButton: 'btn green-meadow'});
-		} else {
-			this.setState({cssBonusButton: 'btn btn-default'});
-		}
   }
   
   motiveCdHandleChange(event) {
@@ -659,8 +653,8 @@ class TableDashboard extends React.Component {
 					  invoiceTypeModified: data.result[0].invoiceType,
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
-					  hasBonus: data.result[0].hasBonus,
-					  cssBonusButton: data.result[0].hasBonus == true ? 'btn green-meadow': 'btn btn-default',
+					  bonusNbr: data.result[0].bonusNbr,
+					  sunatStatus: data.result[0].sunatStatus,
 					  clientDocNumberDisabled: false,
 					  clientNameDisabled: false,
 					  clientAddressDisabled: false,
@@ -756,8 +750,8 @@ class TableDashboard extends React.Component {
 					  invoiceTypeModified: data.result[0].invoiceType,
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
-					  hasBonus: data.result[0].hasBonus,
-					  cssBonusButton: data.result[0].hasBonus == true ? 'btn green-meadow': 'btn btn-default'
+					  bonusNbr: data.result[0].bonusNbr,
+					  sunatStatus: data.result[0].sunatStatus
 				  });
 				  
 			  } else {
@@ -938,9 +932,17 @@ class TableDashboard extends React.Component {
 	      motiveCdDescription: '',
 	      igvModified: '',
 	      totalModified: '',
-	      hasBonus: false
+	      bonusNbr: '',
+	      sunatStatus: 'PENDING'
 	  });
   }
+  
+  _mongoObjectId() {
+	    var timestamp = (new Date().getTime() / 1000 | 0).toString(16);
+	    return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function() {
+	        return (Math.random() * 16 | 0).toString(16);
+	    }).toLowerCase();
+	};
   
   handleSubmit = (evt) => {
 		
@@ -982,7 +984,8 @@ class TableDashboard extends React.Component {
 			date,
 			saveOrUpdate,
 			invoiceHash,
-			hasBonus} = this.state;
+			bonusNbr,
+			sunatStatus} = this.state;
 		var self = this;
 	    var errors = {
 	    		submit: '',
@@ -995,7 +998,7 @@ class TableDashboard extends React.Component {
 	    this.setState({ showError: false, showSuccess: false });
 	    
 	    var invoiceVo = {
-	    	id: id,
+	    	id: this._mongoObjectId(),
 	    	invoiceNumber: invoiceNumber,  
 		    clientDocNumber: clientDocNumber,
 		    clientName: clientName,
@@ -1029,8 +1032,9 @@ class TableDashboard extends React.Component {
 		    igvModified: igvModified,
 			totalModified: totalModified,
 	    	saveOrUpdate: saveOrUpdate,
-	    	hasBonus: hasBonus,
-	    	invoiceHash: invoiceHash
+	    	bonusNbr: bonusNbr,
+	    	invoiceHash: invoiceHash,
+	    	sunatStatus: sunatStatus
 	    };
 
 	    if (solesD2 || solesG90 || solesG95) {
@@ -1048,7 +1052,15 @@ class TableDashboard extends React.Component {
 	    }
 	    
 	    if (formIsValid){
-		    // RUC Validation
+		    // Bonus validation
+	    	if (bonusNbr && bonusNbr >= 0) {
+	    		if (bonusNbr.toString().length  != 5) {
+	    			errors["bonusNbr"] = "Número Bonus debe tener 5 digitos";
+	    			formIsValid = false;
+	    		}
+		    } 
+	    	
+	    	// RUC Validation
 		    if (clientDocType == '6') {
 			    if (clientDocNumber && clientDocNumber >= 0) {
 		    		if (clientDocNumber.toString().length  != 11) {
@@ -1246,11 +1258,6 @@ class TableDashboard extends React.Component {
 			invoicePrefix = 'B001-';
 	  }
 	  
-	  let bonusButtonText = 'Sin Bonus';
-	  if (this.state.hasBonus) {
-		  bonusButtonText = 'Con Bonus';
-	  }
-	  
 	  return (
 			  
       <form onSubmit={this.handleSubmit}>
@@ -1319,8 +1326,18 @@ class TableDashboard extends React.Component {
 	                  </div>
 			          <div className="col-md-2">
 				          <div className="form-group">
-		            	  	<label className="control-label">Seleccionar</label><br></br>  
-		            	  	<a onClick={this._bonusButtonHandleClick.bind(this)} className={this.state.cssBonusButton} >{bonusButtonText}</a>
+		            	  	<label className="control-label">Bonus</label><br></br>  
+		            	  	<input name="bonusNbr" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNbr} onChange={this.bonusNbrChange}/>
+		                  </div>
+		              </div>
+		              <div className="col-md-2">
+			              <div className="form-group">
+		            	  	<label className="control-label">Regresar</label><br></br>  
+		            	  	<div style={{textAlign: 'left'}}>
+				      		      <button className="btn green"> 
+				      		      	<a className='view' href='/invoice-table-page'>Tabla Comprobantes</a>
+				      		      </button>
+				      	      </div>
 		                  </div>
 		              </div>
 	              </div>
@@ -1867,7 +1884,7 @@ class TableDashboard extends React.Component {
 	          <Modal.Body>
 			      {this.state.showError && 
 				        <div className="alert alert-danger">
-			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.bonusNbr + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
 				      	</div>
 			      }
 	
