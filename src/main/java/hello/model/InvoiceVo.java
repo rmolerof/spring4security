@@ -42,7 +42,7 @@ public class InvoiceVo {
 	private String invoiceHash;
 	private String saveOrUpdate;
 	private String status;
-	private String sunatErrorStr;
+	private String sunatErrorStr = "";
 	
 	private String invoiceTypeModified = "";
 	private String invoiceNumberModified  = "";
@@ -53,6 +53,7 @@ public class InvoiceVo {
 	private Double totalModified = 0D;
 	private String bonusNbr = "";
 	private String sunatStatus = "";
+	private boolean sunatValidated = false;
 	
 	public InvoiceVo() {
 		super();
@@ -97,6 +98,7 @@ public class InvoiceVo {
 		this.totalModified = new Double(invoiceDao.getTotalModified());
 		this.bonusNbr = new String(invoiceDao.getBonusNbr());
 		this.sunatStatus = new String(invoiceDao.getSunatStatus());
+		this.sunatValidated = new Boolean(invoiceDao.isSunatValidated());
 	}
 	
 	public static double roundTwo(double amt) {
@@ -377,5 +379,13 @@ public class InvoiceVo {
 	public void setSunatStatus(String sunatStatus) {
 		this.sunatStatus = sunatStatus;
 	}
-	
+
+	public boolean isSunatValidated() {
+		return sunatValidated;
+	}
+
+	public void setSunatValidated(boolean sunatValidated) {
+		this.sunatValidated = sunatValidated;
+	}
+
 }

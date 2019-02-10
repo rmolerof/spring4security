@@ -7,8 +7,20 @@ class InvoiceTableSummary extends React.Component {
 	  showError: false,
 	  showSuccess: false,
       invoicesSummaryData: null,
-      invoicesSummaryConcarData: null
+      invoicesSummaryConcarData: null,
+      processingTypeButtonToggle: true,
+      processingType: 'NORMAL'
     };
+    
+    this.CONSTANTS = {
+	    FACTURA: '01',
+	    BOLETA: '03',
+	    NOTADECREDITO: '07',
+	    SUNAT_PENDING_STATUS: 'PENDIENTE',
+	    SUNAT_SENT_STATUS: 'ENVIADO',
+	    NORMAL_PROCESSING_TYPE: 'NORMAL',
+	    FORCED_PROCESSING_TYPE: 'FORCED'
+    }
   }
   
   _toggleError = () => {
@@ -197,20 +209,119 @@ class InvoiceTableSummary extends React.Component {
 	}
   }
   
+/*  validatePendingInvoices() {
+	  	var search = {};
+		search["dateEnd"] = "latest";
+		search["dateBeg"] = "-31";
+		
+		jQuery.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/validatePendingInvoices",
+			data: JSON.stringify(search),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				
+				
+			},
+			error: function(e){
+
+			}	
+		});
+  }*/
+  
+  _toggleError = () => {
+	  this.setState((prevState, props) => {
+		  return {showError: !prevState.showError}
+	  })
+  }
+  
+  submitPendingInvoiceGroup = (evt) => {
+		evt.preventDefault();
+		
+		var self = this;
+		self.setState({ showError: false});
+		var sunatSubmitCriteria = {};
+		sunatSubmitCriteria["processingType"] = this.state.processingType;
+		
+		jQuery.ajax({
+			type: "POST",
+			contentType: "application/json", 
+			url:"/api/submitInvoicesToSunat",
+			data: JSON.stringify(sunatSubmitCriteria),
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				
+				if (data.result.length > 0) {
+					var submittedInvoices = data.result;
+					var errors = [];
+					var validationError = "Comprobantes Invalidos: ";
+					var sunatErrorStr = "";
+					var sunatErrorCount = 0;
+					
+					for (var i = 0; i < submittedInvoices.length; i++) {
+						if (submittedInvoices[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
+							validationError += submittedInvoices[i].invoiceNumber + " ";
+							sunatErrorStr += submittedInvoices[i].sunatErrorStr + " "
+							sunatErrorCount++;
+						}
+					}
+					
+					if (sunatErrorCount > 0) {
+						errors["sunatValidationMsg"] = validationError + sunatErrorStr;
+						this.setState({errors: errors, showError: true});
+					} else {
+						this.setState({showSuccess: true});
+					}
+				} else {
+					var errors = {
+			    		submit: data.msg
+				    };
+					self.setState({errors: errors}); 
+					self._toggleError();
+				}
+				
+			},
+			error: function(e){
+
+			}	
+		});
+  }
+  
+  _processingTypeButtonHandleClick(){
+		this.setState({processingTypeButtonToggle: !this.state.processingTypeButtonToggle});
+		
+		if (this.state.processingTypeButtonToggle) {
+			this.setState({processingType: this.CONSTANTS.FORCED_PROCESSING_TYPE});
+		} else {
+			this.setState({processingType: this.CONSTANTS.NORMAL_PROCESSING_TYPE});
+		}
+  }
+  
   render() {    
+	  
+	let processingTypeButtonText = this.CONSTANTS.NORMAL_PROCESSING_TYPE;
+	if (!this.state.processingTypeButtonToggle) {
+		processingTypeButtonText = this.CONSTANTS.FORCED_PROCESSING_TYPE;
+	}
+	  
     return (
     
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.submitPendingInvoiceGroup}>
       	  
 	      {this.state.showError && 
 		        <div className="alert alert-danger">
-	      <strong>¡Error!</strong>{" " + this.state.errors.pumpAttendantNames + " - " + this.state.errors.newGals + " - " + this.state.errors.submit}  
+	      <strong>¡Error!</strong>{" " + this.state.errors.sunatValidationMsg + " " + this.state.errors.submit}  
 		      	</div>
 	      }
 	      
 	      {this.state.showSuccess && 
 	      	<div className="alert alert-success">
-	      		<strong>Success!</strong> Tu forma has sido remitida. 
+	      		<strong>Success!</strong> Los comprobantes fueron enviados con éxito. 
 	      	</div>
 	      }
 	      <div className="row">
@@ -226,10 +337,23 @@ class InvoiceTableSummary extends React.Component {
 	          <i className="fa fa-plus"></i>
 	      </button>*/}
 	      <div style={{textAlign: 'right'}}>
-		      <button className="btn green"> 
+		      {/*<button type="submit" onClick={this.validatePendingInvoices.bind(this)} className="btn blue hidden-print margin-bottom-5">
+	        	<i className="fa fa-check"></i>Validar Comprobantes
+	          </button>&nbsp;*/}
+		      {/*<button className="btn blue hidden-print margin-bottom-5">
+	        	<a onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn green-meadow">{processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>
+	          </button>&nbsp;*/}
+	          <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5" > {processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>&nbsp;
+		      <button type="submit" className="btn blue hidden-print margin-bottom-5">
+	          	<i className="fa fa-check"></i>Procesar Pendientes
+	          </button>&nbsp;
+	          <button className="btn green margin-bottom-5"> 
 		      	<a className='view' href='/invoice-page'>Nuevo Comprobante</a>&nbsp;<i className="fa fa-plus"></i>
 		      </button>
 	      </div>
+	      {/*<div style={{textAlign: 'right'}}>
+		      
+	      </div>*/}
 	      
 	      {this.state && this.state.invoicesSummaryData &&
 	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>

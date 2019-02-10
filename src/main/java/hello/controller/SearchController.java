@@ -31,6 +31,7 @@ import hello.model.SearchCriteria;
 import hello.model.SearchDateCriteria;
 import hello.model.SearchDocIdCriteria;
 import hello.model.SearchInvoiceCriteria;
+import hello.model.SubmitInvoiceGroupCriteria;
 import hello.model.User;
 import hello.rucdnisearch.DNIVo;
 import hello.rucdnisearch.RUCVo;
@@ -281,6 +282,30 @@ public class SearchController {
 		List<InvoiceVo> invoiceVos = userService.submitInvoice(invoiceVo);
 		if(invoiceVos.isEmpty()) {
 			result.setMsg("No se pudo remitir comprobante: " + invoiceVo);
+		} else {
+			result.setMsg("Comprobante remitido: " + invoiceVos.get(0).getInvoiceNumber());
+		}
+		result.setResult(invoiceVos);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/submitInvoicesToSunat")
+	public ResponseEntity<?> submitInvoicesToSunat(@Valid @RequestBody SubmitInvoiceGroupCriteria submitInvoiceGroupCriteria, Errors errors){
+		AjaxGetInvoiceResponse result = new AjaxGetInvoiceResponse();
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		List<InvoiceVo> invoiceVos = userService.submitInvoicesToSunat(submitInvoiceGroupCriteria.getProcessingType());
+		
+		if(invoiceVos.isEmpty()) {
+			result.setMsg("No hay comprobantes para enviar a SUNAT.");
 		} else {
 			result.setMsg("Comprobante remitido: " + invoiceVos.get(0).getInvoiceNumber());
 		}

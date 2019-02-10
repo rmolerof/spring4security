@@ -6,7 +6,7 @@ class TableDashboard extends React.Component {
     super();
     this.state = {
       errors: {},
-      id: ' ',
+      id: '',
 	  showError: false,
 	  showSuccess: false,
 	  showEmailModal: false, 
@@ -53,6 +53,8 @@ class TableDashboard extends React.Component {
       selectedOption: 'boleta',
       boletaDisabled: false,
       facturaDisabled: false,
+      invoiceNumberEditorDisabled: true,
+      invoiceNumberEditorButtonDisabled: true,
       notaDeCreditoDisabled: false,
       submitDisabled: false,
       showBoletaRadioButton: 'btn blue active btn-sm',
@@ -76,8 +78,15 @@ class TableDashboard extends React.Component {
 	  igvModified: '',
 	  totalModified: '',
 	  bonusNbr: '',
-	  sunatStatus: 'PENDIENTE'
+	  sunatStatus: 'PENDIENTE',
+	  sunatValidated: false
     };
+    
+    this.CONSTANTS = {
+	    FACTURA: '01',
+	    BOLETA: '03',
+	    NOTADECREDITO: '07'
+    }
   }
   
   galsD2Change = (evt) => {
@@ -243,6 +252,10 @@ class TableDashboard extends React.Component {
 	    this.setState({ clientName: evt.target.value.toUpperCase() });
   }
   
+  invoiceNumberChange = (evt) => {
+	  this.setState({ invoiceNumber: evt.target.value.toUpperCase() });
+  }
+  
   clientDocNumberChange = (evt) => {
     this.setState({ clientDocNumber: evt.target.value.trim() });
     
@@ -404,6 +417,7 @@ class TableDashboard extends React.Component {
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
+		  this.setState({invoiceNumberEditorButtonDisabled: false});
 	  } else {
 		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
 	  }
@@ -450,6 +464,10 @@ class TableDashboard extends React.Component {
 		this.setState({invoiceTypeModified: "03"});
 		this.setState({ invoiceNumber: "B001-XXXXXXXX" });
 	}
+  }
+  
+  editInvoiceNumber() {
+	  this.setState({invoiceNumberEditorDisabled: !this.state.invoiceNumberEditorDisabled});
   }
   
   motiveCdHandleChange(event) {
@@ -626,6 +644,7 @@ class TableDashboard extends React.Component {
 					  date: data.result[0].date,
 					  clientDocNumber: data.result[0].clientDocNumber,
 					  clientName: data.result[0].clientName,
+					  invoiceType: data.result[0].invoiceType,
 					  clientDocType: data.result[0].clientDocType,
 					  clientAddress: data.result[0].clientAddress,
 					  truckPlateNumber: data.result[0].truckPlateNumber,
@@ -650,7 +669,11 @@ class TableDashboard extends React.Component {
 					  clientDocNumberDisabled: true,
 					  clientNameDisabled: true, 
 					  clientAddressDisabled: true,
-					  invoiceTypeModified: data.result[0].invoiceType,
+					  invoiceTypeModified: data.result[0].invoiceTypeModified,
+					  invoiceNumberModified: data.result[0].invoiceNumberModified,
+					  motiveCd: data.result[0].motiveCd,
+					  motiveCdDescription: data.result[0].motiveCdDescription,
+					  dateOfInvoiceModified: data.result[0].dateOfInvoiceModified,
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNbr: data.result[0].bonusNbr,
@@ -662,6 +685,14 @@ class TableDashboard extends React.Component {
 					  invoiceHash: data.result[0].invoiceHash
 				  });
 				  
+				  // Display No of modified invoice
+				  if (data.result[0].invoiceTypeModified == self.CONSTANTS.FACTURA) {
+					  self.setState({invoiceTypeModifiedToggle: true});
+				  } else {
+					  self.setState({invoiceTypeModifiedToggle: false});
+				  }
+				  self.setState({invoiceNumberModifiedDisp: data.result[0].invoiceNumberModified.substring(5)});
+					
 				  // Select typo of invoice
 				  if (data.result[0].invoiceType == '01') {
 					  self.setState({selectedOption: "factura", facturaDisabled: false, boletaDisabled: true, notaDeCreditoDisabled: true });
@@ -751,7 +782,8 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNbr: data.result[0].bonusNbr,
-					  sunatStatus: data.result[0].sunatStatus
+					  sunatStatus: 'PENDIENTE',
+					  sunatValidated: false
 				  });
 				  
 			  } else {
@@ -933,7 +965,7 @@ class TableDashboard extends React.Component {
 	      igvModified: '',
 	      totalModified: '',
 	      bonusNbr: '',
-	      sunatStatus: 'PENDING'
+	      sunatStatus: 'PENDIENTE'
 	  });
   }
   
@@ -998,7 +1030,7 @@ class TableDashboard extends React.Component {
 	    this.setState({ showError: false, showSuccess: false });
 	    
 	    var invoiceVo = {
-	    	id: this._mongoObjectId(),
+	    	id: id ? id: this._mongoObjectId(),
 	    	invoiceNumber: invoiceNumber,  
 		    clientDocNumber: clientDocNumber,
 		    clientName: clientName,
@@ -1274,7 +1306,19 @@ class TableDashboard extends React.Component {
 	      	</div>
 	      }*/}
 	      
-	      <h1 className="page-title col-xs-10 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA {this.state.invoiceNumber}</h1>
+	      
+	      <div className="row">
+          	<div className="col-md-2">
+          		<h1 className="page-title col-xs-10 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA</h1>
+          	</div>
+          	
+	      	{this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><h1 className="page-title uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.invoiceNumber}</h1></div>}
+      		{!this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
+      		
+      		{!this.state.invoiceNumberEditorButtonDisabled && <div className="fa-item col-md-1">
+      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
+            </div>}
+          </div>
 	      
 	      <div className="invoice margin-bottom-20">
 	          {/*<div className="row invoice-logo">

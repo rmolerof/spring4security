@@ -12,6 +12,8 @@ import hello.model.InvoiceVo;
 @Document(collection = "invoices")
 public class InvoiceDao {
 	
+	public static InvoiceDao NOT_FOUND = new InvoiceDao("0000-00000000", "CUSTOMER NOT FOUND");
+	
 	@Id 
 	private ObjectId id;
 
@@ -49,7 +51,7 @@ public class InvoiceDao {
 	private String totalVerbiage;
 	private String invoiceHash;
 	private String saveOrUpdate;
-	private String sunatErrorStr;
+	private String sunatErrorStr = "";
 	
 	private String invoiceTypeModified = "";
 	private String invoiceNumberModified  = "";
@@ -60,9 +62,15 @@ public class InvoiceDao {
 	private Double totalModified = 0D;
 	private String bonusNbr = "";
 	private String sunatStatus = "";
+	private boolean sunatValidated = false;
 
 	public InvoiceDao() {
 		super();
+	}
+	
+	public InvoiceDao(String invoiceNumber, String clientName) {
+		this.invoiceNumber = invoiceNumber;
+		this.clientName = clientName;
 	}
 	
 	public InvoiceDao(InvoiceVo invoiceVo) {
@@ -108,6 +116,7 @@ public class InvoiceDao {
 		this.totalModified = new Double(invoiceVo.getTotalModified());
 		this.bonusNbr = new String(invoiceVo.getBonusNbr());
 		this.sunatStatus = new String(invoiceVo.getSunatStatus());
+		this.sunatValidated = new Boolean(invoiceVo.isSunatValidated());
 	}
 
 	public InvoiceDao(ObjectId id, String invoiceNumber, String clientDocNumber, String clientName,
@@ -457,5 +466,13 @@ public class InvoiceDao {
 	public void setSunatStatus(String sunatStatus) {
 		this.sunatStatus = sunatStatus;
 	}
-	
+
+	public boolean isSunatValidated() {
+		return sunatValidated;
+	}
+
+	public void setSunatValidated(boolean sunatValidated) {
+		this.sunatValidated = sunatValidated;
+	}
+
 }

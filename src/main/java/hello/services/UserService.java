@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ import hello.domain.TanksDao;
 import hello.domain.TanksRepository;
 import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
+import hello.model.SubmitInvoiceGroupCriteria;
 import hello.model.User;
 import hello.sunat.XmlSunat;
 
@@ -55,6 +57,9 @@ public class UserService {
 	private Station currentStation;
 	private TanksVo currentTanksVo;
 	private GasPricesVo currentGasPricesVo;
+	public static final String FACTURA = "01";
+	public static final String BOLETA = "03";
+	public static final String NOTADECREDITO = "07";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -519,6 +524,105 @@ public class UserService {
 		return Stream.of(gasPricesVo).collect(Collectors.toList());
 	}
 	
+	public List<InvoiceVo> submitInvoicesToSunat(String processingType) {
+		
+		List<InvoiceVo> invalidInvoiceVos = null;
+		List<InvoiceDao> pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex("PENDIENTE", new Sort(Sort.Direction.ASC, "date"));
+		
+		InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastSentInvoice(FACTURA);
+		InvoiceDao lastSunatProcessedBoleta = invoicesRepository.findLastSentInvoice(BOLETA);
+		
+		if (processingType.equalsIgnoreCase(SubmitInvoiceGroupCriteria.NORMAL)) {
+			if(validateInvoices(pendingInvoiceDaos, lastSunatProcessedBoleta, lastSunatProcessedFacturaOrNotaDeCredito)) {
+				return submitInvoices(pendingInvoiceDaos);
+			} else {
+				invalidInvoiceVos = pendingInvoiceDaos.stream().map(invoiceDao -> {
+					InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+					return invoiceVo;
+				}).collect(Collectors.toList());
+				return invalidInvoiceVos;
+			}
+		} else {
+			return submitInvoices(pendingInvoiceDaos);
+		}
+		
+	}
+	
+	public boolean validateInvoices(List<InvoiceDao> invoiceDaos, InvoiceDao lastSunatProcessedBoleta, InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito) {
+		
+		boolean isPendingInvoiceGroupValidated = true; 
+		
+		Long lastFacturaOrNotaDeCreditoNumberInLong = invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber());
+		Long lastBoletaNumberInLong = invoiceNumberToLong(lastSunatProcessedBoleta.getInvoiceNumber());
+		
+		for (InvoiceDao invoiceDao: invoiceDaos) {
+			
+			if (invoiceDao.getInvoiceType().equals(UserService.BOLETA)) {
+				Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+				
+				if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {
+					invoiceDao.setSunatValidated(false);
+					isPendingInvoiceGroupValidated = false;
+				} else {
+					invoiceDao.setSunatValidated(true);
+				}
+				
+				lastBoletaNumberInLong = nextInvoiceNumber;
+			} else {
+				Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+				
+				if (nextInvoiceNumber - lastFacturaOrNotaDeCreditoNumberInLong != 1) {
+					invoiceDao.setSunatValidated(false);
+					isPendingInvoiceGroupValidated = false;
+				} else {
+					invoiceDao.setSunatValidated(true);
+				}
+				
+				lastFacturaOrNotaDeCreditoNumberInLong = nextInvoiceNumber;
+			}
+		}
+		
+		return isPendingInvoiceGroupValidated;
+		
+	}
+	
+	public long invoiceNumberToLong(String invoiceNumber) {
+		StringBuilder invoiceNumberImmutable = new StringBuilder(invoiceNumber);
+		return Integer.parseInt(invoiceNumberImmutable.substring(5, invoiceNumberImmutable.length())); 
+	}
+	
+	List<InvoiceVo> submitInvoices(List<InvoiceDao> invoiceDaos){
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			
+			// Sunat
+			String basePath;
+			String deliveryResponse = "";
+			try {
+				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
+				XmlSunat.invokeSunat(invoiceVo, basePath);
+				XmlSunat.firma(invoiceVo, basePath);
+				deliveryResponse = XmlSunat.envio(invoiceVo, basePath);
+				
+			} catch (Exception e) {
+				invoiceVo.setStatus("0");
+				invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());
+			}
+			
+			InvoiceDao invDao = new InvoiceDao(invoiceVo);
+
+			if (deliveryResponse.charAt(0) == '1') {
+				invDao.setSunatStatus("ENVIADO");
+				invoiceVo.setSunatStatus("ENVIADO");
+				invoicesRepository.save(invDao);
+			}
+			
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
+	}
+	
 	public List<InvoiceVo> submitInvoice(InvoiceVo invoiceVo) {
 		
 		try {
@@ -549,7 +653,7 @@ public class UserService {
 				
 				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 				
-				// Sunat
+				/*// Sunat
 				String basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
 				
 				XmlSunat.invokeSunat(invoiceVo, basePath);
@@ -560,9 +664,13 @@ public class UserService {
 
 				if (deliveryResponse.charAt(0) == '1') {
 					invoicesRepository.save(invoiceDao);
-				}
+				}*/
+				
+				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
+				invoicesRepository.save(invoiceDao);
 
 				invoiceVo.setStatus("1");
+				invoiceVo.setSunatErrorStr("1");
 			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
 				
 				// Reset amount verbiage
