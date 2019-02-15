@@ -23,6 +23,8 @@ class TableDashboard extends React.Component {
       clientEmailAddress: '',
 	  // invoice breakdown
       date: '',
+      invoiceDateEditorDisabled: true,
+      invoiceDateDisp: '',
       invoiceType: '03',
 	  // Break-down
       galsD2: '',
@@ -256,6 +258,78 @@ class TableDashboard extends React.Component {
 	  this.setState({ invoiceNumber: evt.target.value.toUpperCase() });
   }
   
+  invoiceDateDispChange = (evt) => {
+	  this.setState({ invoiceDateDisp: evt.target.value.toUpperCase() });
+  }
+  
+  editInvoiceDate() {
+	  this.setState({invoiceDateEditorDisabled: !this.state.invoiceDateEditorDisabled});
+	  
+	  this.setState({invoiceDateDisp: moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A').toString()});
+  }
+  
+  _validateDatetime(datetime) {
+	    
+	  	var datetimeSplit = datetime.trim().split(' ');
+	  	var re;
+	  	//const form = event.target.form;
+		//const index = Array.prototype.indexOf.call(form, event.target);
+	  	
+	  	var date = datetimeSplit[0];
+	    re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+
+	    if(date != '' && !this._validateDate(date)) {
+	      //alert("Formato de Fecha Inválido: " + date);
+	      //form.elements[index].focus();
+	      return false;
+	    }
+
+	    var time = datetimeSplit[1] + ' ' + datetimeSplit[2];
+	    // regular expression to match required time format
+	    re = /^\d{1,2}:([0-5][0-9]) ([AP]M)?$/;
+
+	    if(time != '' && !time.match(re)) {
+	      //alert("Formato de Fecha Inválido: " + time);
+	      //form.elements[index].focus();
+	      return false;
+	    }
+	    
+	    // create date 
+
+	    //alert("Fecha y hora fueron validados!");
+	    
+	    var validatedDate = moment.tz(date + " " + time, 'DD/MM/YYYY hh:mm A', 'America/Lima').toDate();
+	    
+	    //this.setState({date: validatedDate});
+	    return validatedDate;
+  }
+  
+  _validateDate(date)
+  {
+      // First check for the pattern
+      if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(date))
+          return false;
+
+      // Parse the date parts to integers
+      var parts = date.split("/");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+
+      // Check the ranges of month and year
+      if(year < 1000 || year > 3000 || month == 0 || month > 12)
+          return false;
+
+      var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+      // Adjust for leap years
+      if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+          monthLength[1] = 29;
+
+      // Check the range of the day
+      return day > 0 && day <= monthLength[month - 1];
+  };
+  
   clientDocNumberChange = (evt) => {
     this.setState({ clientDocNumber: evt.target.value.trim() });
     
@@ -485,135 +559,137 @@ class TableDashboard extends React.Component {
 	var search = {};
 	search["docId"] = event.target.value;
 	
-	if (this.state.selectedOption != 'boleta') {
-		
-		if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
-			// display RUC search loading
-			self.setState({loadingGif: true});
-			self.setState({clientNameDisabled: false});
-			self.setState({clientAddressDisabled: false});
+	if (search["docId"]) {
+		if (this.state.selectedOption != 'boleta') {
 			
-			jQuery.ajax({
-				type: "POST",
-				contentType: "application/json", 
-				url:"/api/findRuc",
-				data: JSON.stringify(search),
-				datatype: 'json',
-				cache: false,
-				timeout: 600000,
-				success: (data) => {
-					
-					// When no RUC found
-					var isDataEmpty = true;
-					for(var prop in data) {
-				        if(data.hasOwnProperty(prop))
-				        	isDataEmpty = false;
-				    }
-					
-					if (isDataEmpty || !data.result.status) {
-						var errors = {
-				    		submit: 'Numero de RUC no econtrado.'
-					    };
-						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
-						self._toggleError();
+			if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
+				// display RUC search loading
+				self.setState({loadingGif: true});
+				self.setState({clientNameDisabled: false});
+				self.setState({clientAddressDisabled: false});
+				
+				jQuery.ajax({
+					type: "POST",
+					contentType: "application/json", 
+					url:"/api/findRuc",
+					data: JSON.stringify(search),
+					datatype: 'json',
+					cache: false,
+					timeout: 600000,
+					success: (data) => {
 						
-						setTimeout(function() {
-						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
-				        }.bind(this), 0);
-					} else {
-						self.setState({clientAddress: data.result.direccionS});
-						self.setState({clientName: data.result.razonSocial});
-						self.setState({clientEmailAddress: data.result.correoElectronico});
-						self.setState({clientNameDisabled: true});
-						if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
-							self.setState({clientAddressDisabled: false});
+						// When no RUC found
+						var isDataEmpty = true;
+						for(var prop in data) {
+					        if(data.hasOwnProperty(prop))
+					        	isDataEmpty = false;
+					    }
+						
+						if (isDataEmpty || !data.result.status) {
+							var errors = {
+					    		submit: 'Numero de RUC no econtrado.'
+						    };
+							this.setState({errors: errors, clientName: '', clientAddress: ''}); 
+							self._toggleError();
+							
+							setTimeout(function() {
+							    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+					        }.bind(this), 0);
 						} else {
-							self.setState({clientAddressDisabled: true});
+							self.setState({clientAddress: data.result.direccionS});
+							self.setState({clientName: data.result.razonSocial});
+							self.setState({clientEmailAddress: data.result.correoElectronico});
+							self.setState({clientNameDisabled: true});
+							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
+								self.setState({clientAddressDisabled: false});
+							} else {
+								self.setState({clientAddressDisabled: true});
+							}
+							
 						}
 						
-					}
-					
-					// hide delay delay
-					self.setState({loadingGif: false});
-				},
-				error: function(e){
-					self.setState({loadingGif: false});
-				}	
-			});
+						// hide delay delay
+						self.setState({loadingGif: false});
+					},
+					error: function(e){
+						self.setState({loadingGif: false});
+					}	
+				});
+			} else {
+				var errors = {
+		    		submit: 'Numero de RUC es incorrecto.'
+			    };
+				this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
+				self._toggleError();
+				
+				setTimeout(function() {
+				    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+		        }.bind(this), 0);
+			}
+			
 		} else {
-			var errors = {
-	    		submit: 'Numero de RUC es incorrecto.'
-		    };
-			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
-			self._toggleError();
-			
-			setTimeout(function() {
-			    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
-	        }.bind(this), 0);
-		}
-		
-	} else {
-		if (event.target.value && event.target.value > 0 &&  event.target.value.length == 8) {
-			// display RUC search loading
-			self.setState({loadingGif: true});
-			self.setState({clientNameDisabled: false});
-			self.setState({clientAddressDisabled: false});
-			
-			jQuery.ajax({
-				type: "POST",
-				contentType: "application/json", 
-				url:"/api/findDni",
-				data: JSON.stringify(search),
-				datatype: 'json',
-				cache: false,
-				timeout: 600000,
-				success: (data) => {
-					
-					// When no RUC found
-					var isDataEmpty = true;
-					for(var prop in data) {
-				        if(data.hasOwnProperty(prop))
-				        	isDataEmpty = false;
-				    }
-					
-					if (isDataEmpty || !data.result.status) {
-						var errors = {
-				    		submit: 'Numero de DNI no econtrado.'
-					    };
-						this.setState({errors: errors, clientName: '', clientAddress: ''}); 
-						self._toggleError();
+			if (event.target.value && event.target.value > 0 &&  event.target.value.length == 8) {
+				// display RUC search loading
+				self.setState({loadingGif: true});
+				self.setState({clientNameDisabled: false});
+				self.setState({clientAddressDisabled: false});
+				
+				jQuery.ajax({
+					type: "POST",
+					contentType: "application/json", 
+					url:"/api/findDni",
+					data: JSON.stringify(search),
+					datatype: 'json',
+					cache: false,
+					timeout: 600000,
+					success: (data) => {
 						
-						setTimeout(function() {
-							ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
-					    }.bind(this), 0);
-					} else {
-						self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
-						self.setState({clientEmailAddress: data.result.correoElectronico});
-						self.setState({clientNameDisabled: true});
-						self.setState({clientAddressDisabled: false});
-					}
-					
-					// hide delay delay
-					self.setState({loadingGif: false});
-				},
-				error: function(e){
-					self.setState({loadingGif: false});
-				}	
-			});
-		} else if (event.target.value == "0") { 
-			self.setState({clientNameDisabled: true});
-			self.setState({clientAddressDisabled: false});
-			return;
-		} else {
-			var errors = {
-	    		submit: 'Numero de DNI es incorrecto.'
-		    };
-			this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
-			self._toggleError();
-			
-			setTimeout(function() {
-				ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
-		    }.bind(this), 0);
+						// When no RUC found
+						var isDataEmpty = true;
+						for(var prop in data) {
+					        if(data.hasOwnProperty(prop))
+					        	isDataEmpty = false;
+					    }
+						
+						if (isDataEmpty || !data.result.status) {
+							var errors = {
+					    		submit: 'Numero de DNI no econtrado.'
+						    };
+							this.setState({errors: errors, clientName: '', clientAddress: ''}); 
+							self._toggleError();
+							
+							setTimeout(function() {
+								ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+						    }.bind(this), 0);
+						} else {
+							self.setState({clientName: data.result.paterno + " " + data.result.materno + " " + data.result.nombre});
+							self.setState({clientEmailAddress: data.result.correoElectronico});
+							self.setState({clientNameDisabled: true});
+							self.setState({clientAddressDisabled: false});
+						}
+						
+						// hide delay delay
+						self.setState({loadingGif: false});
+					},
+					error: function(e){
+						self.setState({loadingGif: false});
+					}	
+				});
+			} else if (event.target.value == "0") { 
+				self.setState({clientNameDisabled: true});
+				self.setState({clientAddressDisabled: false});
+				return;
+			} else {
+				var errors = {
+		    		submit: 'Numero de DNI es incorrecto.'
+			    };
+				this.setState({errors: errors, clientName: '', clientAddress: '', clientNameDisabled: false, clientAddressDisabled: false}); 
+				self._toggleError();
+				
+				setTimeout(function() {
+					ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+			    }.bind(this), 0);
+			}
 		}
 	}
 	
@@ -1017,7 +1093,8 @@ class TableDashboard extends React.Component {
 			saveOrUpdate,
 			invoiceHash,
 			bonusNbr,
-			sunatStatus} = this.state;
+			sunatStatus,
+			invoiceDateDisp} = this.state;
 		var self = this;
 	    var errors = {
 	    		submit: '',
@@ -1090,7 +1167,19 @@ class TableDashboard extends React.Component {
 	    			errors["bonusNbr"] = "Número Bonus debe tener 5 digitos";
 	    			formIsValid = false;
 	    		}
-		    } 
+		    }
+	    	
+	    	// Date validation
+	    	if (!this.state.invoiceDateEditorDisabled){
+		    	formIsValid = this._validateDatetime(invoiceDateDisp);
+		    	if(formIsValid) {
+		    		invoiceVo.date = formIsValid;
+		    	}
+	    	}
+	    	
+	    	if(!formIsValid) {
+	    		alert("date is invalid");
+	    	}
 	    	
 	    	// RUC Validation
 		    if (clientDocType == '6') {
@@ -1437,7 +1526,13 @@ class TableDashboard extends React.Component {
 		    	      <div className="col-md-2">
 			              <div className="form-group">
 			                  <label className="control-label">Fecha</label>
-			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
+			                  
+			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Fecha"} onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
+			            		
+			            	  <div className="fa-item col-md-1">
+			            			<a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
+			                  </div>
 			              </div>
 			          </div>
 	    	      	  <div className="col-md-2">

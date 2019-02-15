@@ -60,7 +60,11 @@ public class RucDniService {
 			DNIDao dniDao = dnisRepository.findFirstByDni(dni);
 			
 			// if not Found, search in Sunat
-			if (null == dniDao) {
+			if (null == dniDao || dniDao.getNombre().contains("EXPIRADO")) {
+				if (dniDao.getNombre().contains("EXPIRADO")) {
+					dnisRepository.delete(dniDao);
+				}
+				
 				dniVo = getDNIWS(dni);
 				dniVo.setStatus(true);
 				dnisRepository.save(new DNIDao(dniVo));
@@ -80,8 +84,8 @@ public class RucDniService {
 	
 	public DNIVo getDNIWS(String dni) throws Exception {
 		DNIVo dniVo = null;
-		String Usuario = "10447915125";
-		String Password = "xxxxx";
+		String Usuario = "20501568776";
+		String Password = "ruc1234";
 		String Documento = "DNI";
 		String Nro_documento = dni;
 		
@@ -129,8 +133,6 @@ public class RucDniService {
 		RUCVo rucVo = null;
 		String Usuario = "20501568776";
 		String Password = "ruc1234";
-		/*String Usuario = "10447915125";
-		String Password = "xxxxx";*/
 		String Documento = "RUC";
 		String Nro_documento = ruc; 
 		
