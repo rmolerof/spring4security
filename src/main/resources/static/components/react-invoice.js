@@ -56,7 +56,7 @@ class TableDashboard extends React.Component {
       boletaDisabled: false,
       facturaDisabled: false,
       invoiceNumberEditorDisabled: true,
-      invoiceNumberEditorButtonDisabled: true,
+      invoiceNumberEditorButtonDisabled: false,
       notaDeCreditoDisabled: false,
       submitDisabled: false,
       showBoletaRadioButton: 'btn blue active btn-sm',
@@ -272,35 +272,20 @@ class TableDashboard extends React.Component {
 	    
 	  	var datetimeSplit = datetime.trim().split(' ');
 	  	var re;
-	  	//const form = event.target.form;
-		//const index = Array.prototype.indexOf.call(form, event.target);
 	  	
 	  	var date = datetimeSplit[0];
-	    re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-
 	    if(date != '' && !this._validateDate(date)) {
-	      //alert("Formato de Fecha Inválido: " + date);
-	      //form.elements[index].focus();
-	      return false;
+	      return 'Invalid Date';
 	    }
 
 	    var time = datetimeSplit[1] + ' ' + datetimeSplit[2];
-	    // regular expression to match required time format
-	    re = /^\d{1,2}:([0-5][0-9]) ([AP]M)?$/;
-
-	    if(time != '' && !time.match(re)) {
-	      //alert("Formato de Fecha Inválido: " + time);
-	      //form.elements[index].focus();
-	      return false;
+	    re = /^((0[1-9])|(1[0-2])):([0-5][0-9])\s([AP]M)?$/;
+	    if(time != '' && !re.test(time)) {
+	      return 'Invalid Date';
 	    }
-	    
-	    // create date 
-
-	    //alert("Fecha y hora fueron validados!");
 	    
 	    var validatedDate = moment.tz(date + " " + time, 'DD/MM/YYYY hh:mm A', 'America/Lima').toDate();
 	    
-	    //this.setState({date: validatedDate});
 	    return validatedDate;
   }
   
@@ -491,7 +476,7 @@ class TableDashboard extends React.Component {
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
-		  this.setState({invoiceNumberEditorButtonDisabled: false});
+		  //this.setState({invoiceNumberEditorButtonDisabled: false});
 	  } else {
 		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
 	  }
@@ -541,7 +526,7 @@ class TableDashboard extends React.Component {
   }
   
   editInvoiceNumber() {
-	  this.setState({invoiceNumberEditorDisabled: !this.state.invoiceNumberEditorDisabled});
+	  this.setState({invoiceNumberEditorDisabled: !this.state.invoiceNumberEditorDisabled, invoiceNumber: this.state.invoiceNumber.replace(/X/gi, '0')});
   }
   
   motiveCdHandleChange(event) {
@@ -1161,7 +1146,16 @@ class TableDashboard extends React.Component {
 	    }
 	    
 	    if (formIsValid){
-		    // Bonus validation
+		    // Invoice Number validation
+	    	if (!invoiceNumber.includes("XXXXXXXX")) {
+	    		var invoiceNumberInString = invoiceNumber.substring(5, invoiceNumber.length);
+	    		if (!invoiceNumberInString || isNaN(invoiceNumberInString) || parseInt(invoiceNumberInString) <= 0 || invoiceNumber.length < 13) {
+	    			errors["submit"] = "Número de Comprobante es incorrecto";
+	    			formIsValid = false;
+	    		}
+	    	}
+	    	
+	    	// Bonus validation
 	    	if (bonusNbr && bonusNbr >= 0) {
 	    		if (bonusNbr.toString().length  != 5) {
 	    			errors["bonusNbr"] = "Número Bonus debe tener 5 digitos";
@@ -1171,14 +1165,13 @@ class TableDashboard extends React.Component {
 	    	
 	    	// Date validation
 	    	if (!this.state.invoiceDateEditorDisabled){
-		    	formIsValid = this._validateDatetime(invoiceDateDisp);
-		    	if(formIsValid) {
-		    		invoiceVo.date = formIsValid;
+		    	var validatedDatetime = this._validateDatetime(invoiceDateDisp);
+		    	if(validatedDatetime && validatedDatetime != 'Invalid Date') {
+		    		invoiceVo.date = validatedDatetime;
+		    	} else {
+		    		errors["submit"] = "Fecha Inválida.";
+	    			formIsValid = false;
 		    	}
-	    	}
-	    	
-	    	if(!formIsValid) {
-	    		alert("date is invalid");
 	    	}
 	    	
 	    	// RUC Validation
@@ -1402,7 +1395,7 @@ class TableDashboard extends React.Component {
           	</div>
           	
 	      	{this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><h1 className="page-title uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.invoiceNumber}</h1></div>}
-      		{!this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
+      		{!this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
       		
       		{!this.state.invoiceNumberEditorButtonDisabled && <div className="fa-item col-md-1">
       			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
@@ -1546,7 +1539,7 @@ class TableDashboard extends React.Component {
 		    	                  </tr>
 		    	                </tbody>
 		    	              </table>
-	    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+	    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 	                	  </div>
 	    	          </div>
 	    	          <div className="col-md-2">

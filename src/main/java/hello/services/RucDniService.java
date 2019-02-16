@@ -61,7 +61,7 @@ public class RucDniService {
 			
 			// if not Found, search in Sunat
 			if (null == dniDao || dniDao.getNombre().contains("EXPIRADO")) {
-				if (dniDao.getNombre().contains("EXPIRADO")) {
+				if (null != dniDao && dniDao.getNombre().contains("EXPIRADO")) {
 					dnisRepository.delete(dniDao);
 				}
 				

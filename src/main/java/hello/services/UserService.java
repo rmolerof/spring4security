@@ -552,34 +552,38 @@ public class UserService {
 		
 		boolean isPendingInvoiceGroupValidated = true; 
 		
-		Long lastFacturaOrNotaDeCreditoNumberInLong = invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber());
-		Long lastBoletaNumberInLong = invoiceNumberToLong(lastSunatProcessedBoleta.getInvoiceNumber());
-		
-		for (InvoiceDao invoiceDao: invoiceDaos) {
+		try {
+			Long lastFacturaOrNotaDeCreditoNumberInLong = invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber());
+			Long lastBoletaNumberInLong = invoiceNumberToLong(lastSunatProcessedBoleta.getInvoiceNumber());
 			
-			if (invoiceDao.getInvoiceType().equals(UserService.BOLETA)) {
-				Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+			for (InvoiceDao invoiceDao: invoiceDaos) {
 				
-				if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {
-					invoiceDao.setSunatValidated(false);
-					isPendingInvoiceGroupValidated = false;
+				if (invoiceDao.getInvoiceType().equals(UserService.BOLETA)) {
+					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+					
+					if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {
+						invoiceDao.setSunatValidated(false);
+						isPendingInvoiceGroupValidated = false;
+					} else {
+						invoiceDao.setSunatValidated(true);
+					}
+					
+					lastBoletaNumberInLong = nextInvoiceNumber;
 				} else {
-					invoiceDao.setSunatValidated(true);
+					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+					
+					if (nextInvoiceNumber - lastFacturaOrNotaDeCreditoNumberInLong != 1) {
+						invoiceDao.setSunatValidated(false);
+						isPendingInvoiceGroupValidated = false;
+					} else {
+						invoiceDao.setSunatValidated(true);
+					}
+					
+					lastFacturaOrNotaDeCreditoNumberInLong = nextInvoiceNumber;
 				}
-				
-				lastBoletaNumberInLong = nextInvoiceNumber;
-			} else {
-				Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
-				
-				if (nextInvoiceNumber - lastFacturaOrNotaDeCreditoNumberInLong != 1) {
-					invoiceDao.setSunatValidated(false);
-					isPendingInvoiceGroupValidated = false;
-				} else {
-					invoiceDao.setSunatValidated(true);
-				}
-				
-				lastFacturaOrNotaDeCreditoNumberInLong = nextInvoiceNumber;
 			}
+		} catch(Exception e) {
+			return false;
 		}
 		
 		return isPendingInvoiceGroupValidated;
@@ -628,28 +632,30 @@ public class UserService {
 		try {
 			if (invoiceVo.getSaveOrUpdate().equals("save")) {
 				
-				if (invoiceVo.getInvoiceType().equalsIgnoreCase("03")) {
-					// Boleta
-					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
-					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
-					invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
-				} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("01")) {
-					// Factura
-					Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
-					String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
-					invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
-				} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
-					// Nota de credito
-					if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("03")) {
+				if (invoiceVo.getInvoiceNumber().contains("XXXXXXXX")) {
+					if (invoiceVo.getInvoiceType().equalsIgnoreCase("03")) {
+						// Boleta
 						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
-					} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("01")) {
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("01")) {
+						// Factura
 						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+						// Nota de credito
+						if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("03")) {
+							Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
+							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+							invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+						} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("01")) {
+							Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+							invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+						}
 					}
-				}
+				} 
 				
 				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
 				
