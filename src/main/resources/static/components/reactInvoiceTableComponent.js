@@ -6,6 +6,7 @@ class InvoiceTableSummary extends React.Component {
       errors: {},
 	  showError: false,
 	  showSuccess: false,
+	  processingGif: false,
       invoicesSummaryData: null,
       invoicesSummaryConcarData: null,
       processingTypeButtonToggle: true,
@@ -242,7 +243,7 @@ class InvoiceTableSummary extends React.Component {
 		evt.preventDefault();
 		
 		var self = this;
-		self.setState({ showError: false});
+		self.setState({ showError: false, processingGif: true});
 		var sunatSubmitCriteria = {};
 		sunatSubmitCriteria["processingType"] = this.state.processingType;
 		
@@ -277,17 +278,19 @@ class InvoiceTableSummary extends React.Component {
 					} else {
 						this.setState({showSuccess: true});
 					}
+					
+					self.setState({processingGif: false});
 				} else {
 					var errors = {
 			    		submit: data.msg
 				    };
-					self.setState({errors: errors}); 
+					self.setState({errors: errors, processingGif: false}); 
 					self._toggleError();
 				}
 				
 			},
 			error: function(e){
-
+				self.setState({processingGif: false});
 			}	
 		});
   }
@@ -343,7 +346,9 @@ class InvoiceTableSummary extends React.Component {
 		      {/*<button className="btn blue hidden-print margin-bottom-5">
 	        	<a onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn green-meadow">{processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>
 	          </button>&nbsp;*/}
-	          <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5" > {processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>&nbsp;
+		      {this.state.processingGif &&
+                  <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
+		      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5" > {processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>&nbsp;
 		      <button type="submit" className="btn blue hidden-print margin-bottom-5">
 	          	<i className="fa fa-check"></i>Procesar Pendientes
 	          </button>&nbsp;

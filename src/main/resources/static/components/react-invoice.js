@@ -972,12 +972,19 @@ class TableDashboard extends React.Component {
 	  
 	  $('canvas').remove();
       $("img[alt$='Scan me!']").remove();
+      
+      var invoiceNumberDisp = '';
+      if (this.state.invoiceNumberEditorDisabled) {
+    	  invoiceNumberDisp = 'B001-XXXXXXXX';
+      } else {
+    	  invoiceNumberDisp = 'B001-00000000';
+      }
   
 	  this.setState({
 		  errors: {},
 		  showError: false,
 		  showSuccess: false,
-		  invoiceNumber: 'B001-XXXXXXXX',
+		  invoiceNumber: invoiceNumberDisp,
 		  // customer
 	      clientDocNumber: '',
 	      clientName: '',
