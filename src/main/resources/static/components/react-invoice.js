@@ -268,6 +268,22 @@ class TableDashboard extends React.Component {
 	  this.setState({invoiceDateDisp: moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A').toString()});
   }
   
+  _validateInvoiceNumber(invoiceNumber) {
+	  
+	  var re = /^([BF])?001-[0-9]{8}$/;
+	  
+	  if (invoiceNumber != '' && !re.test(invoiceNumber)) {
+		  return false
+	  } else {
+		  var invoiceNumberInString = invoiceNumber.substring(5, invoiceNumber.length);
+		  if (parseInt(invoiceNumberInString) <= 0){
+			  return false;
+		  } else {
+			  return true;
+		  }
+	  } 
+  }
+  
   _validateDatetime(datetime) {
 	    
 	  	var datetimeSplit = datetime.trim().split(' ');
@@ -1149,7 +1165,7 @@ class TableDashboard extends React.Component {
 		    // Invoice Number validation
 	    	if (!invoiceNumber.includes("XXXXXXXX")) {
 	    		var invoiceNumberInString = invoiceNumber.substring(5, invoiceNumber.length);
-	    		if (!invoiceNumberInString || isNaN(invoiceNumberInString) || parseInt(invoiceNumberInString) <= 0 || invoiceNumber.length < 13) {
+	    		if (!self._validateInvoiceNumber(invoiceNumber)) {
 	    			errors["submit"] = "Número de Comprobante es incorrecto";
 	    			formIsValid = false;
 	    		}
@@ -1519,9 +1535,9 @@ class TableDashboard extends React.Component {
 		    	      <div className="col-md-2">
 			              <div className="form-group">
 			                  <label className="control-label">Fecha</label>
-			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
+			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
 			                  
-			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Fecha"} onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
+			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
 			            		
 			            	  <div className="fa-item col-md-1">
 			            			<a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
