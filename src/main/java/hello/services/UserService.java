@@ -684,9 +684,16 @@ public class UserService {
 				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 				invoicesRepository.save(invoiceDao);
+				
 				invoiceVo.setSunatErrorStr("1|Updated");
 				invoiceVo.setStatus("1");
 			}
+			
+			// Save Bonus Number if present
+			if (null != invoiceVo.getBonusNumber() && !invoiceVo.getBonusNumber().trim().equals("")) {
+				utils.saveBonusNumber(invoiceVo);
+			}
+			
 		} catch (Exception e) {
 			invoiceVo.setStatus("0");
 			invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());

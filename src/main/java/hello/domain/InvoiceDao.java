@@ -60,7 +60,7 @@ public class InvoiceDao {
 	private Date dateOfInvoiceModified = new Date(0L);
 	private Double igvModified = 0D;
 	private Double totalModified = 0D;
-	private String bonusNbr = "";
+	private String bonusNumber = "";
 	private String sunatStatus = "";
 	private boolean sunatValidated = false;
 
@@ -114,7 +114,7 @@ public class InvoiceDao {
 		this.dateOfInvoiceModified = new Date(invoiceVo.getDateOfInvoiceModified().getTime());
 		this.igvModified = new Double(invoiceVo.getIgvModified());
 		this.totalModified = new Double(invoiceVo.getTotalModified());
-		this.bonusNbr = new String(invoiceVo.getBonusNbr());
+		this.bonusNumber = new String(invoiceVo.getBonusNumber());
 		this.sunatStatus = new String(invoiceVo.getSunatStatus());
 		this.sunatValidated = new Boolean(invoiceVo.isSunatValidated());
 	}
@@ -123,7 +123,7 @@ public class InvoiceDao {
 			String clientDocType, String clientAddress, String truckPlateNumber, Date date, String invoiceType,
 			Double galsD2, Double galsG90, Double galsG95, Double priceD2, Double priceG90, Double priceG95,
 			Double solesD2, Double solesG90, Double solesG95, Double total, Double subTotal, Double totalIGV,
-			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, String bonusNbr) {
+			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, String bonusNumber) {
 		super();
 		this.id = id;
 		this.invoiceNumber = invoiceNumber;
@@ -152,7 +152,7 @@ public class InvoiceDao {
 		this.sunatErrorStr = sunatErrorStr;
 		this.igvModified = igvModified;
 		this.totalModified = totalModified;
-		this.bonusNbr = bonusNbr;
+		this.bonusNumber = bonusNumber;
 	}
 
 	public ObjectId getId() {
@@ -451,12 +451,12 @@ public class InvoiceDao {
 		this.totalModified = totalModified;
 	}
 
-	public String getBonusNbr() {
-		return bonusNbr;
+	public String getBonusNumber() {
+		return bonusNumber;
 	}
 
-	public void setBonusNbr(String bonusNbr) {
-		this.bonusNbr = bonusNbr;
+	public void setBonusNumber(String bonusNumber) {
+		this.bonusNumber = bonusNumber;
 	}
 
 	public String getSunatStatus() {

@@ -20,6 +20,7 @@ public class RUCVo {
 	private String actividadExterior;
 	private String direccionS;
 	private Date date;
+	private String bonusNumber = "";
 	private boolean status;
 	
 	public RUCVo() {
@@ -42,6 +43,7 @@ public class RUCVo {
 		this.actividadExterior = new String(rucDao.getActividadExterior());
 		this.direccionS = new String(rucDao.getDireccionS());
 		this.date = new Date(rucDao.getDate().getTime());
+		this.bonusNumber = new String(rucDao.getBonusNumber());
 	}
 
 	public String getRuc() {
@@ -143,6 +145,14 @@ public class RUCVo {
 
 	public void setCorreoElectronico(String correoElectronico) {
 		this.correoElectronico = correoElectronico;
+	}
+
+	public String getBonusNumber() {
+		return bonusNumber;
+	}
+
+	public void setBonusNumber(String bonusNumber) {
+		this.bonusNumber = bonusNumber;
 	}
 
 	

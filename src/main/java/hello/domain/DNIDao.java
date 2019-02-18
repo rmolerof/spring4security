@@ -20,6 +20,7 @@ public class DNIDao {
 	private String paterno;
 	private String materno;
 	private String correoElectronico = "";
+	private String bonusNumber = "";
 	
 	public DNIDao() {
 		super();
@@ -32,6 +33,7 @@ public class DNIDao {
 		this.nombre = new String(dniVo.getNombre());
 		this.paterno = new String(dniVo.getPaterno());
 		this.materno = new String(dniVo.getMaterno());
+		this.bonusNumber = new String(dniVo.getBonusNumber());
 	}
 	
 	public String getNombre() {
@@ -83,6 +85,14 @@ public class DNIDao {
 
 	public void setCorreoElectronico(String correoElectronico) {
 		this.correoElectronico = correoElectronico;
+	}
+
+	public String getBonusNumber() {
+		return bonusNumber;
+	}
+
+	public void setBonusNumber(String bonusNumber) {
+		this.bonusNumber = bonusNumber;
 	}
 	
 	

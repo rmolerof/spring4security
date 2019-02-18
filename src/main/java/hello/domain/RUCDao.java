@@ -30,6 +30,7 @@ public class RUCDao {
 	private String direccionS;
 	@Indexed(unique = true)
 	private Date date;
+	private String bonusNumber = "";
 	
 	public RUCDao() {
 		super();
@@ -51,6 +52,7 @@ public class RUCDao {
 		this.actividadExterior = new String(rucVo.getActividadExterior());
 		this.direccionS = new String(rucVo.getDireccionS());
 		this.date = new Date(rucVo.getDate().getTime());
+		this.bonusNumber = new String(rucVo.getBonusNumber());
 	}
 	
 	public String getRuc() {
@@ -150,6 +152,14 @@ public class RUCDao {
 
 	public void setCorreoElectronico(String correoElectronico) {
 		this.correoElectronico = correoElectronico;
+	}
+
+	public String getBonusNumber() {
+		return bonusNumber;
+	}
+
+	public void setBonusNumber(String bonusNumber) {
+		this.bonusNumber = bonusNumber;
 	}
 	
 }

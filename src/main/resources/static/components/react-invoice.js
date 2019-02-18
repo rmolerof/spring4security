@@ -79,7 +79,7 @@ class TableDashboard extends React.Component {
       motiveCdDescription: '',
 	  igvModified: '',
 	  totalModified: '',
-	  bonusNbr: '',
+	  bonusNumber: '',
 	  sunatStatus: 'PENDIENTE',
 	  sunatValidated: false
     };
@@ -284,6 +284,16 @@ class TableDashboard extends React.Component {
 	  } 
   }
   
+  _validateBonusNumber(bonusNumber){
+	  var re = /^[0-9]{19}$/;
+	  
+	  if (bonusNumber != '' && !re.test(bonusNumber)) {
+		  return false
+	  } else {
+		  return true;
+	  } 
+  }
+  
   _validateDatetime(datetime) {
 	    
 	  	var datetimeSplit = datetime.trim().split(' ');
@@ -339,8 +349,8 @@ class TableDashboard extends React.Component {
     }
   }
   
-  bonusNbrChange = (evt) => {
-    this.setState({ bonusNbr: evt.target.value.trim() }); 
+  bonusNumberChange = (evt) => {
+    this.setState({ bonusNumber: evt.target.value.trim() }); 
   }
   
   invoiceNumberModifiedDispChange = (evt) => {
@@ -396,7 +406,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
 
 	  } else if (changeEvent.target.value == 'factura') {
 		  var docLabelObj = {
@@ -415,7 +425,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
 
 	  } else if (changeEvent.target.value == 'nota de credito') {
 		  var docLabelObj = {
@@ -434,7 +444,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
 	  }
   }
   
@@ -601,6 +611,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientName: data.result.razonSocial});
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
+							self.setState({bonusNumber: data.result.bonusNumber});
 							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
 								self.setState({clientAddressDisabled: false});
 							} else {
@@ -667,6 +678,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
 							self.setState({clientAddressDisabled: false});
+							self.setState({bonusNumber: data.result.bonusNumber});
 						}
 						
 						// hide delay delay
@@ -753,7 +765,7 @@ class TableDashboard extends React.Component {
 					  dateOfInvoiceModified: data.result[0].dateOfInvoiceModified,
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
-					  bonusNbr: data.result[0].bonusNbr,
+					  bonusNumber: data.result[0].bonusNumber,
 					  sunatStatus: data.result[0].sunatStatus,
 					  clientDocNumberDisabled: false,
 					  clientNameDisabled: false,
@@ -858,7 +870,7 @@ class TableDashboard extends React.Component {
 					  invoiceTypeModified: data.result[0].invoiceType,
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
-					  bonusNbr: data.result[0].bonusNbr,
+					  bonusNumber: data.result[0].bonusNumber,
 					  sunatStatus: 'PENDIENTE',
 					  sunatValidated: false
 				  });
@@ -1048,7 +1060,7 @@ class TableDashboard extends React.Component {
 	      motiveCdDescription: '',
 	      igvModified: '',
 	      totalModified: '',
-	      bonusNbr: '',
+	      bonusNumber: '',
 	      sunatStatus: 'PENDIENTE'
 	  });
   }
@@ -1100,7 +1112,7 @@ class TableDashboard extends React.Component {
 			date,
 			saveOrUpdate,
 			invoiceHash,
-			bonusNbr,
+			bonusNumber,
 			sunatStatus,
 			invoiceDateDisp} = this.state;
 		var self = this;
@@ -1149,7 +1161,7 @@ class TableDashboard extends React.Component {
 		    igvModified: igvModified,
 			totalModified: totalModified,
 	    	saveOrUpdate: saveOrUpdate,
-	    	bonusNbr: bonusNbr,
+	    	bonusNumber: bonusNumber,
 	    	invoiceHash: invoiceHash,
 	    	sunatStatus: sunatStatus
 	    };
@@ -1179,9 +1191,9 @@ class TableDashboard extends React.Component {
 	    	}
 	    	
 	    	// Bonus validation
-	    	if (bonusNbr && bonusNbr >= 0) {
-	    		if (bonusNbr.toString().length  != 5) {
-	    			errors["bonusNbr"] = "Número Bonus debe tener 5 digitos";
+	    	if (bonusNumber && bonusNumber >= 0) {
+	    		if (!self._validateBonusNumber(bonusNumber)) {
+	    			errors["bonusNumber"] = "Número Bonus debe tener 19 dígitos";
 	    			formIsValid = false;
 	    		}
 		    }
@@ -1476,7 +1488,7 @@ class TableDashboard extends React.Component {
 			          <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">Bonus</label><br></br>  
-		            	  	<input name="bonusNbr" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onBlur={this.onTabPress.bind(this)} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNbr} onChange={this.bonusNbrChange}/>
+		            	  	<input name="bonusNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNumber} onChange={this.bonusNumberChange}/>
 		                  </div>
 		              </div>
 		              <div className="col-md-2">
@@ -2039,7 +2051,7 @@ class TableDashboard extends React.Component {
 	          <Modal.Body>
 			      {this.state.showError && 
 				        <div className="alert alert-danger">
-			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.bonusNbr + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.bonusNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
 				      	</div>
 			      }
 	

@@ -89,7 +89,7 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].totalIGV,
 						invoicesSummaryData[i].total,
 						invoicesSummaryData[i].invoiceHash,
-						invoicesSummaryData[i].bonusNbr,
+						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
 						"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Edit</a>",
 						'<a class="delete" href="">Delete</a>'
@@ -397,7 +397,7 @@ class InvoicesTbl extends React.Component {
 		var table = this.$el;
 		var oTable = table.dataTable({
 			data: this.props.data,
-			pageLength: 5,
+			pageLength: 20,
 			scrollY: 300,
 			deferRender: true,
 			scroller: true,
@@ -649,7 +649,7 @@ class InvoicesConcarTbl extends React.Component {
 		this.$el = $(this.el);
 		var table = this.$el.DataTable({
 			data: this.props.data,
-			pageLength: 5,
+			pageLength: 20,
 			scrollY: 300,
 			deferRender: true,
 			scroller: true,

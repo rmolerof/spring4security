@@ -51,7 +51,7 @@ public class InvoiceVo {
 	private Date dateOfInvoiceModified = new Date(0L);
 	private Double igvModified = 0D;
 	private Double totalModified = 0D;
-	private String bonusNbr = "";
+	private String bonusNumber = "";
 	private String sunatStatus = "";
 	private boolean sunatValidated = false;
 	
@@ -96,7 +96,7 @@ public class InvoiceVo {
 		this.dateOfInvoiceModified = new Date(invoiceDao.getDateOfInvoiceModified().getTime());
 		this.igvModified = new Double(invoiceDao.getIgvModified());
 		this.totalModified = new Double(invoiceDao.getTotalModified());
-		this.bonusNbr = new String(invoiceDao.getBonusNbr());
+		this.bonusNumber = new String(invoiceDao.getBonusNumber());
 		this.sunatStatus = new String(invoiceDao.getSunatStatus());
 		this.sunatValidated = new Boolean(invoiceDao.isSunatValidated());
 	}
@@ -364,12 +364,12 @@ public class InvoiceVo {
 		this.totalModified = totalModified;
 	}
 
-	public String getBonusNbr() {
-		return bonusNbr;
+	public String getBonusNumber() {
+		return bonusNumber;
 	}
 
-	public void setBonusNbr(String bonusNbr) {
-		this.bonusNbr = bonusNbr;
+	public void setBonusNumber(String bonusNumber) {
+		this.bonusNumber = bonusNumber;
 	}
 
 	public String getSunatStatus() {

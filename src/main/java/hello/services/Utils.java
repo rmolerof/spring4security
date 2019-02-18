@@ -325,6 +325,41 @@ public class Utils {
 		
 	}
 	
+	public String saveBonusNumber(InvoiceVo invoiceVo) {
+		
+		if (!invoiceVo.getClientDocNumber().equals("0")) {
+			if (invoiceVo.getClientDocType().equals("1")) {
+				
+				// search DNI in DB
+				DNIDao dniDao = dnisRepository.findFirstByDni(invoiceVo.getClientDocNumber());
+				
+				// if not Found, search in Sunat
+				if (null == dniDao) {
+					return "0";
+				}
+				
+				dniDao.setBonusNumber(invoiceVo.getBonusNumber());
+				dnisRepository.save(dniDao);
+				return "1";
+			} else {
+	
+				RUCDao rucDao = rucsRepository.findFirstByRuc(invoiceVo.getClientDocNumber());
+				
+				// if not Found, search in Sunat
+				if (null == rucDao) {
+					return "0";
+				}
+				
+				rucDao.setBonusNumber(invoiceVo.getBonusNumber());
+				rucsRepository.save(rucDao);
+				return "1";
+			}
+		}
+		
+		return "0";
+		
+	}
+	
 	public void deletePath(String path) {
 		// Delete files in xmlsSunat folder
 		File f = new File(path);
