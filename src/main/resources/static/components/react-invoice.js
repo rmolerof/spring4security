@@ -1425,48 +1425,23 @@ class TableDashboard extends React.Component {
 	      
 	      
 	      <div className="row">
-          	<div className="col-md-2">
-          		<h1 className="page-title col-xs-10 col-md-12 uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.selectedOption} ELECTRÓNICA</h1>
-          	</div>
-          	
-	      	{this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><h1 className="page-title uppercase bold margin-bottom-10" style={{fontSize: "20px"}}> {this.state.invoiceNumber}</h1></div>}
-      		{!this.state.invoiceNumberEditorDisabled && <div className="col-md-2"><input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
-      		
-      		{!this.state.invoiceNumberEditorButtonDisabled && <div className="fa-item col-md-1">
-      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
-            </div>}
+      		<div className="form-inline" style={{marginLeft: '15px'}}>
+	            <div className="form-group" style={{marginRight: "7px"}}>
+	                <h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.selectedOption} ELECTRÓNICA</h1>
+	            </div>
+	            <div className="form-group" style={{marginRight: "7px"}}>
+	                {this.state.invoiceNumberEditorDisabled && <div><h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.invoiceNumber}</h1></div>}
+		      		{!this.state.invoiceNumberEditorDisabled && <div><input type="text" className="form-control" style={{borderColor: '#26344b', width: "130px", marginBottom: "-1px", height: 25}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
+	      		</div>
+	      		<div className="form-group">
+	            	{!this.state.invoiceNumberEditorButtonDisabled && 
+		      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i></a>
+		            }
+	      		</div>
+	        </div>
           </div>
 	      
-	      <div className="invoice margin-bottom-20">
-	          {/*<div className="row invoice-logo">
-	          	  {<div className="col-md-4 invoice-logo-space hidden-xs">
-	          	   <img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" alt="" /> 
-	          	  </div>}
-	          	  {<div className="col-xs-6 col-md-4 invoice-logo-space">
-			          <ul className="list-unstyled">
-		                  <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
-		                  <li> Av. Miguel Grau Mza B Lote 1-2 </li>
-		                  <li> Lima - Lima - Ate </li>
-		                  <li> +51 356 0345 </li>
-		              </ul>
-		          </div>}
-	              <div className="col-xs-6 col-md-4">
-	                  <p> <strong className="uppercase ">{this.state.selectedOption} ELECTRÓNICA</strong> <br/>
-	                      <span className="muted"> RUC: 20501568776  </span><br/>
-	                      <span className="muted bold"> {this.state.invoiceNumber}  </span>
-	                  </p>
-	              </div>
-	          </div>*/}
-	          {/*<div className="row">
-	              <div className="col-md-12">
-	                  <ul className="list-unstyled">
-	                      <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
-	                      <li> Av. Miguel Grau Mza B Lote 1-2 </li>
-	                      <li> Lima - Lima - Ate </li>
-	                      <li> +51 356 0345 </li>
-	                  </ul>
-	              </div>
-              </div>*/}
+	      <div className="invoice margin-bottom-20 margin-top-10">
               <div className="portlet-body form">
         		
 	              <div className="row">
@@ -1493,10 +1468,10 @@ class TableDashboard extends React.Component {
 		              </div>
 		              <div className="col-md-2">
 			              <div className="form-group">
-		            	  	<label className="control-label">Regresar</label><br></br>  
+		            	  	<label className="control-label">Ir a</label><br></br>  
 		            	  	<div style={{textAlign: 'left'}}>
-				      		      <button className="btn green"> 
-				      		      	<a className='view' href='/invoice-table-page'>Tabla Comprobantes</a>
+				      		      <button className="btn yellow"> 
+				      		      	<i className="fa fa-table"></i>&nbsp;<a className='view' href='/invoice-table-page' style={{color:'	#FFFFFF'}}>Tabla Comprobantes</a>
 				      		      </button>
 				      	      </div>
 		                  </div>
@@ -1553,14 +1528,10 @@ class TableDashboard extends React.Component {
               	  <div className="row">
 		    	      <div className="col-md-2">
 			              <div className="form-group">
-			                  <label className="control-label">Fecha</label>
+			                  <label className="control-label">Fecha&nbsp;<a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a></label>
 			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
 			                  
 			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
-			            		
-			            	  <div className="fa-item col-md-1">
-			            			<a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i> Editar</a>
-			                  </div>
 			              </div>
 			          </div>
 	    	      	  <div className="col-md-2">
@@ -1740,12 +1711,12 @@ class TableDashboard extends React.Component {
 					                  </tr>
 					                  <tr>
 					                      <td>
-				                      		<strong>Tarjeta Crédito/Débito:</strong>
+				                      		<strong>Tarjeta Crédito/Débito <i className="fa fa-cc-visa"></i>:</strong>
 					                      </td>
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="Visa" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="VISA" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>
@@ -1758,12 +1729,12 @@ class TableDashboard extends React.Component {
 					                  </tr>
 					                  <tr>
 					                      <td>
-				                      		<strong>Efectivo Entregado:</strong>
+				                      		<strong>Efectivo Entregado <i className="fa fa-money"></i>:</strong>
 					                      </td>
 					                      <td>
 					                      	S/ 
 					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
+					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b', borderWidth: '2px'}} pattern="[0-9]*" className="form-control" placeholder="Efectivo" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
 					                  </tr>
 					                  <tr>
 					                      <td>

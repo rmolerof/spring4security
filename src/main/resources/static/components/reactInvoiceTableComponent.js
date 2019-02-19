@@ -91,8 +91,8 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
-						"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Edit</a>",
-						'<a class="delete" href="">Delete</a>'
+						"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>",
+						'<a class="delete" href="">Eliminar</a>'
 						];
 					
 					tableData[i] = row;
@@ -336,29 +336,22 @@ class InvoiceTableSummary extends React.Component {
 	          </div>
 	      </div>
 	      
-	      {/*<button id="sample_editable_1_new" className="btn green"> Nuevo Comprobante
-	          <i className="fa fa-plus"></i>
-	      </button>*/}
 	      <div style={{textAlign: 'right'}}>
-		      {/*<button type="submit" onClick={this.validatePendingInvoices.bind(this)} className="btn blue hidden-print margin-bottom-5">
-	        	<i className="fa fa-check"></i>Validar Comprobantes
-	          </button>&nbsp;*/}
-		      {/*<button className="btn blue hidden-print margin-bottom-5">
-	        	<a onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn green-meadow">{processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>
-	          </button>&nbsp;*/}
 		      {this.state.processingGif &&
                   <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
-		      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5" > {processingTypeButtonText}&nbsp;<i className="fa fa-check"></i></a>&nbsp;
+		      
+		      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5"> 
+		      	<i className="fa fa-forward"></i>&nbsp;{processingTypeButtonText}
+		      </a>&nbsp;
+		      
 		      <button type="submit" className="btn blue hidden-print margin-bottom-5">
-	          	<i className="fa fa-check"></i>Procesar Pendientes
+	          	<i className="fa fa-play"></i>&nbsp;Procesar Pendientes
 	          </button>&nbsp;
-	          <button className="btn green margin-bottom-5"> 
-		      	<a className='view' href='/invoice-page'>Nuevo Comprobante</a>&nbsp;<i className="fa fa-plus"></i>
+	          
+	          <button className="btn btn-default margin-bottom-5"> 
+	          	<i className="fa fa-pencil"></i>&nbsp;<a className='view' href='/invoice-page'>Nuevo Comprobante</a>
 		      </button>
 	      </div>
-	      {/*<div style={{textAlign: 'right'}}>
-		      
-	      </div>*/}
 	      
 	      {this.state && this.state.invoicesSummaryData &&
 	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>
@@ -398,7 +391,7 @@ class InvoicesTbl extends React.Component {
 		var oTable = table.dataTable({
 			data: this.props.data,
 			pageLength: 20,
-			scrollY: 300,
+			scrollY: 600,
 			deferRender: true,
 			scroller: true,
 			deferRender: true,
@@ -432,8 +425,8 @@ class InvoicesTbl extends React.Component {
 		            { title: "Nro hash" },
 		            { title: "Bonus" },
 		            { title: "Sunat Status" },
-		            { title: "Edit" },
-		            { title: "Cancel" }
+		            { title: "Editar" },
+		            { title: "Eliminar" }
 			]
 		});
 		
@@ -499,8 +492,8 @@ class InvoicesTbl extends React.Component {
             jqTds[16].innerHTML = '<input type="text" class="form-control input-small" value="' + aData[16] + '">';
             jqTds[17].innerHTML = '<input type="text" class="form-control input-small" value="' + aData[17] + '">';
             jqTds[18].innerHTML = '<input type="text" class="form-control input-small" value="' + aData[18] + '">';
-            jqTds[19].innerHTML = '<a class="edit" href="">Save</a>';
-            jqTds[20].innerHTML = '<a class="cancel" href="">Cancel</a>';
+            jqTds[19].innerHTML = '<a class="edit" href="">Guardar</a>';
+            jqTds[20].innerHTML = '<a class="cancel" href="">Cancelar</a>';
         }
 
         function saveRow(oTable, nRow) {
@@ -509,8 +502,8 @@ class InvoicesTbl extends React.Component {
             oTable.fnUpdate(jqInputs[1].value, nRow, 1, false);
             oTable.fnUpdate(jqInputs[2].value, nRow, 2, false);
             oTable.fnUpdate(jqInputs[3].value, nRow, 3, false);
-            oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, 4, false);
-            oTable.fnUpdate('<a class="delete" href="">Delete</a>', nRow, 5, false);
+            oTable.fnUpdate('<a class="edit" href="">Editar</a>', nRow, 4, false);
+            oTable.fnUpdate('<a class="delete" href="">Eliminar</a>', nRow, 5, false);
             oTable.fnDraw();
         }
 
@@ -520,7 +513,7 @@ class InvoicesTbl extends React.Component {
             oTable.fnUpdate(jqInputs[1].value, nRow, 1, false);
             oTable.fnUpdate(jqInputs[2].value, nRow, 2, false);
             oTable.fnUpdate(jqInputs[3].value, nRow, 3, false);
-            oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, 4, false);
+            oTable.fnUpdate('<a class="edit" href="">Editar</a>', nRow, 4, false);
             oTable.fnDraw();
         }
 		
@@ -650,7 +643,7 @@ class InvoicesConcarTbl extends React.Component {
 		var table = this.$el.DataTable({
 			data: this.props.data,
 			pageLength: 20,
-			scrollY: 300,
+			scrollY: 600,
 			deferRender: true,
 			scroller: true,
 			deferRender: true,
