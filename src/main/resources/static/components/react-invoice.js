@@ -1460,6 +1460,7 @@ class TableDashboard extends React.Component {
 		                      </div>
 		                  </div>
 	                  </div>
+	                  
 			          <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">Bonus</label><br></br>  
@@ -1474,6 +1475,14 @@ class TableDashboard extends React.Component {
 				      		      	<i className="fa fa-table"></i>&nbsp;<a className='view' href='/invoice-table-page' style={{color:'	#FFFFFF'}}>Tabla Comprobantes</a>
 				      		      </button>
 				      	      </div>
+		                  </div>
+		              </div>
+		              <div className="col-md-2">
+			              <div className="form-group">
+		            	  	<label className="control-label">Crear</label><br></br>  
+		            	  	<div style={{textAlign: 'left'}}>
+		            	  		<a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
+				      	    </div>
 		                  </div>
 		              </div>
 	              </div>
@@ -1750,8 +1759,8 @@ class TableDashboard extends React.Component {
 		          		  </div>
 			          </div>
 			          
-	                  {this.state.invoiceHash && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
-	                  {!this.state.invoiceHash && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.invoiceHash} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
+	                  {this.state.status && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {!this.state.status && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
 	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
@@ -1759,7 +1768,7 @@ class TableDashboard extends React.Component {
 	    	          	<i className="fa fa-envelope"></i> Email 
 	    	          </button>&nbsp;
 	    	          {/*<a type="submit" onClick={this.emailInvoice.bind(this)} disabled={!this.state.submitDisabled} className="btn green-meadow margin-bottom-5"><i className="fa fa-envelope"></i> Email</a>&nbsp;*/}
-	    	          <a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
+	    	          {/*<a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>*/}
 	    	          {this.state.emailingGif &&
     	                  <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 	              </div>
@@ -1980,12 +1989,13 @@ class TableDashboard extends React.Component {
 	                      <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Motivo: </strong> {this.state.motiveCdDescription} 
 	                      <br/> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
 	                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}
-	                      </div>
-	                      }
+	                      </div>}
+	                      {this.state.bonusNumber && <div><strong>Nro Bonus: </strong> {this.state.bonusNumber}</div>}
 	                  </address>
 	                  <address>
 	                      <strong>Consulte su documento en:</strong>
 	                      <a> www.grifoslajoya.com </a>
+	                      <strong>AUTORIZADO MEDIANTE RESOLUCIÓN DE INTENDENCIA - N° 034-005-0005294/SUNAT</strong>
 	                  </address>
 	          </div>
 	          
