@@ -976,7 +976,7 @@ class TableDashboard extends React.Component {
 				timeout: 500,
 				success: function(data) {
 					
-				  if (data.result == '1') {	
+				  /*if (data.result == '1') {	
 					  self.setState({ sunatErrorStr: data.msg });
 					  self.setState({ showSuccess: true });
 				  } else {
@@ -985,20 +985,20 @@ class TableDashboard extends React.Component {
 				  	  };
 				  	  self.setState({errors: errors}); 
 				  	  self._toggleError();
-				  }
+				  }*/
 				  
 				  self.setState({emailingGif: false});
 			
 				}, error: function(e){
 					
 					if (e.statusText == "timeout") {
-						self.setState({ sunatErrorStr: "Correo electrónico sera enviado en unos minutos" });
-						self.setState({ showSuccess: true });
+						//self.setState({ sunatErrorStr: "Correo electrónico sera enviado en unos minutos" });
+						//self.setState({ showSuccess: true });
 						self.setState({ emailingGif: false});
 						
-						setTimeout(function() {
+						/*setTimeout(function() {
 						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
-				        }.bind(this), 0); 
+				        }.bind(this), 0); */
 					} else {
 						console.log("ERROR: ", e);
 					}
@@ -2044,6 +2044,7 @@ class TableDashboard extends React.Component {
 		                </span>
 		                <input type="email" className="form-control" placeholder="Correo electrónico"  onKeyPress={this.onKeyPress} value={this.state.clientEmailAddress} onChange={this.clientEmailAddressChange}></input>
 			        </div>
+			        Correo electrónico sera enviado en unos minutos!
 	          </Modal.Body>
 	          
 	          <Modal.Footer>
@@ -2072,7 +2073,8 @@ class TableDashboard extends React.Component {
 	          </Modal.Body>
 	          
 	          <Modal.Footer>
-	          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleInvoiceSubmitResultModalClose.bind(this)}>OK</Button>
+	          	{this.state.showSuccess && <Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleInvoiceSubmitResultModalClose.bind(this)}>OK</Button>}
+	          	{this.state.showError &&  <Button bsStyle="primary" onClick={this.handleInvoiceSubmitResultModalHide.bind(this)}>OK</Button>}
 	          </Modal.Footer>
 	      </Modal>
 	      

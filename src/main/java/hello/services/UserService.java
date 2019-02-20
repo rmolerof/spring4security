@@ -60,6 +60,9 @@ public class UserService {
 	public static final String FACTURA = "01";
 	public static final String BOLETA = "03";
 	public static final String NOTADECREDITO = "07";
+	public static final String SUNAT_PENDING_STATUS = "PENDIENTE";
+	public static final String SUNAT_SENT_STATUS = "ENVIADO";
+	public static final String SUNAT_VOIDED_STATUS = "ANULADO";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -716,7 +719,7 @@ public class UserService {
 	
 	public List<InvoiceVo> findInvoice(String invoiceNbr) {
 
-		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr, SUNAT_PENDING_STATUS);
 		if (null != invoiceDao) {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 		
@@ -728,16 +731,25 @@ public class UserService {
 	
 	public String deleteInvoice(String invoiceNbr) {
 
-		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
-		invoicesRepository.delete(invoiceDao);
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr, SUNAT_PENDING_STATUS);
+		invoiceDao.setSunatStatus(SUNAT_VOIDED_STATUS);
+		InvoiceDao savedInvoiceDao = invoicesRepository.save(invoiceDao);
 		
-		invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		if (null != savedInvoiceDao) {
+			return "0";
+		} else {
+			return "1";
+		}
+		
+		/*invoicesRepository.delete(invoiceDao);
+		
+		invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr);
 		if (null != invoiceDao) {
 		
 			return "0";
 		} else {
 			return "1";
-		}
+		}*/
 	}
 	
 	public TanksVo getCurrentTanksVo() {

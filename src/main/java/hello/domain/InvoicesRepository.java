@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 public interface InvoicesRepository extends MongoRepository<InvoiceDao, Long>, InvoicesRepositoryCustom {
 	
-	InvoiceDao findFirstByInvoiceNumber(String invoiceNbr);
+	InvoiceDao findFirstByInvoiceNumberAndSunatStatus(String invoiceNbr, String sunatStatus);
 	
 	@Query("{sunatStatus: {$regex: ?0}}")
 	List<InvoiceDao> findAllPendingByRegex(String statusSunat, Sort sort);

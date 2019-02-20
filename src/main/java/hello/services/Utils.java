@@ -245,7 +245,7 @@ public class Utils {
 			try {
 				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
 				
-				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 				invoiceDao.setDate(new Date(invoiceDao.getDate().getTime() - TimeUnit.HOURS.toMillis(5)));
 				List<InvoiceDao> custList = Stream.of(invoiceDao).collect(Collectors.toList());
 				
@@ -268,7 +268,7 @@ public class Utils {
 	public String generateXMLFromDB(String invoiceNbr) {
 		
 		
-		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumber(invoiceNbr);
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 		
