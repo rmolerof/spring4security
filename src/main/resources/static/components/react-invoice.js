@@ -927,8 +927,16 @@ class TableDashboard extends React.Component {
 	  this.setState({ showEmailModal: false });
   }
   
-  handleResultModalCancel() {
+  handleInvoiceSubmitResultModalHide() {
+	  this.setState({ showError: false, showSuccess: false });  
+  }
+  
+  handleInvoiceSubmitResultModalClose() {
 	  this.setState({ showError: false, showSuccess: false });
+	  
+	  if (this.state.status) {
+		  $('#printInvoiceButton')[0].click();  
+	  }
   }
   
   handleEmailModalClose() {
@@ -1779,7 +1787,7 @@ class TableDashboard extends React.Component {
 		          		  </div>
 			          </div>
 			          
-	                  {this.state.status && <ReactToPrint trigger={() => <a type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {this.state.status && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
 	                  {!this.state.status && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
 	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
@@ -2044,7 +2052,7 @@ class TableDashboard extends React.Component {
 	          </Modal.Footer>
           </Modal>
           
-          <Modal show={this.state.showError || this.state.showSuccess} onHide={this.handleResultModalCancel.bind(this)}>
+          <Modal show={this.state.showError || this.state.showSuccess} onHide={this.handleInvoiceSubmitResultModalHide.bind(this)}>
 	          <Modal.Header closeButton>
 	            <Modal.Title>Status</Modal.Title>
 	          </Modal.Header>
@@ -2064,7 +2072,7 @@ class TableDashboard extends React.Component {
 	          </Modal.Body>
 	          
 	          <Modal.Footer>
-	          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleResultModalCancel.bind(this)}>OK</Button>
+	          	<Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleInvoiceSubmitResultModalClose.bind(this)}>OK</Button>
 	          </Modal.Footer>
 	      </Modal>
 	      

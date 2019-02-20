@@ -242,6 +242,10 @@ class InvoiceTableSummary extends React.Component {
   submitPendingInvoiceGroup = (evt) => {
 		evt.preventDefault();
 		
+		if (confirm("¿Está seguro de procesar comprobantes pendientes?") == false) {
+            return;
+        }
+		
 		var self = this;
 		self.setState({ showError: false, processingGif: true});
 		var sunatSubmitCriteria = {};
