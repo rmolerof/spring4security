@@ -32,6 +32,7 @@ class InvoiceTableSummary extends React.Component {
   
   _fetchInvoiceData(timeframe){
 			
+	  	var self = this;
 	  	var search = {};
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
@@ -71,7 +72,6 @@ class InvoiceTableSummary extends React.Component {
 					count++;
 					var row = [
 						count,
-						/*moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),*/
 						moment(invoicesSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY'),
 						moment(invoicesSummaryData[i].date).tz('America/Lima').format('hh:mm:ss A'),
 						invoiceType,
@@ -91,14 +91,14 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
-						"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>",
-						'<a class="delete" href="">Eliminar</a>'
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					
 					tableData[i] = row;
 				}
 				
-				this.setState({invoicesSummaryData: tableData});
+				self.setState({invoicesSummaryData: tableData});
 			},
 			error: function(e){
 
@@ -327,14 +327,14 @@ class InvoiceTableSummary extends React.Component {
 	      		<strong>Success!</strong> Los comprobantes fueron enviados con éxito. 
 	      	</div>
 	      }
-	      <div className="row">
+	      {/*<div className="row">
 	          <div className="col-md-4">
 	              <div className="form-group">
 	                  <label className="control-label">Hoy es</label>
 	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 	              </div>
 	          </div>
-	      </div>
+	      </div>*/}
 	      
 	      <div style={{textAlign: 'right'}}>
 		      {this.state.processingGif &&
@@ -426,7 +426,7 @@ class InvoicesTbl extends React.Component {
 		            { title: "Bonus" },
 		            { title: "Sunat Status" },
 		            { title: "Editar" },
-		            { title: "Eliminar" }
+		            { title: "Anular" }
 			]
 		});
 		
@@ -503,7 +503,7 @@ class InvoicesTbl extends React.Component {
             oTable.fnUpdate(jqInputs[2].value, nRow, 2, false);
             oTable.fnUpdate(jqInputs[3].value, nRow, 3, false);
             oTable.fnUpdate('<a class="edit" href="">Editar</a>', nRow, 4, false);
-            oTable.fnUpdate('<a class="delete" href="">Eliminar</a>', nRow, 5, false);
+            oTable.fnUpdate('<a class="delete" href="">Anular</a>', nRow, 5, false);
             oTable.fnDraw();
         }
 

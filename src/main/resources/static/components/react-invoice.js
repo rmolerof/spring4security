@@ -87,7 +87,13 @@ class TableDashboard extends React.Component {
     this.CONSTANTS = {
 	    FACTURA: '01',
 	    BOLETA: '03',
-	    NOTADECREDITO: '07'
+	    NOTADECREDITO: '07',
+	    DNI: '1',
+	    RUC: '6',
+	    BLANK_BOLETA_NUMBER: 'B001-XXXXXXXX',
+	    ZERO_BOLETA_NUMBER: 'B001-00000000',
+	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
+	    ZERO_FACTURA_NUMBER: 'F001-00000000'
     }
   }
   
@@ -362,10 +368,10 @@ class TableDashboard extends React.Component {
 	    
 	    if (this.state.invoiceTypeModifiedToggle) {
 	    	this.setState({ invoiceNumberModified: "F001-" + valueWithZeros });
-	    	this.setState({ invoiceNumber: "F001-XXXXXXXX" });
+	    	this.setState({ invoiceNumber: this.CONSTANTS.BLANK_FACTURA_NUMBER });
 	    } else {
 	    	this.setState({ invoiceNumberModified: "B001-" + valueWithZeros });
-	    	this.setState({ invoiceNumber: "B001-XXXXXXXX" });
+	    	this.setState({ invoiceNumber: this.CONSTANTS.BLANK_BOLETA_NUMBER });
 	    }
   }
   
@@ -397,9 +403,9 @@ class TableDashboard extends React.Component {
 	    	  clientNamePH: 'Nombre(s)',
 	      }
 	  	this.setState({docLabelObj: docLabelObj});
-		this.setState({clientDocType: '1'});
-		this.setState({invoiceType: '03'});
-		this.setState({invoiceNumber: 'B001-XXXXXXXX'});
+		this.setState({clientDocType:  this.CONSTANTS.DNI});
+		this.setState({invoiceType: this.CONSTANTS.BOLETA});
+		this.setState({invoiceNumber: this.CONSTANTS.BLANK_BOLETA_NUMBER});
 		this.setState({invoiceTypeModified: ''});
 		this.setState({invoiceNumberModified: ''});
 		this.setState({invoiceNumberModifiedDisp: ''});
@@ -416,9 +422,9 @@ class TableDashboard extends React.Component {
 	    	  clientNamePH: 'Nombre(s)',
 	      }
 	  	this.setState({docLabelObj: docLabelObj});
-		this.setState({clientDocType: '6'});
-		this.setState({invoiceType: '01'});
-		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
+		this.setState({clientDocType: this.CONSTANTS.RUC});
+		this.setState({invoiceType: this.CONSTANTS.FACTURA});
+		this.setState({invoiceNumber: this.CONSTANTS.BLANK_FACTURA_NUMBER});
 		this.setState({invoiceTypeModified: ''});
 		this.setState({invoiceNumberModified: ''});
 		this.setState({invoiceNumberModifiedDisp: ''});
@@ -435,10 +441,10 @@ class TableDashboard extends React.Component {
 	    	  clientNamePH: 'Nombre(s)',
 	      }
 	  	this.setState({docLabelObj: docLabelObj});
-		this.setState({clientDocType: '6'});
-		this.setState({invoiceType: '07'});
-		this.setState({invoiceNumber: 'F001-XXXXXXXX'});
-		this.setState({invoiceTypeModified: '01'});
+		this.setState({clientDocType: this.CONSTANTS.RUC});
+		this.setState({invoiceType: this.CONSTANTS.NOTADECREDITO});
+		this.setState({invoiceNumber: this.CONSTANTS.BLANK_FACTURA_NUMBER});
+		this.setState({invoiceTypeModified: this.CONSTANTS.FACTURA});
 		this.setState({invoiceNumberModified: ''});
 		this.setState({invoiceNumberModifiedDisp: ''});
 		this.setState({dateOfInvoiceModified: new Date()});
@@ -541,13 +547,13 @@ class TableDashboard extends React.Component {
 	this.setState({invoiceTypeModifiedToggle: !this.state.invoiceTypeModifiedToggle});
 	
 	if (!this.state.invoiceTypeModifiedToggle) {
-		this.setState({invoiceType: "07"});
-		this.setState({invoiceTypeModified: "01"});
-		this.setState({ invoiceNumber: "F001-XXXXXXXX" });
+		this.setState({invoiceType: this.CONSTANTS.NOTADECREDITO});
+		this.setState({invoiceTypeModified: this.CONSTANTS.FACTURA});
+		this.setState({ invoiceNumber: this.CONSTANTS.BLANK_FACTURA_NUMBER });
 	} else {
-		this.setState({invoiceType: "07"});
-		this.setState({invoiceTypeModified: "03"});
-		this.setState({ invoiceNumber: "B001-XXXXXXXX" });
+		this.setState({invoiceType: this.CONSTANTS.NOTADECREDITO});
+		this.setState({invoiceTypeModified: this.CONSTANTS.BOLETA});
+		this.setState({ invoiceNumber: this.CONSTANTS.BLANK_BOLETA_NUMBER });
 	}
   }
   
@@ -783,20 +789,40 @@ class TableDashboard extends React.Component {
 				  self.setState({invoiceNumberModifiedDisp: data.result[0].invoiceNumberModified.substring(5)});
 					
 				  // Select typo of invoice
-				  if (data.result[0].invoiceType == '01') {
+				  if (data.result[0].invoiceType == self.CONSTANTS.FACTURA) {
 					  self.setState({selectedOption: "factura", facturaDisabled: false, boletaDisabled: true, notaDeCreditoDisabled: true });
-				  } else if (data.result[0].invoiceType == '03') {
+				  } else if (data.result[0].invoiceType == self.CONSTANTS.BOLETA) {
 					  self.setState({selectedOption: "boleta", facturaDisabled: true, boletaDisabled: false, notaDeCreditoDisabled: true });
-				  } else if (data.result[0].invoiceType == '07')  {
+				  } else if (data.result[0].invoiceType == self.CONSTANTS.NOTADECREDITO)  {
 					  self.setState({selectedOption: "nota de credito", facturaDisabled: true, boletaDisabled: true, notaDeCreditoDisabled: false });
 				  }
+				  
+				  // Select wording based on client document type
+				  var docLabelObj = {};
+				  if (data.result[0].clientDocType == self.CONSTANTS.DNI) {
+					  docLabelObj = {
+				    	  clientDocType: 'DNI',
+				    	  clientDocTypePH: 'Ingrese DNI',
+				    	  clientName: 'Señor(es)',
+				    	  clientNamePH: 'Nombre(s)',
+				      }
+
+				  } else if (data.result[0].clientDocType == self.CONSTANTS.RUC) {
+					  docLabelObj = {
+				    	  clientDocType: 'RUC',
+				    	  clientDocTypePH: 'Ingrese RUC',
+				    	  clientName: 'Razón Social',
+				    	  clientNamePH: 'Nombre(s)',
+				      }
+				  }
+				  self.setState({docLabelObj: docLabelObj});
 
 				  // Select button behind radio button 
-				  var cssB = (data.result[0].invoiceType == '03') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  var cssB = (data.result[0].invoiceType == self.CONSTANTS.BOLETA) ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 				  self.setState({showBoletaRadioButton: cssB});
-				  var cssF = (data.result[0].invoiceType == '01') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  var cssF = (data.result[0].invoiceType == self.CONSTANTS.FACTURA) ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 				  self.setState({showFacturaRadioButton: cssF});
-				  var cssNV = (data.result[0].invoiceType == '07') ? "btn blue active btn-sm" : "btn btn-default btn-sm";
+				  var cssNV = (data.result[0].invoiceType == self.CONSTANTS.NOTADECREDITO) ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 				  self.setState({showNotaDeCreditoRadioButton: cssNV});
 				  
 			  } else {
@@ -985,22 +1011,16 @@ class TableDashboard extends React.Component {
 	  $('canvas').remove();
       $("img[alt$='Scan me!']").remove();
       
-      var invoiceNumberDisp = '';
-      if (this.state.invoiceNumberEditorDisabled) {
-    	  invoiceNumberDisp = 'B001-XXXXXXXX';
-      } else {
-    	  invoiceNumberDisp = 'B001-00000000';
-      }
-  
 	  this.setState({
 		  errors: {},
 		  showError: false,
 		  showSuccess: false,
-		  invoiceNumber: invoiceNumberDisp,
+		  invoiceNumber: this.CONSTANTS.BLANK_BOLETA_NUMBER,
+		  invoiceNumberEditorDisabled: true,
 		  // customer
 	      clientDocNumber: '',
 	      clientName: '',
-	      clientDocType: '1',
+	      clientDocType: this.CONSTANTS.DNI,
 	      clientAddress: '',
 	      clientEmailAddress: '',
 	      truckPlateNumber: '',
@@ -1009,7 +1029,7 @@ class TableDashboard extends React.Component {
 	      clientAddressDisabled: false,
 		  // invoice breakdown
 	      date: new Date(),
-	      invoiceType: '03',
+	      invoiceType: this.CONSTANTS.BOLETA,
 		  // Break-down
 	      galsD2: '',
 	      galsG90: '',
