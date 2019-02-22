@@ -1,6 +1,7 @@
 package hello.model;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
@@ -8,6 +9,7 @@ import hello.domain.InvoiceDao;
 
 public class InvoiceVo {
 	private ObjectId id;
+	private User user;
 	private String invoiceNumber;
 	// customer
 	private String clientDocNumber;
@@ -61,6 +63,7 @@ public class InvoiceVo {
 	
 	public InvoiceVo(InvoiceDao invoiceDao) {
 		this.id = invoiceDao.getId();
+		this.user = new User(null != invoiceDao.getUser() ? invoiceDao.getUser().getName(): "", null != invoiceDao.getUser() ? invoiceDao.getUser().getRoles(): new HashMap<String, Boolean>());
 		this.invoiceNumber = new String(invoiceDao.getInvoiceNumber());
 		this.clientDocNumber = new String(invoiceDao.getClientDocNumber());
 		this.clientName = new String(invoiceDao.getClientName());
@@ -386,6 +389,14 @@ public class InvoiceVo {
 
 	public void setSunatValidated(boolean sunatValidated) {
 		this.sunatValidated = sunatValidated;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

@@ -1,16 +1,21 @@
 package hello.model;
 
-import java.util.List;
+import java.util.Map;
 
 public class User {
 
     String name;
     String password;
     String email;
-    List<String> roles;
+    Map<String, Boolean> roles;
 
     public User() {
     	super();
+    }
+    
+    public User(String name, Map<String, Boolean> roles) {
+    	this.name = name;
+    	this.roles = roles;
     }
     
     public User(String name, String password, String email) {
@@ -43,13 +48,12 @@ public class User {
 		this.email = email;
 	}
 
-	public List<String> getRoles() {
+	public Map<String, Boolean> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(List<String> roles) {
+	public void setRoles(Map<String, Boolean> roles) {
 		this.roles = roles;
 	}
-    
     
 }

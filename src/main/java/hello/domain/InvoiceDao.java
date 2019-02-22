@@ -1,6 +1,7 @@
 package hello.domain;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import hello.model.InvoiceVo;
+import hello.model.User;
 
 @Document(collection = "invoices")
 public class InvoiceDao {
@@ -17,7 +19,7 @@ public class InvoiceDao {
 	
 	@Id 
 	private ObjectId id;
-
+	private User user;
 	private String invoiceNumber;
 	// customer
 	private String clientDocNumber;
@@ -80,6 +82,7 @@ public class InvoiceDao {
 		} else {
 			this.id = invoiceVo.getId().getTimestamp() > 0 ? invoiceVo.getId(): new ObjectId();
 		}
+		this.user = new User(null != invoiceVo.getUser() ? invoiceVo.getUser().getName(): "", null != invoiceVo.getUser() ? invoiceVo.getUser().getRoles(): new HashMap<String, Boolean>());
 		this.invoiceNumber = new String(invoiceVo.getInvoiceNumber());
 		this.clientDocNumber = new String(invoiceVo.getClientDocNumber());
 		this.clientName = new String(invoiceVo.getClientName());
@@ -118,42 +121,6 @@ public class InvoiceDao {
 		this.bonusNumber = new String(invoiceVo.getBonusNumber());
 		this.sunatStatus = new String(invoiceVo.getSunatStatus());
 		this.sunatValidated = new Boolean(invoiceVo.isSunatValidated());
-	}
-
-	public InvoiceDao(ObjectId id, String invoiceNumber, String clientDocNumber, String clientName,
-			String clientDocType, String clientAddress, String truckPlateNumber, Date date, String invoiceType,
-			Double galsD2, Double galsG90, Double galsG95, Double priceD2, Double priceG90, Double priceG95,
-			Double solesD2, Double solesG90, Double solesG95, Double total, Double subTotal, Double totalIGV,
-			String totalVerbiage, String invoiceHash, String saveOrUpdate, String sunatErrorStr, Double igvModified, Double totalModified, String bonusNumber) {
-		super();
-		this.id = id;
-		this.invoiceNumber = invoiceNumber;
-		this.clientDocNumber = clientDocNumber;
-		this.clientName = clientName;
-		this.clientDocType = clientDocType;
-		this.clientAddress = clientAddress;
-		this.truckPlateNumber = truckPlateNumber;
-		this.date = date;
-		this.invoiceType = invoiceType;
-		this.galsD2 = galsD2;
-		this.galsG90 = galsG90;
-		this.galsG95 = galsG95;
-		this.priceD2 = priceD2;
-		this.priceG90 = priceG90;
-		this.priceG95 = priceG95;
-		this.solesD2 = solesD2;
-		this.solesG90 = solesG90;
-		this.solesG95 = solesG95;
-		this.total = total;
-		this.subTotal = subTotal;
-		this.totalIGV = totalIGV;
-		this.totalVerbiage = totalVerbiage;
-		this.invoiceHash = invoiceHash;
-		this.saveOrUpdate = saveOrUpdate;
-		this.sunatErrorStr = sunatErrorStr;
-		this.igvModified = igvModified;
-		this.totalModified = totalModified;
-		this.bonusNumber = bonusNumber;
 	}
 
 	public ObjectId getId() {
@@ -474,6 +441,14 @@ public class InvoiceDao {
 
 	public void setSunatValidated(boolean sunatValidated) {
 		this.sunatValidated = sunatValidated;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

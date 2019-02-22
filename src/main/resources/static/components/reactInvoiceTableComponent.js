@@ -4,8 +4,10 @@ class InvoiceTableSummary extends React.Component {
     super();
     this.state = {
       errors: {},
-      currentUser: {
+      user: {
     	  name: '',
+    	  password: '',
+    	  email: '',
     	  roles: {
     		  ROLE_USER: false,
     		  ROLE_ADMIN: false
@@ -98,8 +100,9 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.currentUser.roles.ROLE_ADMIN ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.currentUser.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
+						invoicesSummaryData[i].user.name,
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					
 					tableData[i] = row;
@@ -206,30 +209,18 @@ class InvoiceTableSummary extends React.Component {
 		});
   }
   
-  _getCurrentUser() {
+  _getUser() {
 
 	  var self = this;
 	  jQuery.ajax({
 			type: "GET",
 			contentType: "application/json", 
-			url:"/getCurrentUser",
+			url:"/getUser",
 			datatype: 'json',
 			cache: false,
 			timeout: 600000,
-			success: (data) => {
-				
-				var currentUser = self.state.currentUser;
-				currentUser.name = data.name;
-				
-				for (var i = 0; i < data.roles.length; i++) {
-					if (data.roles[i] == "ROLE_USER") {
-						currentUser.roles.ROLE_USER = true;
-					} else if (data.roles[i] == "ROLE_ADMIN"){
-						currentUser.roles.ROLE_ADMIN = true;
-					}
-				}
-				
-				self.setState({currentUser: currentUser});
+			success: (data) => {						
+				self.setState({user: data});
 			},
 			error: function(e){
 
@@ -238,7 +229,7 @@ class InvoiceTableSummary extends React.Component {
   }
   
   componentWillMount(){
-	  this._getCurrentUser();
+	  this._getUser();
 	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-31"});
 	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-31"});
   }
@@ -379,7 +370,7 @@ class InvoiceTableSummary extends React.Component {
 	          </div>
 	      </div>*/}
 	      
-	      {this.state.currentUser.roles.ROLE_ADMIN && <div style={{textAlign: 'right'}}>
+	      {this.state.user.roles.ROLE_ADMIN && <div style={{textAlign: 'right'}}>
 		      {this.state.processingGif &&
                   <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 		      
@@ -468,6 +459,7 @@ class InvoicesTbl extends React.Component {
 		            { title: "Nro hash" },
 		            { title: "Bonus" },
 		            { title: "Sunat Status" },
+		            { title: "Usuario" },
 		            { title: "Editar" },
 		            { title: "Anular" }
 			]

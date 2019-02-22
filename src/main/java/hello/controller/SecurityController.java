@@ -1,18 +1,19 @@
 package hello.controller;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import hello.model.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import hello.model.User;
 
 @Controller
 public class SecurityController {
@@ -23,7 +24,7 @@ public class SecurityController {
         return principal.getName();
     }
     
-    @RequestMapping(value = "/getCurrentUser", method = RequestMethod.GET)
+    @RequestMapping(value = "/getUser", method = RequestMethod.GET)
     @ResponseBody
     public User getCurrentUser(Principal principal) {
         
@@ -31,12 +32,10 @@ public class SecurityController {
     	currentUser.setName(principal.getName());
     	
     	Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-    	List<String> roles = new ArrayList<String>();
     	
-    	authorities.stream().map(authority -> {
-    		roles.add(authority.getAuthority());
-    		return roles;
-    	}).collect(Collectors.toList());
+    	Map<String, Boolean> roles = authorities.stream().map(authority -> 
+    		new AbstractMap.SimpleEntry<>(authority.getAuthority(), Boolean.TRUE)
+    	).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     	
     	currentUser.setRoles(roles);
     	
