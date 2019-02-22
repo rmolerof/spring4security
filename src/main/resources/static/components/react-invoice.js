@@ -7,6 +7,13 @@ class TableDashboard extends React.Component {
     this.state = {
       errors: {},
       id: '',
+      currentUser: {
+    	  name: '',
+    	  roles: {
+    		  ROLE_USER: false,
+    		  ROLE_ADMIN: false
+    	  }
+      },
 	  showError: false,
 	  showSuccess: false,
 	  showEmailModal: false, 
@@ -502,9 +509,43 @@ class TableDashboard extends React.Component {
                  if(pair[0] == variable){return pair[1];}
          }
          return(false);
-  } 
+  }
+  
+  _getCurrentUser() {
+
+	  var self = this;
+	  jQuery.ajax({
+			type: "GET",
+			contentType: "application/json", 
+			url:"/getCurrentUser",
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				
+				var currentUser = self.state.currentUser;
+				currentUser.name = data.name;
+				
+				for (var i = 0; i < data.roles.length; i++) {
+					if (data.roles[i] == "ROLE_USER") {
+						currentUser.roles.ROLE_USER = true;
+					} else if (data.roles[i] == "ROLE_ADMIN"){
+						currentUser.roles.ROLE_ADMIN = true;
+					}
+				}
+				
+				self.setState({currentUser: currentUser});
+			},
+			error: function(e){
+
+			}	
+		});
+  }
   
   componentWillMount(){
+	  // Get current User
+	  this._getCurrentUser();
+	  
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
@@ -1462,7 +1503,7 @@ class TableDashboard extends React.Component {
 		      		{!this.state.invoiceNumberEditorDisabled && <div><input type="text" className="form-control" style={{borderColor: '#26344b', width: "130px", marginBottom: "-1px", height: 25}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
 	      		</div>
 	      		<div className="form-group">
-	            	{!this.state.invoiceNumberEditorButtonDisabled && 
+	            	{!this.state.invoiceNumberEditorButtonDisabled && this.state.currentUser.roles.ROLE_ADMIN &&
 		      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i></a>
 		            }
 	      		</div>
@@ -1565,7 +1606,7 @@ class TableDashboard extends React.Component {
               	  <div className="row">
 		    	      <div className="col-md-2">
 			              <div className="form-group">
-			                  <label className="control-label">Fecha&nbsp;<a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a></label>
+			                  <label className="control-label">Fecha&nbsp; {this.state.currentUser.roles.ROLE_ADMIN && <a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a>}</label>
 			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
 			                  
 			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
@@ -2019,6 +2060,7 @@ class TableDashboard extends React.Component {
 	                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}
 	                      </div>}
 	                      {this.state.bonusNumber && <div><strong>Nro Bonus: </strong> {this.state.bonusNumber}</div>}
+	                      <strong>Atendido por:</strong> {this.state.currentUser.name} 
 	                  </address>
 	                  <address>
 	                      <strong>Consulte su documento en:</strong>

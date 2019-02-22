@@ -4,6 +4,13 @@ class InvoiceTableSummary extends React.Component {
     super();
     this.state = {
       errors: {},
+      currentUser: {
+    	  name: '',
+    	  roles: {
+    		  ROLE_USER: false,
+    		  ROLE_ADMIN: false
+    	  }
+      },
 	  showError: false,
 	  showSuccess: false,
 	  processingGif: false,
@@ -91,8 +98,8 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ? '<a class="delete" href="">Anular</a>': "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.currentUser.roles.ROLE_ADMIN ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.currentUser.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					
 					tableData[i] = row;
@@ -197,9 +204,41 @@ class InvoiceTableSummary extends React.Component {
 
 			}	
 		});
-}
+  }
+  
+  _getCurrentUser() {
+
+	  var self = this;
+	  jQuery.ajax({
+			type: "GET",
+			contentType: "application/json", 
+			url:"/getCurrentUser",
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (data) => {
+				
+				var currentUser = self.state.currentUser;
+				currentUser.name = data.name;
+				
+				for (var i = 0; i < data.roles.length; i++) {
+					if (data.roles[i] == "ROLE_USER") {
+						currentUser.roles.ROLE_USER = true;
+					} else if (data.roles[i] == "ROLE_ADMIN"){
+						currentUser.roles.ROLE_ADMIN = true;
+					}
+				}
+				
+				self.setState({currentUser: currentUser});
+			},
+			error: function(e){
+
+			}	
+		});
+  }
   
   componentWillMount(){
+	  this._getCurrentUser();
 	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-31"});
 	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-31"});
   }
@@ -340,7 +379,7 @@ class InvoiceTableSummary extends React.Component {
 	          </div>
 	      </div>*/}
 	      
-	      <div style={{textAlign: 'right'}}>
+	      {this.state.currentUser.roles.ROLE_ADMIN && <div style={{textAlign: 'right'}}>
 		      {this.state.processingGif &&
                   <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 		      
@@ -355,7 +394,7 @@ class InvoiceTableSummary extends React.Component {
 	          <button className="btn btn-default margin-bottom-5"> 
 	          	<i className="fa fa-pencil"></i>&nbsp;<a className='view' href='/invoice-page'>Nuevo Comprobante</a>
 		      </button>
-	      </div>
+	      </div>}
 	      
 	      {this.state && this.state.invoicesSummaryData &&
 	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>

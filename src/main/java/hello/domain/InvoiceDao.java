@@ -12,7 +12,8 @@ import hello.model.InvoiceVo;
 @Document(collection = "invoices")
 public class InvoiceDao {
 	
-	public static InvoiceDao NOT_FOUND = new InvoiceDao("0000-00000000", "CUSTOMER NOT FOUND");
+	public static final String INVOICE_NOT_FOUND_NAME = "CUSTOMER NOT FOUND";
+	public static final InvoiceDao NOT_FOUND = new InvoiceDao("0000-00000000", INVOICE_NOT_FOUND_NAME);
 	
 	@Id 
 	private ObjectId id;

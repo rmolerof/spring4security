@@ -40,7 +40,7 @@ import hello.services.UserService;
 import hello.services.Utils;
 
 @RestController
-public class SearchController {
+public class ServiceController {
 
 	UserService userService;
 	@Autowired

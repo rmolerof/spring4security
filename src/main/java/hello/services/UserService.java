@@ -99,7 +99,7 @@ public class UserService {
 			return new ArrayList<User>(Arrays.asList(new User(authentication.getName(), "*********", authentication.getAuthorities().toString())));
 		} else {
 			List<User> result = users.stream().
-					filter(x -> x.getUsername().equalsIgnoreCase(username)).
+					filter(x -> x.getName().equalsIgnoreCase(username)).
 					collect(Collectors.toList());
 			return result;
 		}
@@ -676,7 +676,14 @@ public class UserService {
 				}*/
 				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
-				invoicesRepository.save(invoiceDao);
+				// Find out any existing invoice with the same invoice number
+				InvoiceDao existingInvoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceDao.getInvoiceNumber());
+				
+				if (existingInvoiceDao.getClientName().equals(InvoiceDao.INVOICE_NOT_FOUND_NAME)) {
+					invoicesRepository.save(invoiceDao);
+				} else {
+					throw new Exception("Comprobante Nro " + invoiceDao.getInvoiceNumber() + " ya existe.");
+				}
 
 				invoiceVo.setStatus("1");
 				invoiceVo.setSunatErrorStr("1");
@@ -719,7 +726,7 @@ public class UserService {
 	
 	public List<InvoiceVo> findInvoice(String invoiceNbr) {
 
-		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr, SUNAT_PENDING_STATUS);
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		if (null != invoiceDao) {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 		
@@ -731,7 +738,7 @@ public class UserService {
 	
 	public String deleteInvoice(String invoiceNbr) {
 
-		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr, SUNAT_PENDING_STATUS);
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		invoiceDao.setSunatStatus(SUNAT_VOIDED_STATUS);
 		InvoiceDao savedInvoiceDao = invoicesRepository.save(invoiceDao);
 		
