@@ -36,6 +36,8 @@
 	<field name="totalIGV" class="java.lang.Double"/>
 	<field name="totalVerbiage" class="java.lang.String"/>
 	<field name="truckPlateNumber" class="java.lang.String"/>
+	<field name="bonusNumber" class="java.lang.String"/>
+	<field name="username" class="java.lang.String"/>
 	<title>
 		<band height="108">
 			<frame>
@@ -297,7 +299,7 @@ DNI	]]></text>
 				<textFieldExpression><![CDATA[String.format("%.2f", $F{total})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="267" y="197" width="100" height="18" uuid="7d4d271c-b15b-4de7-8e7e-1b4bc926be61"/>
+				<reportElement x="267" y="197" width="133" height="18" uuid="7d4d271c-b15b-4de7-8e7e-1b4bc926be61"/>
 				<text><![CDATA[Tarjeta de Crédito/Débito:]]></text>
 			</staticText>
 			<textField>
@@ -345,7 +347,7 @@ DNI	]]></text>
 				<text><![CDATA[Son:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="292" width="268" height="18" uuid="4dfbc155-bd13-4dd7-aacf-af46f3b584bc">
+				<reportElement x="180" y="292" width="268" height="18" uuid="4dfbc155-bd13-4dd7-aacf-af46f3b584bc">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{totalVerbiage}]]></textFieldExpression>
@@ -355,7 +357,7 @@ DNI	]]></text>
 				<text><![CDATA[Código Hash:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="310" width="268" height="20" uuid="5b518bf4-933c-42e1-ac93-c77b2b386a23">
+				<reportElement x="180" y="310" width="268" height="20" uuid="5b518bf4-933c-42e1-ac93-c77b2b386a23">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{invoiceHash}]]></textFieldExpression>
@@ -367,40 +369,40 @@ DNI	]]></text>
 				<text><![CDATA[Motivo:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="330" width="268" height="20" uuid="9bf74a78-bae5-43f8-a0f8-179e5e56a249">
+				<reportElement x="180" y="330" width="268" height="20" uuid="9bf74a78-bae5-43f8-a0f8-179e5e56a249">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{motiveCdDescription}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="350" width="100" height="30" uuid="d382954d-d3a3-4747-aa10-b2de11a5c68e">
+				<reportElement x="0" y="350" width="162" height="20" uuid="d382954d-d3a3-4747-aa10-b2de11a5c68e">
 					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
 				</reportElement>
 				<text><![CDATA[Nro Documento Referencia:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="350" width="268" height="20" uuid="9b8aafed-b53d-4743-8222-a46997f76459">
+				<reportElement x="180" y="350" width="268" height="20" uuid="9b8aafed-b53d-4743-8222-a46997f76459">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{invoiceNumberModified}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="380" width="100" height="30" uuid="8efc07e2-69b6-49fd-b3ef-047b809389c9">
+				<reportElement x="0" y="370" width="162" height="20" uuid="8efc07e2-69b6-49fd-b3ef-047b809389c9">
 					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
 				</reportElement>
 				<text><![CDATA[Fecha Documento Referencia:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="380" width="268" height="30" uuid="6a8c80fa-a734-4a7a-a104-b3d46accd74d">
+				<reportElement x="180" y="370" width="268" height="30" uuid="6a8c80fa-a734-4a7a-a104-b3d46accd74d">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 					<printWhenExpression><![CDATA[$F{invoiceType}.equals( "07") ? new Boolean(true): new Boolean(false)]]></printWhenExpression>
 				</reportElement>
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{dateOfInvoiceModified})]]></textFieldExpression>
 			</textField>
 			<componentElement>
-				<reportElement x="62" y="416" width="150" height="100" uuid="22fdb3ee-1d6b-4bfb-aeaa-1aa5ab19396f"/>
+				<reportElement x="62" y="426" width="150" height="100" uuid="22fdb3ee-1d6b-4bfb-aeaa-1aa5ab19396f"/>
 				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<jr:codeExpression><![CDATA["20501568776" + "|" + $F{invoiceType} + "|" + $F{invoiceNumber}.substring(0, 4) + "|" + $F{invoiceNumber}.substring(5, 13) + "|" + $F{totalIGV} + "|" + $F{total} + "|" + new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{date}) + "|" + $F{clientDocType} + "|" + $F{clientDocNumber}]]></jr:codeExpression>
 				</jr:QRCode>
@@ -429,7 +431,7 @@ DNI	]]></text>
 				<reportElement x="0" y="0" width="555" height="29" backcolor="#EDEBEB" uuid="26220612-c47a-4d07-8441-edf91b67fb17"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="0" y="416" width="100" height="30" uuid="26356e61-cb79-4ac5-b3e7-59fd27fa69d7"/>
+				<reportElement x="0" y="427" width="100" height="30" uuid="26356e61-cb79-4ac5-b3e7-59fd27fa69d7"/>
 				<text><![CDATA[Código QR:]]></text>
 			</staticText>
 			<staticText>
@@ -455,7 +457,7 @@ DNI	]]></text>
 				<text><![CDATA[Producto]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-1" y="520" width="268" height="30" uuid="98714b11-1c9d-407f-bde8-9dc48ffd56df"/>
+				<reportElement x="-1" y="524" width="268" height="30" uuid="98714b11-1c9d-407f-bde8-9dc48ffd56df"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
@@ -493,6 +495,29 @@ DNI	]]></text>
 				<reportElement x="431" y="251" width="19" height="18" uuid="10a88cc3-1315-4a2e-99ca-1fbae8cd7d0f"/>
 				<text><![CDATA[S/]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="0" y="390" width="100" height="14" uuid="35ef67a3-ef29-46b6-8964-04719108ea2b">
+					<printWhenExpression><![CDATA[$F{bonusNumber}.equals( "") ? new Boolean(false): new Boolean(true)]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Númbero  Bonus:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="407" width="100" height="14" uuid="aceeaa51-7913-47fb-a727-6c3e3dfa0c66"/>
+				<text><![CDATA[Atendido por:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="180" y="391" width="268" height="20" uuid="d48c021a-8bd9-4327-9f74-96ec6700f60a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+					<printWhenExpression><![CDATA[$F{bonusNumber}.equals( "") ? new Boolean(false): new Boolean(true)]]></printWhenExpression>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{bonusNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="408" width="268" height="18" uuid="b7df5d96-73cd-42f2-8da0-e17d8b7e22b5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{username}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

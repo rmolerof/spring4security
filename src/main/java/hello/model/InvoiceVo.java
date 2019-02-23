@@ -16,6 +16,7 @@ public class InvoiceVo {
 	private String clientName;
 	private String clientDocType;
 	private String clientAddress;
+	private String clientEmailAddress;
 	private String truckPlateNumber;
 	// invoice breakdown
 	private Date date;
@@ -102,6 +103,7 @@ public class InvoiceVo {
 		this.bonusNumber = new String(invoiceDao.getBonusNumber());
 		this.sunatStatus = new String(invoiceDao.getSunatStatus());
 		this.sunatValidated = new Boolean(invoiceDao.isSunatValidated());
+		this.clientEmailAddress = new String(null != invoiceDao.getClientEmailAddress() ? invoiceDao.getClientEmailAddress(): "");
 	}
 	
 	public static double roundTwo(double amt) {
@@ -397,6 +399,14 @@ public class InvoiceVo {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public String getClientEmailAddress() {
+		return clientEmailAddress;
+	}
+
+	public void setClientEmailAddress(String clientEmailAddress) {
+		this.clientEmailAddress = clientEmailAddress;
 	}
 
 }

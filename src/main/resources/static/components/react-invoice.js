@@ -808,7 +808,8 @@ class TableDashboard extends React.Component {
 					  clientNameDisabled: false,
 					  clientAddressDisabled: false,
 					  saveOrUpdate: 'update',
-					  invoiceHash: data.result[0].invoiceHash
+					  invoiceHash: data.result[0].invoiceHash,
+					  clientEmailAddress: data.result[0].clientEmailAddress
 				  });
 				  
 				  // Display No of modified invoice
@@ -929,7 +930,8 @@ class TableDashboard extends React.Component {
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
 					  sunatStatus: 'PENDIENTE',
-					  sunatValidated: false
+					  sunatValidated: false,
+					  clientEmailAddress: data.result[0].clientEmailAddress
 				  });
 				  
 			  } else {
@@ -1155,7 +1157,8 @@ class TableDashboard extends React.Component {
 			invoiceNumber, 
 			invoiceType, 
 			clientDocType, 
-			clientAddress, 
+			clientAddress,
+			clientEmailAddress,
 			clientDocNumber, 
 			clientName, 
 			truckPlateNumber, 
@@ -1194,6 +1197,7 @@ class TableDashboard extends React.Component {
 		    clientName: clientName,
 		    clientDocType: clientDocType, // RUC
 		    clientAddress: clientAddress,
+		    clientEmailAddress: clientEmailAddress,
 		    truckPlateNumber: truckPlateNumber,
 		    date: date,
 	    	invoiceType: invoiceType, // factura

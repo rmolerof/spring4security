@@ -104,6 +104,13 @@ function fire_ajax_submit() {
 	            $('.motiveCdDescription').html(data.result[0].motiveCdDescription);
 	            $('.invoiceNumberModified').html(data.result[0].invoiceNumberModified);
 	            $('.dateOfInvoiceModified').html(moment(data.result[0].dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A'));
+	            $('.bonusNumber').html(data.result[0].bonusNumber);
+	            if (data.result[0].bonusNumber) {
+	            	$('.toggleBonusNumber').show();
+	            } else {
+	            	$('.toggleBonusNumber').hide();
+	            }
+	            $('.userName').html(data.result[0].user.name);
 	            
 	            var qrcode1 = new QRCode("qrcode1");
 				qrcode1.clear();
@@ -118,8 +125,6 @@ function fire_ajax_submit() {
 						data.result[0].clientDocNumber
 				);
 	            
-	            console.log("SUCCESS : ", data);
-            
 			} else {
 				$('#errorAlert').parent().parent().show();
 				$('#errorAlert').html("Recibo no encontrado. Intente otra vez");

@@ -20,12 +20,14 @@ public class InvoiceDao {
 	@Id 
 	private ObjectId id;
 	private User user;
+	private String username;
 	private String invoiceNumber;
 	// customer
 	private String clientDocNumber;
 	private String clientName;
 	private String clientDocType;
 	private String clientAddress;
+	private String clientEmailAddress;
 	private String truckPlateNumber;
 	// invoice breakdown
 	@Indexed(unique = true)
@@ -121,6 +123,7 @@ public class InvoiceDao {
 		this.bonusNumber = new String(invoiceVo.getBonusNumber());
 		this.sunatStatus = new String(invoiceVo.getSunatStatus());
 		this.sunatValidated = new Boolean(invoiceVo.isSunatValidated());
+		this.clientEmailAddress = new String(null != invoiceVo.getClientEmailAddress() ? invoiceVo.getClientEmailAddress(): "");
 	}
 
 	public ObjectId getId() {
@@ -129,6 +132,14 @@ public class InvoiceDao {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+	
+	public String getUsername() {
+		return user.getName();
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getInvoiceNumber() {
@@ -449,6 +460,14 @@ public class InvoiceDao {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public String getClientEmailAddress() {
+		return clientEmailAddress;
+	}
+
+	public void setClientEmailAddress(String clientEmailAddress) {
+		this.clientEmailAddress = clientEmailAddress;
 	}
 
 }
