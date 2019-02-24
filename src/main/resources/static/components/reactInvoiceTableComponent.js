@@ -382,9 +382,9 @@ class InvoiceTableSummary extends React.Component {
 	          	<i className="fa fa-play"></i>&nbsp;Procesar Pendientes
 	          </button>&nbsp;
 	          
-	          <button className="btn btn-default margin-bottom-5"> 
-	          	<i className="fa fa-pencil"></i>&nbsp;<a className='view' href='/invoice-page'>Nuevo Comprobante</a>
-		      </button>
+		      <a href="/invoice-page" className="btn btn-default margin-bottom-5">
+		          <i className="fa fa-pencil"></i>&nbsp;Nuevo Comprobante
+			  </a>
 	      </div>}
 	      
 	      {this.state && this.state.invoicesSummaryData &&

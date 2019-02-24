@@ -37,11 +37,17 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	public InvoiceDao findLastSentInvoice(String invoiceType) {
 		
 		Query query = null;
+		Criteria invoiceTypeCriteria = null;
+		Criteria notaDeCreditoOfInvoiceTypeCriteria = null;
 		
 		if (invoiceType.equals(UserService.BOLETA)) {
-			query = new Query(Criteria.where("sunatStatus").is("ENVIADO").and("invoiceType").is(invoiceType));
+			invoiceTypeCriteria = Criteria.where("sunatStatus").is(UserService.SUNAT_SENT_STATUS).and("invoiceType").is(UserService.BOLETA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(UserService.SUNAT_SENT_STATUS).and("invoiceTypeModified").is(UserService.BOLETA);
+			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		} else {
-			query = new Query(Criteria.where("sunatStatus").is("ENVIADO").and("invoiceType").ne(UserService.BOLETA));
+			invoiceTypeCriteria = Criteria.where("sunatStatus").is(UserService.SUNAT_SENT_STATUS).and("invoiceType").is(UserService.FACTURA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(UserService.SUNAT_SENT_STATUS).and("invoiceTypeModified").is(UserService.FACTURA);
+			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		}
 		
 		query.limit(1);

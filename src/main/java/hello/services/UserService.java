@@ -561,7 +561,7 @@ public class UserService {
 			
 			for (InvoiceDao invoiceDao: invoiceDaos) {
 				
-				if (invoiceDao.getInvoiceType().equals(UserService.BOLETA)) {
+				if (invoiceDao.getInvoiceType().equals(UserService.BOLETA) || invoiceDao.getInvoiceTypeModified().equals(UserService.BOLETA)) {
 					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
 					
 					if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {

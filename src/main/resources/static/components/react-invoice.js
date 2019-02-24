@@ -581,10 +581,24 @@ class TableDashboard extends React.Component {
 		this.setState({invoiceType: this.CONSTANTS.NOTADECREDITO});
 		this.setState({invoiceTypeModified: this.CONSTANTS.FACTURA});
 		this.setState({ invoiceNumber: this.CONSTANTS.BLANK_FACTURA_NUMBER });
+		var docLabelObj = {
+		    	  clientDocType: 'RUC',
+		    	  clientDocTypePH: 'Ingrese Doc',
+		    	  clientName: 'Señor(es)',
+		    	  clientNamePH: 'Nombre(s)',
+        }
+		this.setState({docLabelObj: docLabelObj});
 	} else {
 		this.setState({invoiceType: this.CONSTANTS.NOTADECREDITO});
 		this.setState({invoiceTypeModified: this.CONSTANTS.BOLETA});
 		this.setState({ invoiceNumber: this.CONSTANTS.BLANK_BOLETA_NUMBER });
+		var docLabelObj = {
+		    	  clientDocType: 'DNI',
+		    	  clientDocTypePH: 'Ingrese DNI',
+		    	  clientName: 'Señor(es)',
+		    	  clientNamePH: 'Nombre(s)',
+	    }
+	  	this.setState({docLabelObj: docLabelObj});
 	}
   }
   
@@ -599,18 +613,26 @@ class TableDashboard extends React.Component {
 	  this.setState({motiveCdDescription: event.nativeEvent.target[index].text.toUpperCase()});
   }
   
+  searchButton(event) {
+	  this.onTabPress(event);
+  }
+  
   onTabPress(event) {
 	
 	this.setState({ showError: false});
 	
 	var self = this; 
 	var search = {};
-	search["docId"] = event.target.value;
+	if (event.target.innerText && event.target.innerText == "Buscar") {
+		search["docId"] = this.state.clientDocNumber;
+	} else {
+		search["docId"] = event.target.value;
+	}
 	
 	if (search["docId"]) {
 		if (this.state.selectedOption != 'boleta') {
 			
-			if (event.target.value && event.target.value >=0 &&  event.target.value.length == 11) {
+			if (search["docId"] && search["docId"] >= 0 &&  search["docId"].length == 11) {
 				// display RUC search loading
 				self.setState({loadingGif: true});
 				self.setState({clientNameDisabled: false});
@@ -677,7 +699,7 @@ class TableDashboard extends React.Component {
 			}
 			
 		} else {
-			if (event.target.value && event.target.value > 0 &&  event.target.value.length == 8) {
+			if (search["docId"] && search["docId"] > 0 &&  search["docId"].length == 8) {
 				// display RUC search loading
 				self.setState({loadingGif: true});
 				self.setState({clientNameDisabled: false});
@@ -1514,7 +1536,7 @@ class TableDashboard extends React.Component {
 			              <div className="form-group">
 			                  <label className="control-label">Tipo de Comprobante</label>
 		    	              <div className="clearfix">
-					    	      <div className="btn-group">
+					    	      <div className="btn-group btn-group-xs">
 			                      <label className={this.state.showBoletaRadioButton}>
 			                          <input type="radio" value="boleta" disabled={this.state.boletaDisabled} className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
 			                      <label className={this.state.showFacturaRadioButton}>
@@ -1536,9 +1558,9 @@ class TableDashboard extends React.Component {
 			              <div className="form-group">
 		            	  	<label className="control-label">Ir a</label><br></br>  
 		            	  	<div style={{textAlign: 'left'}}>
-				      		      <button className="btn yellow"> 
-				      		      	<i className="fa fa-table"></i>&nbsp;<a className='view' href='/invoice-table-page' style={{color:'	#FFFFFF'}}>Tabla Comprobantes</a>
-				      		      </button>
+					      		  <a href="/invoice-table-page" className="btn btn-sm yellow margin-bottom-5">
+							          <i className="fa fa-table"></i>&nbsp;Tabla Comprobantes
+								  </a>
 				      	      </div>
 		                  </div>
 		              </div>
@@ -1546,7 +1568,7 @@ class TableDashboard extends React.Component {
 			              <div className="form-group">
 		            	  	<label className="control-label">Crear</label><br></br>  
 		            	  	<div style={{textAlign: 'left'}}>
-		            	  		<a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
+		            	  		<a type="submit" onClick={this.newInvoice} className="btn btn-sm purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
 				      	    </div>
 		                  </div>
 		              </div>
@@ -1556,7 +1578,7 @@ class TableDashboard extends React.Component {
 		              <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">{invoicePrefix}</label><br></br>  
-		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn green-meadow">{this.state.invoiceTypeModifiedToggle} {!this.state.invoiceTypeModifiedToggle} {buttonText}</a>
+		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn btn-sm green-meadow">{this.state.invoiceTypeModifiedToggle} {!this.state.invoiceTypeModifiedToggle} {buttonText}</a>
 		                  </div>
 		              </div>
 		              <div className="col-md-2">
@@ -1582,7 +1604,7 @@ class TableDashboard extends React.Component {
 	    	          <div className="col-md-2">
 	    	              <div className="form-group">
 	    	                  <label className="control-label">Seleccione Motivo</label>
-	    	                  <select className="ticket-assign form-control input-medium" style={{borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
+	    	                  <select className="ticket-assign form-control input-medium selectHeight" style={{borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
 	    	                  	  <option value=""></option>
 	    	                  	  <option value="01">Anulacion de la Operacion</option>
 	    	                  	  <option value="02">Anulacion por error en el RUC</option>
@@ -1610,10 +1632,10 @@ class TableDashboard extends React.Component {
 			          </div>
 	    	      	  <div className="col-md-2">
 	    	              <div className="form-group">
-	    	                  <table style={{width:'30%'}}>
+	    	                  <table style={{width:'50%'}}>
 	    	                  	<tbody>
 	    	                  	  <tr>
-		    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}</label></td>
+		    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}&nbsp;<a type="button" onClick={this.searchButton.bind(this)} > <i className="fa fa-edit">Buscar</i></a></label></td>
 		    	                    <td>{this.state.loadingGif &&
 		  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
 		    	                  </tr>
