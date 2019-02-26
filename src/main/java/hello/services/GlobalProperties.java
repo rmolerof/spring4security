@@ -4,44 +4,51 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties("email")
+@ConfigurationProperties("globalProperties")
 public class GlobalProperties {
 	
-	public String username;
-	public String password;
-	public String host;
-	public String from;
+	public String emailUsername;
+	public String emailPassword;
+	public String emailHost;
+	public String emailFrom;
 	public String myRuc;
+	public String sunatInvoicingServiceURL;
 	
-	public String getUsername() {
-		return username;
+	public String getEmailUsername() {
+		return emailUsername;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setEmailUsername(String emailUsername) {
+		this.emailUsername = emailUsername;
 	}
-	public String getPassword() {
-		return password;
+	public String getEmailPassword() {
+		return emailPassword;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setEmailPassword(String emailPassword) {
+		this.emailPassword = emailPassword;
 	}
-	public String getHost() {
-		return host;
+	public String getEmailHost() {
+		return emailHost;
 	}
-	public void setHost(String host) {
-		this.host = host;
+	public void setEmailHost(String emailHost) {
+		this.emailHost = emailHost;
 	}
-	public String getFrom() {
-		return from;
+	public String getEmailFrom() {
+		return emailFrom;
 	}
-	public void setFrom(String from) {
-		this.from = from;
+	public void setEmailFrom(String emailFrom) {
+		this.emailFrom = emailFrom;
 	}
 	public String getMyRuc() {
 		return myRuc;
 	}
 	public void setMyRuc(String myRuc) {
 		this.myRuc = myRuc;
+	}
+	public String getSunatInvoicingServiceURL() {
+		return sunatInvoicingServiceURL;
+	}
+	public void setSunatInvoicingServiceURL(String sunatInvoicingServiceURL) {
+		this.sunatInvoicingServiceURL = sunatInvoicingServiceURL;
 	}
 	
 }

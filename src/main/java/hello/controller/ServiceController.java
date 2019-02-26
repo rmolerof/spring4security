@@ -35,6 +35,7 @@ import hello.model.SubmitInvoiceGroupCriteria;
 import hello.model.User;
 import hello.rucdnisearch.DNIVo;
 import hello.rucdnisearch.RUCVo;
+import hello.services.GlobalProperties;
 import hello.services.RucDniService;
 import hello.services.UserService;
 import hello.services.Utils;
@@ -51,6 +52,8 @@ public class ServiceController {
 	RucDniService rucDniService;
 	@Autowired
 	Utils utils;
+	@Autowired
+	private GlobalProperties globalProperties;
 	
 	@PostMapping("/api/search")
 	public ResponseEntity<?> getSearchResultViaAjax(@Valid @RequestBody SearchCriteria search, Errors errors){
@@ -451,7 +454,7 @@ public class ServiceController {
 		utils.saveCustomerEmail(search.getClientEmailAddress(), search.getClientDocNumber(), search.getClientDocType());
 		
 		String to = search.getClientEmailAddress().toLowerCase();
-		String from = "support@grifoslajoya.net";
+		String from = globalProperties.getEmailFrom();
 		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
 		String body = "Estimado Cliente. Buen día. Adjuntado está su comprobante: " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
 		List<String> attachmentPaths = Arrays.asList(new String(xmlPath), new String(pdfPath));

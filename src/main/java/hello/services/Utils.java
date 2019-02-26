@@ -155,9 +155,9 @@ public class Utils {
 	
 	public String sendEmail(String to, String from, String subject, String body, List<String> attachmentPaths) {
 
-		final String username = globalProperties.getUsername();
-		final String password = globalProperties.getPassword();
-		String host = globalProperties.getHost();
+		final String username = globalProperties.getEmailUsername();
+		final String password = globalProperties.getEmailPassword();
+		String host = globalProperties.getEmailHost();
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");

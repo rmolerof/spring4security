@@ -13,8 +13,8 @@ import hello.rucdnisearch.DNIVo;
 public class DNIDao {
 	@Id 
 	private ObjectId id;
-	@Indexed(unique = true)
 	private Date date;
+	@Indexed(unique = true)
 	private String dni;
 	private String nombre;
 	private String paterno;

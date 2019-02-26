@@ -28,7 +28,6 @@ public class RUCDao {
 	private String inscripcion;
 	private String actividadExterior;
 	private String direccionS;
-	@Indexed(unique = true)
 	private Date date;
 	private String bonusNumber = "";
 	

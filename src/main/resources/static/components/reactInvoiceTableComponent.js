@@ -101,7 +101,9 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
 						invoicesSummaryData[i].user.name,
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? 
+								"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": 
+									((new Date() - invoicesSummaryData[i].date) < 300000 ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>"),
 						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					

@@ -78,6 +78,8 @@ public class UserService {
 	private NextSequenceInvoiceService nextSequenceInvoiceService;
 	@Autowired
 	private ResourceLoader resourceLoader;
+	@Autowired
+	private GlobalProperties globalProperties;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -609,7 +611,7 @@ public class UserService {
 				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
 				XmlSunat.invokeSunat(invoiceVo, basePath);
 				XmlSunat.firma(invoiceVo, basePath);
-				deliveryResponse = XmlSunat.envio(invoiceVo, basePath);
+				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL());
 				
 			} catch (Exception e) {
 				invoiceVo.setStatus("0");

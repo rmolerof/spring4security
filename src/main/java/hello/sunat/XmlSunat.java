@@ -204,14 +204,13 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static String envio(InvoiceVo invoiceVo, String basePath) {
+	public static String envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL) {
 		String UsuSol = "MODDATOS";// pruebas de sunat
 		String PassSol = "moddatos";// password de prueba de sunat
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = basePath + "/xmlsSunat/";
-		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
-		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, RutaWS);
+		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
 		invoiceVo.setSunatErrorStr(sunatResponse);
 		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);

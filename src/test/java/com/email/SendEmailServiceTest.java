@@ -49,7 +49,7 @@ public class SendEmailServiceTest {
 	@Test
 	public void sendEmailTest() {
 		String to = "rmolerof@gmail.com";// mecamolfer@hotmail.com
-		String from = globalProperties.getFrom();
+		String from = globalProperties.getEmailFrom();
 		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - FACTURA: F001-0000001";
 		String body = "Buen Día. Adjuntado está su comprobante de pago de FACTURA: F001-0000001";
 		List<String> attachmentPaths = Arrays.asList(new String("C:/Users/mecam/xmlsSunat/20501568776-07-B001-00000022.XML"), new String("C:/Users/mecam/xmlsSunat/invoice.pdf"));
@@ -69,10 +69,10 @@ public class SendEmailServiceTest {
 		 * Grifos la Joya Details
 		 */
 	    to = "rmolerof@gmail.com";
-		from = globalProperties.getFrom();
-		final String username = globalProperties.getUsername();
-		final String password = globalProperties.getPassword();
-		host = globalProperties.getHost();
+		from = globalProperties.getEmailFrom();
+		final String username = globalProperties.getEmailUsername();
+		final String password = globalProperties.getEmailPassword();
+		host = globalProperties.getEmailHost();
 		
 		/*
 		 * Gmail 
