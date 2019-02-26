@@ -178,14 +178,14 @@ public class XmlSunat {
 	    
 	}
 	
-	public static void firma(InvoiceVo invoiceVo, String basePath) throws FileNotFoundException, NoSuchAlgorithmException,
+	public static void firma(InvoiceVo invoiceVo, String basePath, String sunatSignatureFileName) throws FileNotFoundException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, ParserConfigurationException, SAXException, MarshalException,
 			KeyStoreException, IOException, CertificateException, Exception {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
 		String rutaXML = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = basePath + "/certificatesAndTemplates/FIRMABETA.pfx";
+		String rutaFirma = basePath + "/certificatesAndTemplates/" + sunatSignatureFileName;
 		
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    

@@ -279,7 +279,7 @@ public class Utils {
 			try {
 				
 				XmlSunat.invokeSunat(invoiceVo, getBasePath());
-				XmlSunat.firma(invoiceVo, getBasePath());
+				XmlSunat.firma(invoiceVo, getBasePath(), globalProperties.getSunatSignatureFileName());
 				
 			} catch (Exception e) {
 				logger.error(e.getMessage());

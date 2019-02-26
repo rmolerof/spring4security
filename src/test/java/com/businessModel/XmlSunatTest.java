@@ -105,7 +105,7 @@ public class XmlSunatTest {
 		
 		// Nota de credito
 		XmlSunat.invokeSunat(invoiceVo3, System.getProperty("user.home"));
-		XmlSunat.firma(invoiceVo3, System.getProperty("user.home"));
+		XmlSunat.firma(invoiceVo3, System.getProperty("user.home"), "FIRMABETA.pfx");
 		XmlSunat.envio(invoiceVo3, System.getProperty("user.home"), "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService");
 	}
 	

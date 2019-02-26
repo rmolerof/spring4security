@@ -610,7 +610,7 @@ public class UserService {
 			try {
 				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
 				XmlSunat.invokeSunat(invoiceVo, basePath);
-				XmlSunat.firma(invoiceVo, basePath);
+				XmlSunat.firma(invoiceVo, basePath, globalProperties.getSunatSignatureFileName());
 				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL());
 				
 			} catch (Exception e) {

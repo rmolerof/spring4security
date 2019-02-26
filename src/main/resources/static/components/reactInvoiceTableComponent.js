@@ -232,8 +232,8 @@ class InvoiceTableSummary extends React.Component {
   
   componentWillMount(){
 	  this._getUser();
-	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-31"});
-	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-31"});
+	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-310"});
+	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-310"});
   }
   
   onKeyPress(event) {

@@ -13,6 +13,7 @@ public class GlobalProperties {
 	public String emailFrom;
 	public String myRuc;
 	public String sunatInvoicingServiceURL;
+	public String sunatSignatureFileName;
 	
 	public String getEmailUsername() {
 		return emailUsername;
@@ -49,6 +50,12 @@ public class GlobalProperties {
 	}
 	public void setSunatInvoicingServiceURL(String sunatInvoicingServiceURL) {
 		this.sunatInvoicingServiceURL = sunatInvoicingServiceURL;
+	}
+	public String getSunatSignatureFileName() {
+		return sunatSignatureFileName;
+	}
+	public void setSunatSignatureFileName(String sunatSignatureFileName) {
+		this.sunatSignatureFileName = sunatSignatureFileName;
 	}
 	
 }
