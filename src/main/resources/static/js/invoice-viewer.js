@@ -104,7 +104,7 @@ function fire_ajax_submit() {
 	            $('.motiveCdDescription').html(data.result[0].motiveCdDescription);
 	            $('.invoiceNumberModified').html(data.result[0].invoiceNumberModified);
 	            $('.dateOfInvoiceModified').html(moment(data.result[0].dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A'));
-	            $('.bonusNumber').html(data.result[0].bonusNumber);
+	            $('.bonusNumber').html(data.result[0].bonusNumber.substring(10));
 	            if (data.result[0].bonusNumber) {
 	            	$('.toggleBonusNumber').show();
 	            } else {

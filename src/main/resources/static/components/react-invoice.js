@@ -90,6 +90,7 @@ class TableDashboard extends React.Component {
 	  igvModified: '',
 	  totalModified: '',
 	  bonusNumber: '',
+	  bonusNumberDisp: '',
 	  sunatStatus: 'PENDIENTE',
 	  sunatValidated: false
     };
@@ -103,7 +104,8 @@ class TableDashboard extends React.Component {
 	    BLANK_BOLETA_NUMBER: 'B001-XXXXXXXX',
 	    ZERO_BOLETA_NUMBER: 'B001-00000000',
 	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
-	    ZERO_FACTURA_NUMBER: 'F001-00000000'
+	    ZERO_FACTURA_NUMBER: 'F001-00000000',
+	    BONUS_NUMBER_PREFIX: '7027661000'
     }
   }
   
@@ -300,10 +302,10 @@ class TableDashboard extends React.Component {
 	  } 
   }
   
-  _validateBonusNumber(bonusNumber){
-	  var re = /^[0-9]{19}$/;
+  _validateBonusNumberDisp(bonusNumberDisp){
+	  var re = /^[0-9]{9}$/;
 	  
-	  if (bonusNumber != '' && !re.test(bonusNumber)) {
+	  if (bonusNumberDisp != '' && !re.test(bonusNumberDisp)) {
 		  return false
 	  } else {
 		  return true;
@@ -365,8 +367,9 @@ class TableDashboard extends React.Component {
     }
   }
   
-  bonusNumberChange = (evt) => {
-    this.setState({ bonusNumber: evt.target.value.trim() }); 
+  bonusNumberDispChange = (evt) => {
+    this.setState({bonusNumberDisp: evt.target.value.trim()});
+    this.setState({bonusNumber: this.CONSTANTS.BONUS_NUMBER_PREFIX + evt.target.value.trim()});
   }
   
   invoiceNumberModifiedDispChange = (evt) => {
@@ -422,7 +425,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: '', bonusNumberDisp: ''});
 
 	  } else if (changeEvent.target.value == 'factura') {
 		  var docLabelObj = {
@@ -441,7 +444,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: '', bonusNumberDisp: ''});
 
 	  } else if (changeEvent.target.value == 'nota de credito') {
 		  var docLabelObj = {
@@ -460,7 +463,7 @@ class TableDashboard extends React.Component {
 		this.setState({dateOfInvoiceModified: new Date()});
 		this.setState({igvModified: ''});
 		this.setState({totalModified: ''});
-		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: ''});
+		this.setState({clientDocNumber: '', clientName: '', clientAddress: '', clientEmailAddress: '', truckPlateNumber: '', bonusNumber: '', bonusNumberDisp: ''});
 	  }
   }
   
@@ -672,6 +675,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
 							self.setState({bonusNumber: data.result.bonusNumber});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(10)});
 							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
 								self.setState({clientAddressDisabled: false});
 							} else {
@@ -739,6 +743,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientNameDisabled: true});
 							self.setState({clientAddressDisabled: false});
 							self.setState({bonusNumber: data.result.bonusNumber});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(10)});
 						}
 						
 						// hide delay delay
@@ -826,6 +831,7 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(10),
 					  sunatStatus: data.result[0].sunatStatus,
 					  clientDocNumberDisabled: false,
 					  clientNameDisabled: false,
@@ -952,6 +958,7 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(10),
 					  sunatStatus: 'PENDIENTE',
 					  sunatValidated: false,
 					  clientEmailAddress: data.result[0].clientEmailAddress
@@ -1146,6 +1153,7 @@ class TableDashboard extends React.Component {
 	      igvModified: '',
 	      totalModified: '',
 	      bonusNumber: '',
+	      bonusNumberDisp: '',
 	      sunatStatus: 'PENDIENTE'
 	  });
   }
@@ -1200,6 +1208,7 @@ class TableDashboard extends React.Component {
 			saveOrUpdate,
 			invoiceHash,
 			bonusNumber,
+			bonusNumberDisp,
 			sunatStatus,
 			invoiceDateDisp} = this.state;
 		var self = this;
@@ -1281,8 +1290,8 @@ class TableDashboard extends React.Component {
 	    	
 	    	// Bonus validation
 	    	if (bonusNumber && bonusNumber >= 0) {
-	    		if (!self._validateBonusNumber(bonusNumber)) {
-	    			errors["bonusNumber"] = "Número Bonus debe tener 19 dígitos";
+	    		if (!self._validateBonusNumberDisp(bonusNumberDisp)) {
+	    			errors["bonusNumberDisp"] = "Número Bonus debe tener 9 dígitos";
 	    			formIsValid = false;
 	    		}
 		    }
@@ -1551,7 +1560,7 @@ class TableDashboard extends React.Component {
 			          <div className="col-md-2">
 				          <div className="form-group">
 		            	  	<label className="control-label">Bonus</label><br></br>  
-		            	  	<input name="bonusNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNumber} onChange={this.bonusNumberChange}/>
+		            	  	<input name="bonusNumberDisp" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNumberDisp} onChange={this.bonusNumberDispChange}/>
 		                  </div>
 		              </div>
 		              <div className="col-md-2">
@@ -2077,7 +2086,7 @@ class TableDashboard extends React.Component {
 	                      <br/> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
 	                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}
 	                      </div>}
-	                      {this.state.bonusNumber && <div><strong>Nro Bonus: </strong> {this.state.bonusNumber}</div>}
+	                      {this.state.bonusNumberDisp && <div><strong>Nro Bonus: </strong> {this.state.bonusNumberDisp}</div>}
 	                      <strong>Atendido por:</strong> {this.state.user.name} 
 	                  </address>
 	                  <address>
@@ -2121,7 +2130,7 @@ class TableDashboard extends React.Component {
 	          <Modal.Body>
 			      {this.state.showError && 
 				        <div className="alert alert-danger">
-			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.bonusNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
+			      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.bonusNumberDisp + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
 				      	</div>
 			      }
 	
