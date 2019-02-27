@@ -78,6 +78,21 @@ class InvoiceTableSummary extends React.Component {
 						clientDocType = 'RUC'
 					}
 					
+					var editInvoice = '';
+					if (invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
+						if (self.state.user.roles.ROLE_ADMIN) {
+							editInvoice = "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>";
+						} else {
+							if ((new Date() - invoicesSummaryData[i].date) < 300000) {
+								editInvoice = "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>";
+							} else{
+								editInvoice = "<a ></a>"; 
+							}
+						}
+					} else {
+						editInvoice = "<a ></a>";
+					}
+					
 					count++;
 					var row = [
 						count,
@@ -101,9 +116,7 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].bonusNumber,
 						invoicesSummaryData[i].sunatStatus,
 						invoicesSummaryData[i].user.name,
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? 
-								"<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": 
-									((new Date() - invoicesSummaryData[i].date) < 300000 ? "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>": "<a ></a>"),
+						editInvoice,
 						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					
@@ -564,7 +577,7 @@ class InvoicesTbl extends React.Component {
             var nRow = $(this).parents('tr')[0];
             var invoiceNumber = nRow.cells[4].innerText;
             
-            if (confirm("¿Está seguro de borrar comprobante " + invoiceNumber + "?") == false) {
+            if (confirm("¿Está seguro de anular comprobante " + invoiceNumber + "?") == false) {
                 return;
             }
             

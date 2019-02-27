@@ -48,13 +48,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()
-				.withUser("rmolero").password("rmolero").roles("USER", "ADMIN")
+				.withUser("rmolero").password("facturacion2301").roles("USER", "ADMIN")
 				.and()
 				.withUser("avilcahuaman").password("avilcahuaman").roles("USER")
 				.and()
-				.withUser("pmori").password("pmori").roles("USER", "ADMIN")
+				.withUser("ymolero").password("ymolero@0828").roles("USER")
 				.and()
-				.withUser("imolero").password("imolero").roles("USER", "ADMIN")
+				.withUser("pmori").password("pmori").roles("USER")
+				.and()
+				.withUser("imolero").password("imolero@8945").roles("USER", "ADMIN")
 				.and()
 				.withUser("yatencio").password("Espinoza").roles("USER", "ADMIN")
 				.and()
@@ -66,13 +68,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 				.withUser("eazucena").password("eazucena1234").roles("USER")
 				.and()
-				.withUser("hsandra").password("hsandra1234").roles("USER")
-				.and()
-				.withUser("user").password("password").roles("USER")
-				.and()
-				.withUser("admin").password("password").roles("ADMIN")
-				.and()
-				.withUser("superuser").password("password").roles("ADMIN", "USER");
-		
+				.withUser("hsandra").password("hsandra1234").roles("USER");
 	}
 }
