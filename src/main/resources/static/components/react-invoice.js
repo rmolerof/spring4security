@@ -1647,7 +1647,7 @@ class TableDashboard extends React.Component {
 			          </div>
 	    	      	  <div className="col-md-2">
 	    	              <div className="form-group">
-	    	                  <table style={{width:'50%'}}>
+	    	                  <table style={{width:'100%'}}>
 	    	                  	<tbody>
 	    	                  	  <tr>
 		    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}&nbsp;<a type="button" onClick={this.searchButton.bind(this)} > <i className="fa fa-edit">Buscar</i></a></label></td>
@@ -1919,11 +1919,11 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="company-address text-center">
 	                      <span className="bold uppercase" style={{fontSize: 13}}>La Joya de Santa Isabel EIRL</span>
+	                      <br/> <span className="muted"> RUC: 20501568776  </span>
 	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
 	                      <br/> Lima - Lima - Ate 
 	                      <br/> Teléfono: +51 356 0345
 	                      <br/> www.grifoslajoya.com 
-	                      <br/> <span className="muted"> RUC: 20501568776  </span>
                       </div>
 	              </div>
 	          </div>
@@ -1952,7 +1952,7 @@ class TableDashboard extends React.Component {
 			                  {this.state.selectedOption != 'boleta' && 
 			                  <tr>
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-		                      	  Placa de Vehículo:
+		                      	  Placa:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
