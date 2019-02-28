@@ -311,15 +311,7 @@ class TableDashboard extends React.Component {
 	      		<strong>Success!</strong> Tu forma has sido remitida. 
 	      	</div>
 	      }
-	      <div className="row">
-	          <div className="col-md-4">
-	              <div className="form-group">
-	                  <label className="control-label">Hoy es</label>
-	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment().tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
-	              </div>
-	          </div>
-	      </div>
-	      
+	      	      
 	      {this.state && this.state.stationSummaryData &&
 	    	  <StationTbl data={this.state.stationSummaryData}></StationTbl>
 		  } 
@@ -477,7 +469,7 @@ class CreditsOrExpensesTbl extends React.Component {
 		this.$el.DataTable({
 			data: this.props.data,
 			pageLength: 5,
-			scrollY: 300,
+			scrollY: 600,
 			deferRender: true,
 			scroller: true,
 			deferRender: true,
@@ -536,7 +528,7 @@ class StationTbl extends React.Component {
 		this.$el.DataTable({
 			data: this.props.data,
 			pageLength: 5,
-			scrollY: 300,
+			scrollY: 600,
 			deferRender: true,
 			scroller: true,
 			deferRender: true,

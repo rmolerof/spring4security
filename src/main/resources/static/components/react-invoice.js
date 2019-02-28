@@ -92,7 +92,8 @@ class TableDashboard extends React.Component {
 	  bonusNumber: '',
 	  bonusNumberDisp: '',
 	  sunatStatus: 'PENDIENTE',
-	  sunatValidated: false
+	  sunatValidated: false,
+	  showNewInvoiceButton: true
     };
     
     this.CONSTANTS = {
@@ -105,7 +106,7 @@ class TableDashboard extends React.Component {
 	    ZERO_BOLETA_NUMBER: 'B001-00000000',
 	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
 	    ZERO_FACTURA_NUMBER: 'F001-00000000',
-	    BONUS_NUMBER_PREFIX: '7027661000'
+	    BONUS_NUMBER_PREFIX: '7027661'
     }
   }
   
@@ -303,7 +304,7 @@ class TableDashboard extends React.Component {
   }
   
   _validateBonusNumberDisp(bonusNumberDisp){
-	  var re = /^[0-9]{9}$/;
+	  var re = /^([0-9]{6}|[0-9]{8,9})$/;
 	  
 	  if (bonusNumberDisp != '' && !re.test(bonusNumberDisp)) {
 		  return false
@@ -369,7 +370,12 @@ class TableDashboard extends React.Component {
   
   bonusNumberDispChange = (evt) => {
     this.setState({bonusNumberDisp: evt.target.value.trim()});
-    this.setState({bonusNumber: this.CONSTANTS.BONUS_NUMBER_PREFIX + evt.target.value.trim()});
+    this.setState({bonusNumber: this._transformToFullBonusNumber(evt.target.value.trim())});
+  }
+  
+  _transformToFullBonusNumber(bonusNumberDisp) {
+	  var pad = "000000000000";
+	  return this.CONSTANTS.BONUS_NUMBER_PREFIX + (pad+bonusNumberDisp).slice(-pad.length);
   }
   
   invoiceNumberModifiedDispChange = (evt) => {
@@ -543,7 +549,7 @@ class TableDashboard extends React.Component {
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
-		  this.setState({printDisabled: false});
+		  this.setState({printDisabled: false, showNewInvoiceButton: false});
 	  } else {
 		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
 	  }
@@ -675,7 +681,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
 							self.setState({bonusNumber: data.result.bonusNumber});
-							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(10)});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7).replace(/^0+/, '')});
 							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
 								self.setState({clientAddressDisabled: false});
 							} else {
@@ -743,7 +749,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientNameDisabled: true});
 							self.setState({clientAddressDisabled: false});
 							self.setState({bonusNumber: data.result.bonusNumber});
-							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(10)});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7).replace(/^0+/, '')});
 						}
 						
 						// hide delay delay
@@ -831,7 +837,7 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
-					  bonusNumberDisp: data.result[0].bonusNumber.substring(10),
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(7).replace(/^0+/, ''),
 					  sunatStatus: data.result[0].sunatStatus,
 					  clientDocNumberDisabled: false,
 					  clientNameDisabled: false,
@@ -958,7 +964,7 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
-					  bonusNumberDisp: data.result[0].bonusNumber.substring(10),
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(7).replace(/^0+/, ''),
 					  sunatStatus: 'PENDIENTE',
 					  sunatValidated: false,
 					  clientEmailAddress: data.result[0].clientEmailAddress
@@ -1291,7 +1297,7 @@ class TableDashboard extends React.Component {
 	    	// Bonus validation
 	    	if (bonusNumber && bonusNumber >= 0) {
 	    		if (!self._validateBonusNumberDisp(bonusNumberDisp)) {
-	    			errors["bonusNumberDisp"] = "Número Bonus debe tener 9 dígitos";
+	    			errors["bonusNumberDisp"] = "Número Bonus debe tener 6, 8, o 9 dígitos";
 	    			formIsValid = false;
 	    		}
 		    }
@@ -1468,7 +1474,7 @@ class TableDashboard extends React.Component {
 						self.setState({emailingGif: false});
 						
 						setTimeout(function() {
-						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+						    ReactDOM.findDOMNode(self.refs['refResultModalError']).focus();
 				        }.bind(this), 0); 
 					}
 				},
@@ -1478,7 +1484,7 @@ class TableDashboard extends React.Component {
 					self.setState({emailingGif: false});
 					
 					setTimeout(function() {
-					    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+					    ReactDOM.findDOMNode(self.refs['refResultModalError']).focus();
 			        }.bind(this), 0); 
 				}	
 			});
@@ -1487,7 +1493,7 @@ class TableDashboard extends React.Component {
 			self._toggleError();
 			
 		    setTimeout(function() {
-			    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
+			    ReactDOM.findDOMNode(self.refs['refResultModalError']).focus();
 	        }.bind(this), 0);  
 			
 		}
@@ -1573,14 +1579,14 @@ class TableDashboard extends React.Component {
 				      	      </div>
 		                  </div>
 		              </div>
-		              <div className="col-md-2">
+		              {this.state.showNewInvoiceButton && <div className="col-md-2">
 			              <div className="form-group">
 		            	  	<label className="control-label">Crear</label><br></br>  
 		            	  	<div style={{textAlign: 'left'}}>
 		            	  		<a type="submit" onClick={this.newInvoice} className="btn btn-sm purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
 				      	    </div>
 		                  </div>
-		              </div>
+		              </div>}
 	              </div>
 	              {this.state.selectedOption == 'nota de credito' &&
 	              <div className="row">
@@ -2143,7 +2149,7 @@ class TableDashboard extends React.Component {
 	          
 	          <Modal.Footer>
 	          	{this.state.showSuccess && <Button bsStyle="primary" name="resultModal" ref={'refResultModal'} onClick={this.handleInvoiceSubmitResultModalClose.bind(this)}>OK</Button>}
-	          	{this.state.showError &&  <Button bsStyle="primary" onClick={this.handleInvoiceSubmitResultModalHide.bind(this)}>OK</Button>}
+	          	{this.state.showError &&  <Button bsStyle="primary" ref={'refResultModalError'} onClick={this.handleInvoiceSubmitResultModalHide.bind(this)}>OK</Button>}
 	          </Modal.Footer>
 	      </Modal>
 	      
