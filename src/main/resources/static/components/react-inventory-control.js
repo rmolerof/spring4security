@@ -618,13 +618,13 @@ class IncorporationForm extends React.Component {
 				          </div>
 				          <div className="col-md-2">
 				              <div className="form-group">
-				                  <label className="control-label">Marca Horaria</label>
+				                  <label className="control-label">Creado Fecha</label>
 				                  <input type="text" id="date" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`} readOnly/>
 				              </div>
 				          </div>
 				          <div className="col-md-1">
 				              <div className="form-group">
-				                  <label className="control-label">Fecha Turno</label>
+				                  <label className="control-label">Fecha</label>
 				                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>
 				              </div>
 				          </div>
@@ -652,7 +652,7 @@ class IncorporationForm extends React.Component {
 			          			<tr>
 			          				{this.state.tanks.map((tank, idx) => (
 				            			<td key={`col${idx}`}>
-				            				<label className="control-label" key={`name${idx}`}>Inicio {tank.fuelType} (gal)</label>
+				            				<label className="control-label" key={`name${idx}`}>Gal {tank.fuelType.toUpperCase()}</label>
 				            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={tank.gals.toFixed(2)} readOnly/>
 			          				</td>
 			          				))}
@@ -669,7 +669,7 @@ class IncorporationForm extends React.Component {
 			            			<tr>
 			            				{this.state.gasPrices.map((gasPrice, idx) => (
 				            			<td key={`col${idx}`}>
-				            				<label className="control-label" key={`name${idx}`}>Precio {gasPrice.name}</label>
+				            				<label className="control-label" key={`name${idx}`}>S/ {gasPrice.name.toUpperCase()}</label>
 				            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={`S/. ` + gasPrice.price.toFixed(2)} readOnly/>
 			            				</td>
 			            				))}

@@ -22,9 +22,9 @@ public class DefaultController {
 		return "admin";
 	}
 	
-	@RequestMapping("user")
-	public String user(){
-		return "user";
+	@RequestMapping("inventory-control-page")
+	public String inventoryControlPage(){
+		return "inventory-control-page";
 	}
 	
 	@RequestMapping("about")
