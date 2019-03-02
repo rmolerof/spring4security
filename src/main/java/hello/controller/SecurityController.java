@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -28,10 +29,15 @@ public class SecurityController {
     @ResponseBody
     public User getCurrentUser(Principal principal) {
         
-    	User currentUser = new User();
-    	currentUser.setName(principal.getName());
+    	return getCurrentUser() ;
+    }
+    
+    public User getCurrentUser() {
     	
-    	Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+    	User currentUser = new User();
+    	
+    	Authentication authentication =  SecurityContextHolder.getContext().getAuthentication();
+    	Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();
     	
     	Map<String, Boolean> roles = authorities.stream().map(authority -> 
     		new AbstractMap.SimpleEntry<>(authority.getAuthority(), Boolean.TRUE)
@@ -39,6 +45,9 @@ public class SecurityController {
     	
     	currentUser.setRoles(roles);
     	
+    	currentUser.setName(authentication.getName());
+    	
     	return currentUser;
+    	
     }
 }

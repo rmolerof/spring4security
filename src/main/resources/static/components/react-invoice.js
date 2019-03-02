@@ -107,7 +107,8 @@ class TableDashboard extends React.Component {
 	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
 	    ZERO_FACTURA_NUMBER: 'F001-00000000',
 	    BONUS_NUMBER_PREFIX: '7027661',
-	    EDIT_ENABLED_TIME_IN_MS: 600000 
+	    EDIT_ENABLED_TIME_IN_MS: 600000,
+	    LARGE_AMOUNT: 500.00
     }
   }
   
@@ -1291,7 +1292,11 @@ class TableDashboard extends React.Component {
 	    };
 
 	    if (solesD2 || solesG90 || solesG95) {
-	    	
+	    	if ((solesD2 || 0) >= self.CONSTANTS.LARGE_AMOUNT  || (solesG90 || 0) >= self.CONSTANTS.LARGE_AMOUNT || (solesG95 || 0) >= self.CONSTANTS.LARGE_AMOUNT) {
+		    	if (confirm("Cantidad es mayor a S/ " + self.CONSTANTS.LARGE_AMOUNT + " soles ¿Está seguro de continuar?") == false) {
+	                return;
+	            }
+	    	}
     	} else {
 	    	errors["submit"] = "Cantidades no pueden ser nulas";
 			formIsValid = false;

@@ -34,6 +34,7 @@ import hello.businessModel.Tank;
 import hello.businessModel.TanksVo;
 import hello.businessModel.TotalDay;
 import hello.businessModel.TotalDayUnit;
+import hello.controller.SecurityController;
 import hello.domain.GasPricesDao;
 import hello.domain.GasPricesRepository;
 import hello.domain.InvoiceDao;
@@ -82,6 +83,8 @@ public class UserService {
 	private ResourceLoader resourceLoader;
 	@Autowired
 	private GlobalProperties globalProperties;
+	@Autowired
+	private SecurityController securityController;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -734,12 +737,14 @@ public class UserService {
 	public List<InvoiceVo> findInvoice(String invoiceNbr) {
 
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
-		if (null != invoiceDao) {
+		if (!invoiceDao.getClientName().equals(InvoiceDao.INVOICE_NOT_FOUND_NAME)) {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			
+			invoiceVo.setUser(securityController.getCurrentUser());
 		
 			return Stream.of(invoiceVo).collect(Collectors.toList());
 		} else {
-			return Stream.of(new InvoiceVo()).collect(Collectors.toList());
+			return Stream.of(InvoiceVo.NOT_FOUND).collect(Collectors.toList());
 		}
 	}
 	

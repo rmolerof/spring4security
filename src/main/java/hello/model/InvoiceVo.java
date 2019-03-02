@@ -8,6 +8,10 @@ import org.bson.types.ObjectId;
 import hello.domain.InvoiceDao;
 
 public class InvoiceVo {
+	
+	public static final String INVOICE_NOT_FOUND_NAME = "CUSTOMER NOT FOUND";
+	public static final InvoiceVo NOT_FOUND = new InvoiceVo("0000-00000000", INVOICE_NOT_FOUND_NAME);
+	
 	private ObjectId id;
 	private User user;
 	private String invoiceNumber;
@@ -60,6 +64,11 @@ public class InvoiceVo {
 	
 	public InvoiceVo() {
 		super();
+	}
+	
+	public InvoiceVo(String invoiceNumber, String clientName) {
+		this.invoiceNumber = invoiceNumber;
+		this.clientName = clientName;
 	}
 	
 	public InvoiceVo(InvoiceDao invoiceDao) {
