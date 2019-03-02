@@ -63,6 +63,8 @@ public class UserService {
 	public static final String SUNAT_PENDING_STATUS = "PENDIENTE";
 	public static final String SUNAT_SENT_STATUS = "ENVIADO";
 	public static final String SUNAT_VOIDED_STATUS = "ANULADO";
+	public static final String DNI = "1";
+	public static final String RUC = "6";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -610,8 +612,8 @@ public class UserService {
 			try {
 				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
 				XmlSunat.invokeSunat(invoiceVo, basePath);
-				XmlSunat.firma(invoiceVo, basePath, globalProperties.getSunatSignatureFileName());
-				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL());
+				XmlSunat.firma(invoiceVo, basePath, globalProperties.getSunatSignatureFileName(), globalProperties.getSunatSignaturePassword());
+				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL(), globalProperties.getSunatSolUsername(), globalProperties.getSunatSolPassword());
 				
 			} catch (Exception e) {
 				invoiceVo.setStatus("0");
@@ -632,50 +634,51 @@ public class UserService {
 		return invoiceVos;
 	}
 	
+	public Long getNextInvoiceSequence(String invoiceType) {
+		
+		if (invoiceType.equals(BOLETA)) {
+			InvoiceDao lastSunatProcessedBoletaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(BOLETA);
+			return invoiceNumberToLong(lastSunatProcessedBoletaOrNotaDeCredito.getInvoiceNumber()) + 1;
+		} else if (invoiceType.equals(FACTURA)){
+			InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(FACTURA);
+			return invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber()) + 1;
+		}
+		
+		return 0L;
+	}
+	
 	public List<InvoiceVo> submitInvoice(InvoiceVo invoiceVo) {
 		
 		try {
+			
+			invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
+			
 			if (invoiceVo.getSaveOrUpdate().equals("save")) {
 				
 				if (invoiceVo.getInvoiceNumber().contains("XXXXXXXX")) {
-					if (invoiceVo.getInvoiceType().equalsIgnoreCase("03")) {
+					if (invoiceVo.getInvoiceType().equalsIgnoreCase(BOLETA)) {
 						// Boleta
-						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
+						Long receiptNbr = getNextInvoiceSequence(BOLETA);
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
-					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("01")) {
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(FACTURA)) {
 						// Factura
-						Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+						Long receiptNbr = getNextInvoiceSequence(FACTURA);
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
-					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(NOTADECREDITO)) {
 						// Nota de credito
-						if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("03")) {
-							Long receiptNbr = nextSequenceInvoiceService.getNextSequence("boletaSequences");
+						if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(BOLETA)) {
+							Long receiptNbr = getNextInvoiceSequence(BOLETA);
 							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 							invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
-						} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase("01")) {
-							Long receiptNbr = nextSequenceInvoiceService.getNextSequence("facturaSequences");
+						} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(FACTURA)) {
+							Long receiptNbr = getNextInvoiceSequence(FACTURA);
 							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 							invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
 						}
 					}
-				} 
-				
-				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
-				
-				/*// Sunat
-				String basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
-				
-				XmlSunat.invokeSunat(invoiceVo, basePath);
-				XmlSunat.firma(invoiceVo, basePath);
-				String deliveryResponse = XmlSunat.envio(invoiceVo, basePath);
-				
-				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
-
-				if (deliveryResponse.charAt(0) == '1') {
-					invoicesRepository.save(invoiceDao);
-				}*/
+				}
 				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 				// Find out any existing invoice with the same invoice number
@@ -691,9 +694,6 @@ public class UserService {
 				invoiceVo.setSunatErrorStr("1");
 			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
 				
-				// Reset amount verbiage
-				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
-				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 				invoicesRepository.save(invoiceDao);
 				
@@ -704,6 +704,11 @@ public class UserService {
 			// Save Bonus Number if present
 			if (null != invoiceVo.getBonusNumber() && !invoiceVo.getBonusNumber().trim().equals("")) {
 				utils.saveBonusNumber(invoiceVo);
+			}
+			
+			// Save address if present for DNI
+			if (null != invoiceVo.getClientAddress() && !invoiceVo.getClientAddress().trim().equals("")) {
+				utils.saveClientAddressForDNI(invoiceVo);
 			}
 			
 		} catch (Exception e) {

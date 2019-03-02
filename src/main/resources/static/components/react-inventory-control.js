@@ -337,12 +337,30 @@ class IncorporationForm extends React.Component {
 	  this.setState({fetchBackDataCount: this.state.fetchBackDataCount + 1});
   }
   
+  _getQueryVariable(variable)
+  {
+         var query = window.location.search.substring(1);
+         var vars = query.split("&");
+         for (var i=0;i<vars.length;i++) {
+                 var pair = vars[i].split("=");
+                 if(pair[0] == variable){return pair[1];}
+         }
+         return(false);
+  }
+  
   _fetchData(timeframe){
-			
-		var search = {};
-		search["dateEnd"] = timeframe.dateEnd;
-		search["dateBeg"] = timeframe.dateBeg;
-		search["backDataCount"] = timeframe.backDataCount;
+	  
+	  	var search = {};
+		if (timeframe.dateEnd == 'latest') {
+			search["dateEnd"] = timeframe.dateEnd;
+			search["dateBeg"] = timeframe.dateBeg;
+			search["backDataCount"] = timeframe.backDataCount;
+		} else {
+			var date = timeframe.substring(0, timeframe.indexOf('-'));
+			var shift = timeframe.substring(timeframe.indexOf('-') + 1);
+			search["date"] = date;
+			search["shift"] = shift;
+		}
 		
 		jQuery.ajax({
 			type: "POST",
@@ -572,8 +590,14 @@ class IncorporationForm extends React.Component {
 	}
   
   componentWillMount(){
-	  this._fetchData({dateEnd: "latest", dateBeg: ""});
-	  this._initExpensesAndCredits();
+	  
+	  var dateAndShift = this._getQueryVariable('id');
+	  if (dateAndShift) {
+		  this._fetchData(dateAndShift);
+	  } else {
+		  this._fetchData({dateEnd: "latest", dateBeg: ""});
+		  this._initExpensesAndCredits();  
+	  }
   }
   
   onKeyPress(event) {
@@ -622,7 +646,7 @@ class IncorporationForm extends React.Component {
 				                  <input type="text" id="date" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`} readOnly/>
 				              </div>
 				          </div>
-				          <div className="col-md-1">
+				          <div className="col-md-2">
 				              <div className="form-group">
 				                  <label className="control-label">Fecha</label>
 				                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>

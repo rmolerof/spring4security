@@ -279,7 +279,7 @@ public class Utils {
 			try {
 				
 				XmlSunat.invokeSunat(invoiceVo, getBasePath());
-				XmlSunat.firma(invoiceVo, getBasePath(), globalProperties.getSunatSignatureFileName());
+				XmlSunat.firma(invoiceVo, getBasePath(), globalProperties.getSunatSignatureFileName(), globalProperties.getSunatSignaturePassword());
 				
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -338,8 +338,11 @@ public class Utils {
 					return "0";
 				}
 				
-				dniDao.setBonusNumber(invoiceVo.getBonusNumber());
-				dnisRepository.save(dniDao);
+				if (!invoiceVo.getBonusNumber().equals(dniDao.getBonusNumber())) {
+					dniDao.setBonusNumber(invoiceVo.getBonusNumber());
+					dnisRepository.save(dniDao);
+				}
+				
 				return "1";
 			} else {
 	
@@ -350,10 +353,38 @@ public class Utils {
 					return "0";
 				}
 				
-				rucDao.setBonusNumber(invoiceVo.getBonusNumber());
-				rucsRepository.save(rucDao);
+				if (!invoiceVo.getBonusNumber().equals(rucDao.getBonusNumber())) {
+					rucDao.setBonusNumber(invoiceVo.getBonusNumber());
+					rucsRepository.save(rucDao);
+				}
 				return "1";
 			}
+		}
+		
+		return "0";
+		
+	}
+	
+	public String saveClientAddressForDNI(InvoiceVo invoiceVo) {
+		
+		if (!invoiceVo.getClientDocNumber().equals("0")) {
+			if (invoiceVo.getClientDocType().equals(UserService.DNI)) {
+				
+				// search DNI in DB
+				DNIDao dniDao = dnisRepository.findFirstByDni(invoiceVo.getClientDocNumber());
+				
+				// if not Found, search in Sunat
+				if (null == dniDao) {
+					return "0";
+				}
+				
+				if (!invoiceVo.getClientAddress().trim().equals(dniDao.getDireccion())) {
+					dniDao.setDireccion(invoiceVo.getClientAddress().trim());
+					dnisRepository.save(dniDao);
+				}
+				
+				return "1";
+			} 
 		}
 		
 		return "0";

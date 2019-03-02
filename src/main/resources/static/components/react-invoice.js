@@ -106,7 +106,8 @@ class TableDashboard extends React.Component {
 	    ZERO_BOLETA_NUMBER: 'B001-00000000',
 	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
 	    ZERO_FACTURA_NUMBER: 'F001-00000000',
-	    BONUS_NUMBER_PREFIX: '7027661'
+	    BONUS_NUMBER_PREFIX: '7027661',
+	    EDIT_ENABLED_TIME_IN_MS: 600000 
     }
   }
   
@@ -542,15 +543,28 @@ class TableDashboard extends React.Component {
 		});
   }
   
+  _getSubmitInvoiceButtonStatus(user) {
+	  var isSubmitInvoiceButtonDisabled = true;
+	  if (user.roles.ROLE_ADMIN) {
+		  isSubmitInvoiceButtonDisabled = false;
+      } else {
+			if ((new Date() - this.state.date) < this.CONSTANTS.EDIT_ENABLED_TIME_IN_MS) {
+				isSubmitInvoiceButtonDisabled = false;
+			} else{
+				isSubmitInvoiceButtonDisabled = true;
+			}
+      }
+	  return isSubmitInvoiceButtonDisabled;
+  }
+  
   componentWillMount(){
-	  // Get current User
-	  this._getUser();
 	  
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
 		  this.setState({printDisabled: false, showNewInvoiceButton: false});
 	  } else {
+		  this._getUser();
 		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
 	  }
 	  
@@ -749,6 +763,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientNameDisabled: true});
 							self.setState({clientAddressDisabled: false});
 							self.setState({bonusNumber: data.result.bonusNumber});
+							self.setState({clientAddress: data.result.direccion});
 							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7).replace(/^0+/, '')});
 						}
 						
@@ -844,7 +859,8 @@ class TableDashboard extends React.Component {
 					  clientAddressDisabled: false,
 					  saveOrUpdate: 'update',
 					  invoiceHash: data.result[0].invoiceHash,
-					  clientEmailAddress: data.result[0].clientEmailAddress
+					  clientEmailAddress: data.result[0].clientEmailAddress,
+					  user: data.result[0].user
 				  });
 				  
 				  // Display No of modified invoice
@@ -891,6 +907,10 @@ class TableDashboard extends React.Component {
 				  self.setState({showFacturaRadioButton: cssF});
 				  var cssNV = (data.result[0].invoiceType == self.CONSTANTS.NOTADECREDITO) ? "btn blue active btn-sm" : "btn btn-default btn-sm";
 				  self.setState({showNotaDeCreditoRadioButton: cssNV});
+				  
+				  if (self._getQueryVariable('id')) {
+					 self.setState({submitDisabled: self._getSubmitInvoiceButtonStatus(data.result[0].user)});
+				  }
 				  
 			  } else {
 			  	  var errors = {
@@ -1863,7 +1883,7 @@ class TableDashboard extends React.Component {
 			          
 	                  {this.state.status && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
 	                  {!this.state.status && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
-	                  <button type="submit" disabled={((this.state.submitDisabled && !((new Date() - this.state.date) > 300000)) || ((new Date() - this.state.date) > 300000)) && !this.state.user.roles.ROLE_ADMIN} className="btn green hidden-print margin-bottom-5">
+	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
 	    	          <button type="button" onClick={this.emailInvoice} disabled={this.state.printDisabled} className="btn green-meadow hidden-print margin-bottom-5">
@@ -1949,14 +1969,12 @@ class TableDashboard extends React.Component {
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.clientAddress}</td>
 			                  </tr>
-			                  {this.state.selectedOption != 'boleta' && 
 			                  <tr>
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 		                      	  Placa:
 			                      </td>
 			                      <td className="text-center sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{this.state.truckPlateNumber}</td>
 			                  </tr>
-			                  }
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 			                      Fecha:

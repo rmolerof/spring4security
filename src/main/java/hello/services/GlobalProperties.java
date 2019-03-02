@@ -14,6 +14,9 @@ public class GlobalProperties {
 	public String myRuc;
 	public String sunatInvoicingServiceURL;
 	public String sunatSignatureFileName;
+	public String sunatSignaturePassword;
+	public String sunatSolUsername;
+	public String sunatSolPassword;
 	
 	public String getEmailUsername() {
 		return emailUsername;
@@ -56,6 +59,24 @@ public class GlobalProperties {
 	}
 	public void setSunatSignatureFileName(String sunatSignatureFileName) {
 		this.sunatSignatureFileName = sunatSignatureFileName;
+	}
+	public String getSunatSignaturePassword() {
+		return sunatSignaturePassword;
+	}
+	public void setSunatSignaturePassword(String sunatSignaturePassword) {
+		this.sunatSignaturePassword = sunatSignaturePassword;
+	}
+	public String getSunatSolUsername() {
+		return sunatSolUsername;
+	}
+	public void setSunatSolUsername(String sunatSolUsername) {
+		this.sunatSolUsername = sunatSolUsername;
+	}
+	public String getSunatSolPassword() {
+		return sunatSolPassword;
+	}
+	public void setSunatSolPassword(String sunatSolPassword) {
+		this.sunatSolPassword = sunatSolPassword;
 	}
 	
 }

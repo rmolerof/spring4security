@@ -57,6 +57,30 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		
 		return invoiceDaos.size() > 0 ? invoiceDaos.get(0): InvoiceDao.NOT_FOUND;
 	}
+	
+	public InvoiceDao findLastNotVoidedInvoice(String invoiceType) {
+		
+		Query query = null;
+		Criteria invoiceTypeCriteria = null;
+		Criteria notaDeCreditoOfInvoiceTypeCriteria = null;
+		
+		if (invoiceType.equals(UserService.BOLETA)) {
+			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(UserService.SUNAT_VOIDED_STATUS).and("invoiceType").is(UserService.BOLETA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(UserService.SUNAT_VOIDED_STATUS).and("invoiceTypeModified").is(UserService.BOLETA);
+			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
+		} else {
+			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(UserService.SUNAT_VOIDED_STATUS).and("invoiceType").is(UserService.FACTURA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(UserService.SUNAT_VOIDED_STATUS).and("invoiceTypeModified").is(UserService.FACTURA);
+			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
+		}
+		
+		query.limit(1);
+		query.with(new Sort(Direction.DESC, "date"));
+		
+		List<InvoiceDao> invoiceDaos = mongoTemplate.find(query, InvoiceDao.class);
+		
+		return invoiceDaos.size() > 0 ? invoiceDaos.get(0): InvoiceDao.NOT_FOUND;
+	}
 
 	@Override
 	public InvoiceDao findFirstByInvoiceNumberNotVoided(String invoiceNumber) {

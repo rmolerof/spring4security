@@ -178,7 +178,7 @@ public class XmlSunat {
 	    
 	}
 	
-	public static void firma(InvoiceVo invoiceVo, String basePath, String sunatSignatureFileName) throws FileNotFoundException, NoSuchAlgorithmException,
+	public static void firma(InvoiceVo invoiceVo, String basePath, String sunatSignatureFileName, String passFirma) throws FileNotFoundException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, ParserConfigurationException, SAXException, MarshalException,
 			KeyStoreException, IOException, CertificateException, Exception {
 
@@ -193,7 +193,6 @@ public class XmlSunat {
 	    if(!alreadyExists){
 			(new File(rutaFirma)).getParentFile().mkdirs();
 		}
-		String passFirma = "123456";
 
 		// String nomArchivo = "20100078792-20-R002-41372";
 		int signingResult = FirmaCPESunat.Signature(flg_firma, rutaXML, rutaFirma, passFirma);
@@ -204,13 +203,11 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static String envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL) {
-		String UsuSol = "MODDATOS";// pruebas de sunat
-		String PassSol = "moddatos";// password de prueba de sunat
+	public static String envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL, String sunatSolUsername, String sunatSolPassword) {
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = basePath + "/xmlsSunat/";
-		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
+		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
 		invoiceVo.setSunatErrorStr(sunatResponse);
 		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);

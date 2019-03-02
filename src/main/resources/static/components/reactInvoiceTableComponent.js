@@ -29,7 +29,8 @@ class InvoiceTableSummary extends React.Component {
 	    SUNAT_PENDING_STATUS: 'PENDIENTE',
 	    SUNAT_SENT_STATUS: 'ENVIADO',
 	    NORMAL_PROCESSING_TYPE: 'NORMAL',
-	    FORCED_PROCESSING_TYPE: 'FORCED'
+	    FORCED_PROCESSING_TYPE: 'FORCED',
+	    EDIT_ENABLED_TIME_IN_MS: 600000
     }
   }
   
@@ -83,7 +84,7 @@ class InvoiceTableSummary extends React.Component {
 						if (self.state.user.roles.ROLE_ADMIN) {
 							editInvoice = "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>";
 						} else {
-							if ((new Date() - invoicesSummaryData[i].date) < 300000) {
+							if ((new Date() - invoicesSummaryData[i].date) < self.CONSTANTS.EDIT_ENABLED_TIME_IN_MS) {
 								editInvoice = "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>";
 							} else{
 								editInvoice = "<a ></a>"; 

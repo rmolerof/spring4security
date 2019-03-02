@@ -93,7 +93,8 @@ class TableDashboard extends React.Component {
 						credits,
 						expensesOnly,
 						(stationSummaryData[i].totalDay.totalSolesRevenueDay - stationSummaryData[i].totalCash - expensesAndCredits).toFixed(2),
-						stationSummaryData[i].totalDay.totalProfitDay
+						stationSummaryData[i].totalDay.totalProfitDay,
+						"<a class='view' href='/inventory-control-page?id=" + stationSummaryData[i].shiftDate + "-" + stationSummaryData[i].shift + "'>Editar</a>"
 						];
 					
 					tableData[i] = row;
@@ -568,6 +569,7 @@ class StationTbl extends React.Component {
 		            { title: "Solo Gastos" },
 		            { title: "Falta/Sobra" },
 		            { title: "Util Bruta" },
+		            { title: "Editar" }
 			]
 		});
 	}

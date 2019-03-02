@@ -9,4 +9,6 @@ public interface InvoicesRepositoryCustom {
 	InvoiceDao findLastSentInvoice(String invoiceType);
 	
 	InvoiceDao findFirstByInvoiceNumberNotVoided(String invoiceNumber);
+	
+	InvoiceDao findLastNotVoidedInvoice(String invoiceType);
 }
