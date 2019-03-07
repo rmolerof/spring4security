@@ -113,6 +113,19 @@ public class UserService {
 		
 	}
 	
+	public List<Station> findStationStatusByShiftDateAndShift(String shiftDate, String shift) {
+		StationDao stationDao = stationRepository.findFirsByShiftDateAndShift(shiftDate, shift);
+		StationDao stationDaoBeforeDate = stationRepository.findFirstBeforeDate(stationDao.getDate());
+		
+		// Update ObjectId and date from latest station status into current station as it is used lated to submit updated day status
+		stationDaoBeforeDate.setId(stationDao.getId());
+		stationDaoBeforeDate.setDate(stationDao.getDate());
+		
+		setCurrentStation(new Station(stationDaoBeforeDate));
+		
+		return new LinkedList<Station>(Arrays.asList(new Station(stationDao), new Station(stationDaoBeforeDate)));
+	}
+	
 	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg, int backDataCount) {
 		Station station = new Station();
 		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg, backDataCount);
@@ -445,7 +458,8 @@ public class UserService {
 			tanksVo = new TanksVo(tanksDao);
 			setCurrentTanksVo(tanksVo);
 		} else if (operation.equals("update"))  {
-			tanksDao = tanksRepository.findLatest("latest", "").get(0);
+			//tanksDao = tanksRepository.findLatest("latest", "").get(0);
+			tanksDao = tanksRepository.findFirstByDate(tanksVoCriteria.getDate());
 			tanksDao.setDate(tanksVoCriteria.getDate());
 			tanksDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
 			tanksDao.setTanks(tanksVoCriteria.getTanks());

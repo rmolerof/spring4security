@@ -350,17 +350,24 @@ class IncorporationForm extends React.Component {
   
   _fetchData(timeframe){
 	  
-	  	var search = {};
+	  var self = this;	
+	  var search = {};
 		if (timeframe.dateEnd == 'latest') {
 			search["dateEnd"] = timeframe.dateEnd;
 			search["dateBeg"] = timeframe.dateBeg;
 			search["backDataCount"] = timeframe.backDataCount;
 		} else {
-			var date = timeframe.substring(0, timeframe.indexOf('-'));
+			var shiftDate = timeframe.substring(0, timeframe.indexOf('-'));
 			var shift = timeframe.substring(timeframe.indexOf('-') + 1);
-			search["date"] = date;
+			search["shiftDate"] = shiftDate;
 			search["shift"] = shift;
 		}
+		
+		var errors = {
+	    		submit: ''
+	    };
+		
+		this.setState({errors: errors});
 		
 		jQuery.ajax({
 			type: "POST",
@@ -583,8 +590,10 @@ class IncorporationForm extends React.Component {
 				this.setState({gasPrices: gasPrices});*/
 			},
 			error: function(e){
-				var json = "<h4>Ajax Response</h4><pre>" + e.responseText + "</pre>";
+				var json = "<h4>Ajax Response</h4><pre>" + e.responseJSON + "</pre>";
 				console.log("ERROR: ", e);
+				errors["submit"] = e.responseJSON.msg;
+				self._toggleError();
 			}	
 		});
 	}
@@ -593,6 +602,7 @@ class IncorporationForm extends React.Component {
 	  
 	  var dateAndShift = this._getQueryVariable('id');
 	  if (dateAndShift) {
+		  this.setState({saveOrUpdate:  'update'});
 		  this._fetchData(dateAndShift);
 	  } else {
 		  this._fetchData({dateEnd: "latest", dateBeg: ""});

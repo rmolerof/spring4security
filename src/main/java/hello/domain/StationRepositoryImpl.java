@@ -1,5 +1,6 @@
 package hello.domain;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import hello.businessModel.Tank;
@@ -68,5 +70,17 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 	    
 		
 		return latestStationStatuses;
+	}
+
+	@Override
+	public StationDao findFirstBeforeDate(Date date) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("date").lt(date));
+		query.limit(1);
+		query.with(new Sort(Direction.DESC, "date"));
+		
+		List<StationDao> firstStationBeforeDateGroup = mongoTemplate.find(query, StationDao.class);
+		
+		return firstStationBeforeDateGroup.size() > 0 ? firstStationBeforeDateGroup.get(0): StationDao.NOT_FOUND;
 	}	
 }

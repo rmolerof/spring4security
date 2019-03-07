@@ -30,7 +30,8 @@ class InvoiceTableSummary extends React.Component {
 	    SUNAT_SENT_STATUS: 'ENVIADO',
 	    NORMAL_PROCESSING_TYPE: 'NORMAL',
 	    FORCED_PROCESSING_TYPE: 'FORCED',
-	    EDIT_ENABLED_TIME_IN_MS: 600000
+	    EDIT_ENABLED_TIME_IN_MS: 600000,
+	    NUMBER_OF_RECORDS_TO_LOAD: 5000
     }
   }
   
@@ -248,8 +249,8 @@ class InvoiceTableSummary extends React.Component {
   
   componentWillMount(){
 	  this._getUser();
-	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: "-310"});
-	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: "-310"});
+	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: this.CONSTANTS.NUMBER_OF_RECORDS_TO_LOAD});
+	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: this.CONSTANTS.NUMBER_OF_RECORDS_TO_LOAD});
   }
   
   onKeyPress(event) {
@@ -312,20 +313,24 @@ class InvoiceTableSummary extends React.Component {
 				if (data.result.length > 0) {
 					var submittedInvoices = data.result;
 					var errors = [];
-					var validationError = "Comprobantes Invalidos: ";
-					var sunatErrorStr = "";
+					var invoiceSequenceValidationErrorMsg = "Secuencia incompleta en: ";
+					var sunatFailedToSendMsg = "Comprobantes no enviados: ";
 					var sunatErrorCount = 0;
 					
 					for (var i = 0; i < submittedInvoices.length; i++) {
+						if (!submittedInvoices[i].sunatValidated) {
+							invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
+							sunatErrorCount++;
+						}
+						
 						if (submittedInvoices[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
-							validationError += submittedInvoices[i].invoiceNumber + " ";
-							sunatErrorStr += submittedInvoices[i].sunatErrorStr + " "
+							sunatFailedToSendMsg += submittedInvoices[i].invoiceNumber + " "
 							sunatErrorCount++;
 						}
 					}
 					
 					if (sunatErrorCount > 0) {
-						errors["sunatValidationMsg"] = validationError + sunatErrorStr;
+						errors["sunatValidationMsg"] = invoiceSequenceValidationErrorMsg + sunatFailedToSendMsg;
 						this.setState({errors: errors, showError: true});
 					} else {
 						this.setState({showSuccess: true});
@@ -370,7 +375,7 @@ class InvoiceTableSummary extends React.Component {
       	  
 	      {this.state.showError && 
 		        <div className="alert alert-danger">
-	      <strong>¡Error!</strong>{" " + this.state.errors.sunatValidationMsg + " " + this.state.errors.submit}  
+	      <strong>¡Error!</strong>{this.state.errors.sunatValidationMsg && ` ${this.state.errors.sunatValidationMsg}`}{this.state.errors.submit && ` ${this.state.errors.submit}`}  
 		      	</div>
 	      }
 	      

@@ -1,5 +1,6 @@
 package hello.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class ServiceController {
 	}
 	
 	@PostMapping("/api/getStationStatusByDates")
-	public ResponseEntity<?> getSearchResultViaAjax(@Valid @RequestBody SearchDateCriteria search, Errors errors){
+	public ResponseEntity<?> getSearchResultViaAjax(@Valid @RequestBody SearchDateCriteria searchCriteria, Errors errors){
 		AjaxGetStationResponse result = new AjaxGetStationResponse();
 		
 		if(errors.hasErrors()) {
@@ -89,13 +90,21 @@ public class ServiceController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<Station> users = userService.findLatestStationStatus(search.getDateEnd(), search.getDateBeg(), search.getBackDataCount());
-		if(users.isEmpty()) {
-			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
+		List<Station> stations = null; 
+		if (null != searchCriteria.getDateEnd() && null != searchCriteria.getDateBeg()) {
+			stations = userService.findLatestStationStatus(searchCriteria.getDateEnd(), searchCriteria.getDateBeg(), searchCriteria.getBackDataCount());
+		} else if (null != searchCriteria.getShiftDate() && null != searchCriteria.getShift()) {
+			stations = userService.findStationStatusByShiftDateAndShift(searchCriteria.getShiftDate(), searchCriteria.getShift());
+		} else {
+			stations = new ArrayList<Station>();
+		}
+		
+		if(stations.isEmpty()) {
+			result.setMsg("No hay datos para la fecha: " + searchCriteria.getDateEnd());
 		} else {
 			result.setMsg("Datos hallados");
 		}
-		result.setResult(users);
+		result.setResult(stations);
 		
 		return ResponseEntity.ok(result);
 		

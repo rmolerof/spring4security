@@ -21,6 +21,9 @@ import hello.businessModel.TotalDay;
 @Document(collection = "stations")
 public class StationDao {
 	
+	public static final String STATION_STATUS_NOT_FOUND = "STATION STATUS NOT FOUND";
+	public static final StationDao NOT_FOUND = new StationDao(STATION_STATUS_NOT_FOUND);
+	
 	@Id 
 	private ObjectId id;
 	
@@ -39,6 +42,10 @@ public class StationDao {
 	
 	public StationDao() {
 		super();
+	}
+	
+	public StationDao(String name) {
+		this.name = name;
 	}
 	
 	public StationDao(Station original) {
