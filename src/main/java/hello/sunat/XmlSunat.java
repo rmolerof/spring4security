@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.xml.crypto.MarshalException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.bean.CpeBean;
@@ -31,6 +33,8 @@ import com.bean.Cpe_DetalleBean;*/
 import hello.model.InvoiceVo;
 
 public class XmlSunat {
+	
+	private static Logger logger = LogManager.getLogger(XmlSunat.class);
 	
 	public static final String myRUC = "20501568776";
 	private static final String[] UNIDADES = { "", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", "siete ", "ocho ", "nueve " };
@@ -210,9 +214,8 @@ public class XmlSunat {
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
 		invoiceVo.setSunatErrorStr(sunatResponse);
-		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
-		System.out.println("hash: " + invoiceVo.getInvoiceHash());
-		
+		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
+		logger.info("hash: " + invoiceVo.getInvoiceHash());
 		return sunatResponse;
 	}
 	

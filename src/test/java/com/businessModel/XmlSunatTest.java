@@ -29,7 +29,13 @@ public class XmlSunatTest {
 	public static CpeBean cpe = null;
     public static Cpe_DetalleBean cpe_Detalle = null;
     
-	public static void main(String[] args) throws FileNotFoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, KeyStoreException, CertificateException, ParserConfigurationException, SAXException, MarshalException, IOException, Exception {
+    public static void main(String[] args) throws Exception {
+    	
+    	//processInvoice();
+    	ConexionCPEConsultaTicketTest();
+    }
+	
+    public static void processInvoice() throws FileNotFoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, KeyStoreException, CertificateException, ParserConfigurationException, SAXException, MarshalException, IOException, Exception {
 		
 		// Factura
 		InvoiceVo invoiceVo2 = new InvoiceVo();
@@ -107,6 +113,20 @@ public class XmlSunatTest {
 		XmlSunat.invokeSunat(invoiceVo3, System.getProperty("user.home"));
 		XmlSunat.firma(invoiceVo3, System.getProperty("user.home"), "FIRMABETA.pfx", "123456");
 		XmlSunat.envio(invoiceVo3, System.getProperty("user.home"), "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService", "MODDATOS", "moddatos");
+	}
+	
+	public static void ConexionCPEConsultaTicketTest() {
+		
+		String ruc = "20501568776";
+		String UsuarioSol = "LAJOYA40";
+		String PassSol = "Lajoya@4";
+		String rucCliente = "20501568776";
+		String tipoDocumento = "01";
+		String serie = "F001";
+		String numero = "108";
+		String RutaWS = "https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService";
+		
+		ApiClienteEnvioSunat.ConexionCPEConsultaEstadoFactura(ruc, UsuarioSol, PassSol, rucCliente, tipoDocumento, serie, numero, RutaWS);
 	}
 	
 	public static void firma() throws FileNotFoundException, NoSuchAlgorithmException,
