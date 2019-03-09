@@ -66,6 +66,7 @@ public class UserService {
 	public static final String SUNAT_VOIDED_STATUS = "ANULADO";
 	public static final String DNI = "1";
 	public static final String RUC = "6";
+	public static final String CLIENTES_VARIOS_DOC_NUMBER = "0";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -643,6 +644,7 @@ public class UserService {
 				invDao.setSunatStatus("ENVIADO");
 				invoiceVo.setSunatStatus("ENVIADO");
 				invoicesRepository.save(invDao);
+				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked ENVIADO.");
 			}
 			
 			return invoiceVo;
@@ -703,6 +705,7 @@ public class UserService {
 				
 				if (existingInvoiceDao.getClientName().equals(InvoiceDao.INVOICE_NOT_FOUND_NAME)) {
 					invoicesRepository.save(invoiceDao);
+					logger.info("Unprocessed invoice " + invoiceDao.getInvoiceNumber() + " sent to database");
 				} else {
 					throw new Exception("Comprobante Nro " + invoiceDao.getInvoiceNumber() + " ya existe.");
 				}
@@ -713,6 +716,7 @@ public class UserService {
 				
 				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
 				invoicesRepository.save(invoiceDao);
+				logger.info("Unprocessed invoice " + invoiceDao.getInvoiceNumber() + " updated in database");
 				
 				invoiceVo.setSunatErrorStr("1|Updated");
 				invoiceVo.setStatus("1");
@@ -725,7 +729,7 @@ public class UserService {
 			
 			// Save address if present for DNI
 			if (null != invoiceVo.getClientAddress() && !invoiceVo.getClientAddress().trim().equals("")) {
-				utils.saveClientAddressForDNI(invoiceVo);
+				utils.saveClientAddressForDNIOrRUC(invoiceVo);
 			}
 			
 		} catch (Exception e) {

@@ -691,7 +691,7 @@ class TableDashboard extends React.Component {
 							    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
 					        }.bind(this), 0);
 						} else {
-							self.setState({clientAddress: data.result.direccionS});
+							self.setState({clientAddress: data.result.direccion});
 							self.setState({clientName: data.result.razonSocial});
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});

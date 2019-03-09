@@ -172,7 +172,7 @@ public class RucDniService {
 		rucVo.setTipo(obj.getJSONObject("result").getString("Tipo"));
 		rucVo.setEstado(obj.getJSONObject("result").getString("Estado"));
 		rucVo.setCondicion(obj.getJSONObject("result").getString("Condicion"));
-		rucVo.setDireccion(obj.getJSONObject("result").getString("Direccion"));
+		rucVo.setDireccion(obj.getJSONObject("result").getString("Direccion").trim().replaceAll(" +", " "));
 		rucVo.setDepartamento(true == obj.getJSONObject("result").isNull("departamento") ? "": obj.getJSONObject("result").getString("departamento"));
 		rucVo.setProvincia(true == obj.getJSONObject("result").isNull("provincia") ? "": obj.getJSONObject("result").getString("provincia"));
 		rucVo.setDistrito(true == obj.getJSONObject("result").isNull("distrito") ? "": obj.getJSONObject("result").getString("distrito"));
