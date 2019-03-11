@@ -26,7 +26,8 @@ class IncorporationForm extends React.Component {
       totalExpenses: '',
       inputStyle: {color: 'black'},
       excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'},
-      fetchBackDataCount: 0
+      fetchBackDataCount: 0,
+      normalPrintEnabled: false
     };
   }
   
@@ -616,7 +617,16 @@ class IncorporationForm extends React.Component {
 	}
   }
   
-  render() {    
+  _printModeButtonHandleClick(){
+		this.setState({normalPrintEnabled: !this.state.normalPrintEnabled});
+  }
+  
+  render() {
+	  
+	let printModeButtonText = 'Formato Normal';
+	if (!this.state.normalPrintEnabled) {
+		printModeButtonText = 'Formato Ticket';
+	}  
     return (
     
       <form onSubmit={this.handleSubmit}>
@@ -635,371 +645,343 @@ class IncorporationForm extends React.Component {
         
         <div className="row">
 	      <div className="col-md-12">
-	          <div className="portlet light form-fit ">
+	      	  
+	          <div className="portlet light form-fit " >
 	                <div className="portlet-title">
 	                    <div className="caption">
 	                        <i className="icon-social-dribbble font-green"></i>
-	                        <span className="caption-subject font-green bold uppercase">Grifo {this.state.name}</span>
+	                        <span className="caption-subject font-green bold uppercase">Grifo {this.state.name}</span>&nbsp;&nbsp;
+	                        <a onClick={this._printModeButtonHandleClick.bind(this)} className="btn btn-sm green-meadow">{printModeButtonText}</a>&nbsp;&nbsp;
+	                        {!this.state.normalPrintEnabled && <ReactToPrint trigger={() => <a type="submit" className="btn btn-sm purple mt-ladda-btn ladda-button" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.dispensersStatusRef}></ReactToPrint>}
+	                        {this.state.normalPrintEnabled && <ReactToPrint trigger={() => <a type="submit" className="btn btn-sm blue mt-ladda-btn ladda-button" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.normalPrintStatusRef}></ReactToPrint>}
 	                    </div>
 	                </div>
-				    <div className="form-body">
-				      <div className="row">
-				          <div className="col-md-3">
-				              <div className="form-group">
-				                  <label className="control-label">Nombres de Grifero(s)</label>
-				                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
-				              </div>
-				          </div>
-				          <div className="col-md-2">
-				              <div className="form-group">
-				                  <label className="control-label">Creado Fecha</label>
-				                  <input type="text" id="date" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`} readOnly/>
-				              </div>
-				          </div>
-				          <div className="col-md-2">
-				              <div className="form-group">
-				                  <label className="control-label">Fecha</label>
-				                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>
-				              </div>
-				          </div>
-				          <div className="col-md-1">
-				              <div className="form-group">
-				                  <label className="control-label">Turno</label>
-				                  <input type="text" id="shift" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
-				              </div>
-				          </div>
-				          <div className="col-md-2">
-				              <div className="form-group">
-				              	  <label className="control-label">&nbsp;</label><br></br>
-						          <a onClick={this.loadPrevious} className="btn red">
-                                    <i className="fa fa-edit"></i> Editar Anterior
-                                </a>
-				              </div>
-				          </div>
-				      </div>
-				      
-				      <div className="row">
-					  	<div className="col-md-3" >
-				              <div className="form-group">
-				              <table className="table table-hover table-light">
-				            	<tbody>
-			          			<tr>
-			          				{this.state.tanks.map((tank, idx) => (
-				            			<td key={`col${idx}`}>
-				            				<label className="control-label" key={`name${idx}`}>Gal {tank.fuelType.toUpperCase()}</label>
-				            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={tank.gals.toFixed(2)} readOnly/>
-			          				</td>
-			          				))}
-				                    </tr>
-			                  </tbody>
-				              </table>
-				              </div>
-				        </div>
-				      
-			  		  	<div className="col-md-3" >
-				              <div className="form-group">
-				              <table className="table table-hover table-light">
-				            	<tbody>
-			            			<tr>
-			            				{this.state.gasPrices.map((gasPrice, idx) => (
-				            			<td key={`col${idx}`}>
-				            				<label className="control-label" key={`name${idx}`}>S/ {gasPrice.name.toUpperCase()}</label>
-				            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={`S/. ` + gasPrice.price.toFixed(2)} readOnly/>
-			            				</td>
-			            				))}
-				                    </tr>
-			                    </tbody>
-				              </table>
-				              </div>
-				        </div>
-				      </div>
-				      
-			      	  <div className="row">
-					      <div className="col-md-3">
-					          <div className="portlet box red">
-					              <div className="portlet-title">
-					                  <div className="caption">
-					                      <i className="fa fa-gift"></i>Grupo 1 de Máquinas</div>
+				    <div className="form-body" >
+				      <div ref={el => (this.dispensersStatusRef = el)}>
+					      <div className="row">
+					          <div className="col-md-3">
+					              <div className="form-group">
+					                  <label className="control-label">Nombres de Grifero(s)</label>
+					                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." onKeyPress={this.onKeyPress} value={this.state.pumpAttendantNames} onChange={this.handlePumpAttendantNamesChange}/>
 					              </div>
-					              
-					              <div className="portlet-body form">
-						              <div className="portlet-body">
-						                  <div className="table-responsive">  
-							              	<table>
-								      	        <tbody>
-								      				<tr>
-								      					<td>
-								      						
-								      					          <div  className="shareholder">
-								      					            
-								      					            <table className="table table-bordered">
-								      					            	<tbody>
-								      					            		<tr>
-								      					            			<th>
-								      					            				Prod
-								      					            			</th>
-								      					            			<th>
-								      					            				Soles
-								      					            			</th>
-								      					            			<th>
-								      					            				Venta
-								      					            			</th>
-								      					            		</tr>
-								      					            		{this.state.shareholders1.map((shareholder, idx) => (
-								      					            		<tr key={`d1${idx}`}>
-								      						            		<td>
-								      						            			<input  style={{border: 'none', width: '40px'}} type="text" key={`prod${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.name} readOnly/>
-								      						            		</td>
-								      						            		<td>
-								      						            			<input style={{border: 'none', width: '80px'}} type="text" key={`price${idx}`} value={`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`} readOnly/>
-								      						            		</td>
-								      						            		<td>
-								      						            			<table>
-								      						            				<tbody>
-								      						            					<tr>
-								      						            						<td>
-								      						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange1(idx)}/>
-								      						            						</td>
-								      						            					</tr>
-								      						            					<tr>
-								      						            						<td>
-								      						            							<input style={{border: 'none', width: '80px', textAlign: 'right'}} type="text" key={`beg${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.numBeg} readOnly/>
-								      						            						</td>
-								      						            					</tr>
-								      						            					<tr>
-								      					            						<td>
-								      					            							<input style={{borderBottomWidth: '4px', width: '80px', textAlign: 'right'}} type="text" key={`dif${idx}`} placeholder={`Numero ${idx + 1}`} value={`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`} readOnly/>
-								      					            						</td>
-								      					            					</tr>
-								      						            				</tbody>
-								      						            			</table>
-								      						                    </td>
-								      						            	</tr>
-							      					            			))}
-								      					            	</tbody>
-								      					            </table>
-								      					          </div>
-									      				        
-									      					</td>
-									      				</tr>
-									      		</tbody>
-								              </table>
-							              </div>
-				                      </div>
-					              </div>
-					              
 					          </div>
+					          <div className="col-md-2">
+					              <div className="form-group">
+					                  <label className="control-label">Creado Fecha</label>
+					                  <input type="text" id="date" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`} readOnly/>
+					              </div>
+					          </div>
+					          <div className="col-md-2">
+					              <div className="form-group">
+					                  <label className="control-label">Fecha</label>
+					                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>
+					              </div>
+					          </div>
+					          <div className="col-md-1">
+					              <div className="form-group">
+					                  <label className="control-label">Turno</label>
+					                  <input type="text" id="shift" className="form-control" placeholder="Turno" value={this.state.shift} readOnly/>
+					              </div>
+					          </div>
+					          {/*<div className="col-md-2">
+					              <div className="form-group">
+					              	  <label className="control-label">&nbsp;</label><br></br>
+					              	  
+					              	  <a onClick={this.loadPrevious} className="btn red">
+	                                    <i className="fa fa-edit"></i> Editar Anterior
+	                                  </a>
+					              </div>
+					          </div>*/}
 					      </div>
 					      
-					      <div className="col-md-3">
-					          <div className="portlet box purple">
-					              <div className="portlet-title">
-					                  <div className="caption">
-					                      <i className="fa fa-gift"></i>Grupo 2 de Maquinas</div>
+					      <div className="row">
+						  	<div className="col-md-3" >
+					              <div className="form-group">
+					              <table className="table table-hover table-light">
+					            	<tbody>
+				          			<tr>
+				          				{this.state.tanks.map((tank, idx) => (
+					            			<td key={`col${idx}`}>
+					            				<label className="control-label" key={`name${idx}`}>Gal {tank.fuelType.toUpperCase()}</label>
+					            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={tank.gals.toFixed(2)} readOnly/>
+				          				</td>
+				          				))}
+					                    </tr>
+				                  </tbody>
+					              </table>
 					              </div>
-					              
-					              <div className="portlet-body form">
-					              	<div className="portlet-body">
-					                  <div className="table-responsive"> 
-						                  <table>
-							      	        <tbody>
-							      				<tr>
-							      					<td>
-						  					            <table className="table table-bordered">
-						  					            	<tbody>
-						  					            		<tr>
-						  					            			<th>
-						  					            				Prod
-						  					            			</th>
-						  					            			<th>
-						  					            				Soles
-						  					            			</th>
-						  					            			<th>
-						  					            				Venta
-						  					            			</th>
-						  					            		</tr>
-						  					            		{this.state.shareholders2.map((shareholder, idx) => (
-							  					            		<tr key={`d2${idx}`}>
-							  						            		<td>
-							  						            			<input style={{border: 'none', width: '40px'}} type="text" key={`prod${idx}`} value={shareholder.name} readOnly/>
-							  						            		</td>
-							  						            		<td>
-							  						            			<input style={{border: 'none', width: '80px'}} type="text" key={`price${idx}`} value={`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`} readOnly/>
-							  						            		</td>
-							  						            		<td>
-							  						            			<table>
-							  						            				<tbody>
-							  						            					<tr>
-							  						            						<td>
-							  						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange2(idx)}/>
-							  					            							</td>
-							  						            					</tr>
-							  						            					<tr>
-							  						            						<td>
-							  						            							<input style={{border: 'none', width: '80px', textAlign: 'right'}} type="text" key={`beg${idx}`}  value={shareholder.numBeg} readOnly/>
-							  						            						</td>
-							  						            					</tr>
-							  						            					<tr>
-							  					            						<td>
-							  					            							<input style={{borderBottomWidth: '4px', width: '80px', textAlign: 'right'}} type="text" key={`dif${idx}`} placeholder={`Gals Vendidos ${idx + 1}`} value={`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`} readOnly/>
-							  					            						</td>
-							  					            					</tr>
-							  						            				</tbody>
-							  						            			</table>
-							  						                    </td>
-							  						            	</tr>
-						  					            		))}
-						  					            	</tbody>
-						  					            </table>
-								      				</td>
-								      			</tr>
-								      		</tbody>
-							              </table>
-					                  </div>
-					                </div>
+					        </div>
+					      
+				  		  	<div className="col-md-3" >
+					              <div className="form-group">
+					              <table className="table table-hover table-light">
+					            	<tbody>
+				            			<tr>
+				            				{this.state.gasPrices.map((gasPrice, idx) => (
+					            			<td key={`col${idx}`}>
+					            				<label className="control-label" key={`name${idx}`}>S/ {gasPrice.name.toUpperCase()}</label>
+					            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={gasPrice.price.toFixed(2)} readOnly/>
+				            				</td>
+				            				))}
+					                    </tr>
+				                    </tbody>
+					              </table>
 					              </div>
-					              
-					          </div>
+					        </div>
 					      </div>
 					      
-					      <div className="col-md-4">
-					          <div className="portlet box green">
-					              <div className="portlet-title">
-					                  <div className="caption">
-					                      <i className="fa fa-gift"></i>Resultados</div>
-					              </div>
-					              
-					              <div className="portlet-body form">
-					              	<div className="portlet-body">
-						              	<div className="table-responsive">
-						              	
-						              	
-						              	  <table className="table table-light">
-							      	        <tbody>
-									      	    <tr>
-						      	        			<td>
-							      	        			<table className="table table-hover table-borderless">
-						  					            	<tbody>
-						  					            		<tr>
-						  					            			<td>
-						  					            				<label className="control-label" key="revenueLabel">Venta Total:</label>&nbsp;&nbsp;
-						  					            			</td>
-						  					            			<td>
-						  					            				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
-						  					            			</td>
-						  					            		</tr>
-						  					            		<tr>
-										      	        			<td>
-										      	        				<label className="control-label" key="cashLabel">Effectivo:</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-										      	        				<label className="control-label" key="gastosOrCreditsLabel">VDCG:</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalVisasLabel">Solo Visas: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalDepositsLabel">Solo Depósitos: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalCreditsLabel">Solo Créditos: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-									      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalExpensesLabel">Solo Gastos: S/.</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-										      	        		<tr>
-									      	        				<td>
-										      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
-									      	        				</td>
-									      	        				<td>
-										      	        				<input style={this.state.excessOrMissingStyle} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
-										      	        			</td>
-										      	        		</tr>
-					  					            		</tbody>
-				  					            		</table>
-						      	        			</td>
-						      	        		</tr>
-						      	        		
-						      	        		<tr>
-							      					<td>
-						  					            <table className="table table-hover table-bordered">
-						  					            	<tbody>
-						  					            		<tr>
-						  					            			<th>
-						  					            				Item
-						  					            			</th>
-						  					            			<th>
-						  					            				Monto
-						  					            			</th>
-						  					            			<th>
-						  					            				
-						  					            			</th>
-						  					            		</tr>
-						  					            		{this.state.expensesAndCredits.map((expenseOrCredit, idx) => (	
-						  					            		<tr key={`trItem${idx}`}>
-						  						            		<td>
-						  						            			<input style={{width: '160px'}} type="text" key={`item${idx}`} onKeyPress={this.onKeyPress} placeholder={`Crédito o gasto`} value={expenseOrCredit.item}  onChange={this.handleItemChange(idx)}/>
-					  						            			</td>
-						  						            		<td>
-						  						            			<input type="number" style={{size:10, width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`amt${idx}`} placeholder={`Monto`} inputMode="numeric" value={expenseOrCredit.amt}  onChange={this.handleItemAmtChange(idx)}/>
-						  						            			{/* <MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask="1111.11" key={`amt${idx}`} placeholder={`Monto`} value={`${expenseOrCredit.amt}`} onChange={this.handleItemAmtChange(idx)}/>*/}
-						  						            		</td>
-						  						            		<td>
-						  						            			
-						  						            			<a key={`del${idx}`} onClick={this.handleRemoveItem(idx)} className="btn btn-outline btn-circle dark btn-sm black">
-						  						            				<i className="fa fa-trash-o"></i>
-						  						            			</a>
-						  						            		</td>
-						  						            	</tr>
-						  					            		))}
-						  					            	</tbody>
-						  					            </table>
-								      				</td>
-								      			</tr>
-						      	        		
-								      		</tbody>
-							              </table>
-							              
-							              <a key={"addItem"} onClick={this.handleAddItem} className="btn btn-outline btn-circle btn-sm purple">
-							              	<i className="fa fa-plus"></i> Añadir ítem 
-			                              </a>
-			                              
+				      	  <div className="row">
+						      <div className="col-md-3">
+						          <div className="portlet box red">
+						              <div className="portlet-title">
+						                  <div className="caption">
+						                      <i className="fa fa-gift"></i>Grupo 1 de Máquinas</div>
+						              </div>
+						              
+						              <div className="portlet-body form">
+							              <div className="portlet-body">
+							                  <div className="table-responsive">  
+				      					          <div  className="shareholder">
+				      					            
+				      					            <table className="table table-hover">
+				      					            	<tbody>
+				      					            		<tr>
+				      					            			<th>
+				      					            				Prod
+				      					            			</th>
+				      					            			<th>
+				      					            				Soles
+				      					            			</th>
+				      					            			<th>
+				      					            				Venta
+				      					            			</th>
+				      					            		</tr>
+				      					            		{this.state.shareholders1.map((shareholder, idx) => (
+				      					            		<tr key={`d1${idx}`}>
+				      						            		<td>
+				      						            			<input  style={{border: 'none', width: '40px'}} type="text" key={`prod${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.name} readOnly/>
+				      						            		</td>
+				      						            		<td>
+				      						            			<input style={{border: 'none', width: '80px'}} type="text" key={`price${idx}`} value={`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`} readOnly/>
+				      						            		</td>
+				      						            		<td>
+				      						            			<table>
+				      						            				<tbody>
+				      						            					<tr>
+				      						            						<td>
+				      						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange1(idx)}/>
+				      						            						</td>
+				      						            					</tr>
+				      						            					<tr>
+				      						            						<td>
+				      						            							<input style={{border: 'none', width: '80px', textAlign: 'right'}} type="text" key={`beg${idx}`} placeholder={`Numero ${idx + 1}`} value={shareholder.numBeg} readOnly/>
+				      						            						</td>
+				      						            					</tr>
+				      						            					<tr>
+				      					            						<td>
+				      					            							<input style={{borderBottomWidth: '4px', width: '80px', textAlign: 'right'}} type="text" key={`dif${idx}`} placeholder={`Numero ${idx + 1}`} value={`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`} readOnly/>
+				      					            						</td>
+				      					            					</tr>
+				      						            				</tbody>
+				      						            			</table>
+				      						                    </td>
+				      						            	</tr>
+			      					            			))}
+				      					            	</tbody>
+				      					            </table>
+				      					          </div>
+								              </div>
+					                      </div>
+						              </div>
+						              
+						          </div>
+						      </div>
+						      
+						      <div className="col-md-3">
+						          <div className="portlet box purple">
+						              <div className="portlet-title">
+						                  <div className="caption">
+						                      <i className="fa fa-gift"></i>Grupo 2 de Maquinas</div>
+						              </div>
+						              
+						              <div className="portlet-body form">
+						              	<div className="portlet-body">
+						                  <div className="table-responsive"> 
+			  					            <table className="table table-hover">
+			  					            	<tbody>
+			  					            		<tr>
+			  					            			<th>
+			  					            				Prod
+			  					            			</th>
+			  					            			<th>
+			  					            				Soles
+			  					            			</th>
+			  					            			<th>
+			  					            				Venta
+			  					            			</th>
+			  					            		</tr>
+			  					            		{this.state.shareholders2.map((shareholder, idx) => (
+				  					            		<tr key={`d2${idx}`}>
+				  						            		<td>
+				  						            			<input style={{border: 'none', width: '40px'}} type="text" key={`prod${idx}`} value={shareholder.name} readOnly/>
+				  						            		</td>
+				  						            		<td>
+				  						            			<input style={{border: 'none', width: '80px'}} type="text" key={`price${idx}`} value={`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`} readOnly/>
+				  						            		</td>
+				  						            		<td>
+				  						            			<table>
+				  						            				<tbody>
+				  						            					<tr>
+				  						            						<td>
+				  						            							<MaskedInput style={{size:10, width:'80px', textAlign: 'right'}} mask={shareholder.pattern} key={`end${idx}`} placeholder={`Num ${shareholder.name}`} value={`${shareholder.numEnd}`} onChange={this.handleNumEndChange2(idx)}/>
+				  					            							</td>
+				  						            					</tr>
+				  						            					<tr>
+				  						            						<td>
+				  						            							<input style={{border: 'none', width: '80px', textAlign: 'right'}} type="text" key={`beg${idx}`}  value={shareholder.numBeg} readOnly/>
+				  						            						</td>
+				  						            					</tr>
+				  						            					<tr>
+				  					            						<td>
+				  					            							<input style={{borderBottomWidth: '4px', width: '80px', textAlign: 'right'}} type="text" key={`dif${idx}`} placeholder={`Gals Vendidos ${idx + 1}`} value={`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`} readOnly/>
+				  					            						</td>
+				  					            					</tr>
+				  						            				</tbody>
+				  						            			</table>
+				  						                    </td>
+				  						            	</tr>
+			  					            		))}
+			  					            	</tbody>
+			  					            </table>
+						                  </div>
 						                </div>
-					                </div>
-					              </div>
-					              
-					          </div>
-					      </div>
-					      
+						              </div>
+						              
+						          </div>
+						      </div>
+						      
+						      <div className="col-md-3">
+						          <div className="portlet box green">
+						              <div className="portlet-title">
+						                  <div className="caption">
+						                      <i className="fa fa-gift"></i>Resultados</div>
+						              </div>
+						              
+						              <div className="portlet-body form">
+						              	<div className="portlet-body">
+							              	<div className="table-responsive">
+					      	        			<table className="table table-hover table-borderless">
+				  					            	<tbody>
+				  					            		<tr>
+				  					            			<td>
+				  					            				<label className="control-label" key="revenueLabel">Venta Total:</label>&nbsp;&nbsp;
+				  					            			</td>
+				  					            			<td>
+				  					            				<input style={{width: '80px', textAlign: 'right'}} key="totalRevenue" type="text" value={this.state.totalRevenue} readOnly/>
+				  					            			</td>
+				  					            		</tr>
+				  					            		<tr>
+								      	        			<td>
+								      	        				<label className="control-label" key="cashLabel">Effectivo:</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input type="number" style={{width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} inputMode="numeric" placeholder={`Effectivo`} value={this.state.totalCash} onChange={this.handleTotalCashChange}/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+								      	        				<label className="control-label" key="gastosOrCreditsLabel">VDCG:</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={{width: '80px', textAlign: 'right'}} key="gastosOrCredits" type="text" value={this.state.totalExpensesAndCredits} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+							      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalVisasLabel">Solo Visas: S/.</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalVisas" type="text" value={this.state.totalVisas} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+							      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalDepositsLabel">Solo Depósitos: S/.</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalDeposits" type="text" value={this.state.totalDeposits} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+							      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalCreditsLabel">Solo Créditos: S/.</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalCredits" type="text" value={this.state.totalCredits} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+							      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalExpensesLabel">Solo Gastos: S/.</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={{width: '80px', textAlign: 'right'}} key="totalExpenses" type="text" value={this.state.totalExpenses} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+								      	        		<tr>
+							      	        				<td>
+								      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
+							      	        				</td>
+							      	        				<td>
+								      	        				<input style={this.state.excessOrMissingStyle} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
+								      	        			</td>
+								      	        		</tr>
+			  					            		</tbody>
+		  					            		</table>
+				  					            <table className="table table-hover">
+				  					            	<tbody>
+				  					            		<tr>
+				  					            			<th>
+				  					            				Item
+				  					            			</th>
+				  					            			<th>
+				  					            				Monto
+				  					            			</th>
+				  					            			<th>
+				  					            				
+				  					            			</th>
+				  					            		</tr>
+				  					            		{this.state.expensesAndCredits.map((expenseOrCredit, idx) => (	
+				  					            		<tr key={`trItem${idx}`}>
+				  						            		<td>
+				  						            			<input style={{width: '150px'}} type="text" key={`item${idx}`} onKeyPress={this.onKeyPress} placeholder={`Crédito o gasto`} value={expenseOrCredit.item}  onChange={this.handleItemChange(idx)}/>
+			  						            			</td>
+				  						            		<td>
+				  						            			<input type="number" style={{size:10, width:'80px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`amt${idx}`} placeholder={`Monto`} inputMode="numeric" value={expenseOrCredit.amt}  onChange={this.handleItemAmtChange(idx)}/>
+				  						            		</td>
+				  						            		<td>
+				  						            			
+				  						            			<a key={`del${idx}`} onClick={this.handleRemoveItem(idx)} >
+				  						            				<i className="fa fa-trash-o"></i>
+				  						            			</a>
+				  						            		</td>
+				  						            	</tr>
+				  					            		))}
+				  					            	</tbody>
+				  					            </table>
+								              
+				  					            <a key={"addItem"} onClick={this.handleAddItem} className="btn btn-outline btn-circle btn-sm purple">
+								              		<i className="fa fa-plus"></i> Añadir ítem 
+								              	</a>
+				                              
+							                </div>
+						                </div>
+						              </div>
+						              
+						          </div>
+						      </div>
+						      
+						  </div>
 					  </div>
 					  
 					  <div className="form-actions">
@@ -1009,10 +991,9 @@ class IncorporationForm extends React.Component {
 					      <button type="button" className="btn default">Cancelar</button>
 					  </div>
 					  
-					  <br></br>
+					  <br/>
 					  
-					  <ReactToPrint trigger={() => <button type="button" className="btn btn-default mt-ladda-btn ladda-button" data-style="expand-left" data-spinner-color="#333"><a href="#"><i className="fa fa-print"></i> Print this out</a></button>} content={() => this.componentRef}></ReactToPrint>
-					  <div className="row" ref={el => (this.componentRef = el)}>
+					  <div className="row" ref={el => (this.normalPrintStatusRef = el)}>
 					      <div className="col-md-7">
 					          <div className="portlet box red">
 					              <div className="portlet-title">
@@ -1032,10 +1013,10 @@ class IncorporationForm extends React.Component {
 											                  <input type="text" className="form-control" placeholder="Nombre1, Nombre2, ..." value={this.state.pumpAttendantNames} readOnly/>
 											              </div>
 											          </td>
-											         {/* <td>
+											         {/*<td >
 											              <div className="form-group">
-											                  <label className="control-label">Marca Horaria</label>
-											                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+											                  <label className="control-label">Creado Fecha</label>
+											                  <input type="text" id="timestamp"  className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
 											              </div>
 											          </td>*/}
 											          <td>
@@ -1060,7 +1041,7 @@ class IncorporationForm extends React.Component {
 										          			<tr>
 										          				{this.state.tanks.map((tank, idx) => (
 											            			<td key={`col${idx}`}>
-											            				<label className="control-label" key={`name${idx}`}>Inic {tank.fuelType.toUpperCase()} (gal)</label>
+											            				<label className="control-label" key={`name${idx}`}>Gal {tank.fuelType.toUpperCase()}</label>
 											            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={tank.gals.toFixed(2)} readOnly/>
 										          				</td>
 										          				))}
@@ -1077,8 +1058,8 @@ class IncorporationForm extends React.Component {
 										            			<tr>
 										            				{this.state.gasPrices.map((gasPrice, idx) => (
 											            			<td key={`col${idx}`}>
-											            				<label className="control-label" key={`name${idx}`}>Precio {gasPrice.name}</label>
-											            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={`S/. ` + gasPrice.price.toFixed(2)} readOnly/>
+											            				<label className="control-label" key={`name${idx}`}>S/ {gasPrice.name.toUpperCase()}</label>
+											            				<input type="text" className="form-control"  key={`cost${idx}`} onKeyPress={this.onKeyPress} value={gasPrice.price.toFixed(2)} readOnly/>
 										            				</td>
 										            				))}
 											                    </tr>
@@ -1101,7 +1082,7 @@ class IncorporationForm extends React.Component {
 												      					<td>
 											      					          <div  className="shareholder">
 											      					            
-											      					            <table className="table table-bordered">
+											      					            <table className="table table-hover">
 											      					            	<tbody>
 											      					            		<tr>
 											      					            			<th>
@@ -1170,7 +1151,7 @@ class IncorporationForm extends React.Component {
 												      					<td>
 											      					          <div  className="shareholder">
 											      					            
-											      					            <table className="table table-bordered">
+											      					            <table className="table table-hover">
 											      					            	<tbody>
 											      					            		<tr>
 											      					            			<th>
@@ -1351,7 +1332,7 @@ class IncorporationForm extends React.Component {
 					          </div>
 					      </div>
 					   </div>
-				      </div>
+				    </div>
 			  </div>
 		  </div>
 		</div>
