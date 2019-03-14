@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-    	<title>Spring Boot Thymelef + Spring Security</title>
+    	<title>CONTROL DE GRIFO Y FACTURACION ELECTRONICA</title>
     	<!-- Copies all header-css from fragments/header below -->
     	<div th:replace="fragments/header :: header-css"/>
 	</head>
@@ -11,8 +11,9 @@
 			<div class="starter-template">
 				<h1>CONTROL DE GRIFO Y FACTURACION ELECTRONICA</h1>
 				<h2>1. <a th:href="@{/admin}">ADMINISTRADOR</a></h2>
-	        	<h2>2. <a th:href="@{/invoicing-page}">USUARIO</a></h2>
-	        	<h2>3. <a th:href="@{/about}">ACERCA</a></h2>
+	        	<h2>2. <a th:href="@{/invoice-page}">USUARIO</a></h2>
+	        	<h2>3. <a th:href="@{/invoice-viewer-page}">CONSULTE RECIBO</a></h2>
+	        	<h2>4. <a th:href="@{/about}">ACERCA</a></h2>
         	</div>
 		</div>
 		<div th:replace="fragments/footer :: footer"/>

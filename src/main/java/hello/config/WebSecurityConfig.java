@@ -2,6 +2,7 @@ package hello.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,7 +23,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 			.authorizeRequests()
-				.antMatchers("/", "/home", "/about").permitAll() // if request is for /home or /about->permit
+				.antMatchers("/", "/home", "/about", "/invoice-viewer-page").permitAll() // if request is for /home or /about->permit
+				.antMatchers(HttpMethod.POST,"/api/findInvoice").permitAll()
+				.antMatchers(HttpMethod.GET,"/assets/**").permitAll()
 				.antMatchers("/admin/**").hasAnyRole("ADMIN") // if request path is /admin/** -> verify it has at least role ADMIN 
 				.antMatchers("/user/**").hasAnyRole("USER")
 				.anyRequest().authenticated() // any request needs to be authenticated
@@ -45,25 +48,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()
-				.withUser("rmolerof").password("rmolerof").roles("USER")
+				.withUser("rmolero").password("facturacion2301").roles("USER", "ADMIN")
 				.and()
 				.withUser("avilcahuaman").password("avilcahuaman").roles("USER")
 				.and()
+				.withUser("ymolero").password("ymolero@0828").roles("USER")
+				.and()
 				.withUser("pmori").password("pmori").roles("USER")
 				.and()
-				.withUser("imolero").password("imolero").roles("USER")
+				.withUser("imolero").password("imolero@8945").roles("USER", "ADMIN")
 				.and()
-				.withUser("rmolero").password("rmolero").roles("USER")
+				.withUser("yatencio").password("Espinoza").roles("USER", "ADMIN")
 				.and()
-				.withUser("yaninaa").password("yaninaa").roles("USER")
+				.withUser("erodas").password("erodas").roles("USER")
 				.and()
-				.withUser("grifer@").password("grifer@").roles("USER")
+				.withUser("mnalverte").password("mnalverte1234").roles("USER")
 				.and()
-				.withUser("user").password("password").roles("USER")
+				.withUser("mlaura").password("mlaura1234").roles("USER")
 				.and()
-				.withUser("admin").password("password").roles("ADMIN")
+				.withUser("eazucena").password("eazucena1234").roles("USER")
 				.and()
-				.withUser("superuser").password("password").roles("ADMIN", "USER");
-		
+				.withUser("hsandra").password("hsandra1234").roles("USER");
 	}
 }

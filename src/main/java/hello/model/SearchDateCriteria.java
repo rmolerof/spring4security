@@ -1,13 +1,20 @@
 package hello.model;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 public class SearchDateCriteria {
 	
-	@NotBlank(message = "Fecha no puede ser nula")
+	//@NotBlank(message = "Fecha no puede ser nula")
 	String dateEnd;
 	String dateBeg;
+	int backDataCount;
+	String shiftDate;
+	String shift;
 	
+	public String getShift() {
+		return shift;
+	}
+	public void setShift(String shift) {
+		this.shift = shift;
+	}
 	public String getDateEnd() {
 		return dateEnd;
 	}
@@ -20,5 +27,18 @@ public class SearchDateCriteria {
 	public void setDateBeg(String dateBeg) {
 		this.dateBeg = dateBeg;
 	}
+	public int getBackDataCount() {
+		return backDataCount;
+	}
+	public void setBackDataCount(int backDataCount) {
+		this.backDataCount = backDataCount;
+	}
+	public String getShiftDate() {
+		return shiftDate;
+	}
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
+	}
+	
 	
 }

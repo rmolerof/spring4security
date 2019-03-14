@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Visualizador de Comprobante</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+   	<div th:replace="fragments/header :: header-css"/>
+   	<div th:replace="fragments/invoice-header :: header-viewer-css"/>    
+</head>
+
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid" style="background-color:white;">
+	
+	<div th:replace="fragments/search-header :: header"/>
+	
+	<div class="container" style="min-height: 500px">
+
+	    <div class="starter-template">
+	
+           		<div class="page-container">
+            		<div class="page-content-wrapper">
+		                <!-- BEGIN CONTENT BODY -->
+		                <div class="page-content">
+			            	<!-- Status: <strong class="uppercase"><span id="errorAlert"></span></strong> -->
+		                    <div class="invoice">
+			                     <div class="row invoice-logo">
+						              <div class="col-xs-12 invoice-logo-space">
+						                  <!-- <img src="../assets/pages/media/invoice/lajoya.png" class="img-responsive" alt="" /> -->
+						                  Status: <strong class="uppercase"><span id="errorAlert"></span></strong></div> 
+						              <div class="col-xs-12 text-center">
+						                  <p> <strong class="uppercase "><span id="invoiceType"></span> ELECTRÓNICA</strong> <br/>
+						                      <span class="muted"> RUC: 20501568776  </span><br/>
+						                      <span class="muted bold" id="invoiceNbr"></span>
+						                  </p>
+						              </div>
+						          </div>
+			                     <div class="row">
+						              <div class="col-md-12">
+						                  <ul class="list-unstyled">
+						                      <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
+						                      <li> Av. Miguel Grau Mza B Lote 1-2 </li>
+						                      <li> Lima - Lima - Ate </li>
+						                      <li> +51 356 0345 </li>
+						                  </ul>
+						              </div>
+					              </div>
+					              <div class="portlet-body form">
+        		
+						    	      <div class="row">
+							    	      <div class="col-md-3">
+								              <div class="form-group" style="margin-bottom: 0px;">
+								                  <label class="control-label">Fecha</label>: 
+								                  <span id="dateId"></span>
+								                  
+								              </div>
+								          </div>
+						    	      	  <div class="col-md-2">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
+						    	                  <label class="control-label"><span id="clientDocType"></span></label>: 
+						    	                  <span id="clientDocNumber"></span>
+						    	              </div>
+						    	          </div>
+						    	          <div class="col-md-5">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
+						    	                  <label class="control-label"><span id="clientNameVrb"></span></label>: 
+						    	                  <span id="clientName"></span>
+						    	              </div>
+						    	          </div>
+						              </div>
+						              <div class="row">
+						    	          <div class="col-md-5">
+						    	              <div class="form-group" style="margin-bottom: 0px;">
+						    	                  <label class="control-label">Dirección: </label>
+						    	                  <span id="clientAddress"></span>
+						    	              </div>
+						    	          </div>
+						    	          <div class="col-md-5" > <!-- {this.state.selectedOption != 'boleta' && -->
+						    	              <div class="form-group" style="margin-bottom: 0px;">
+						    	                  <label class="control-label">Nro de Placa: </label>
+						    	                  <span id="truckPlateNumber"></span>
+						    	              </div>
+						    	          </div>
+							          </div>
+					              </div>
+			                     <div class="row">
+			                         <div class="col-xs-12">
+			                             <table class="table table-striped table-condensed table-hover">
+			                                 <thead>
+			                                     <tr>
+			                                         <th class="text-center"> Producto </th>
+			                                         <th class="text-center"> Cantidad </th>
+			                                         <th class="text-center"> Precio </th>
+			                                         <th class="text-center"> Importe </th>
+			                                     </tr>
+			                                 </thead>
+			                                 <tbody>
+			                                     <tr id="d2Row">
+			                                         <td> 01-MAX-D BIODIESEL </td>
+			                                         <td class="text-right"> <span id="galsD2"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceD2"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesD2"></span> </td>
+			                                     </tr>
+			                                     <tr id="g90Row">
+			                                         <td> 02-GASOHOL 90 </td>
+			                                         <td class="text-right"> <span id="galsG90"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceG90"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesG90"></span> </td>
+			                                     </tr>
+			                                     <tr id="g95Row">
+			                                         <td> 03-GASOHOL 95 </td>
+			                                         <td class="text-right"> <span id="galsG95"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="priceG95"></span> </td>
+			                                         <td class="text-right"> S/&nbsp;<span id="solesG95"></span> </td>
+			                                     </tr>
+			                                 </tbody>
+			                             </table>
+			                         </div>
+			                     </div>
+			                     <div class="row">
+			                         <div class="col-xs-6 hidden-xs">
+			                             <div >
+			                                  <address>
+								                  <strong>Son: </strong> <span class="totalVerbiage"></span>
+							                      <br/> <strong>Código Hash: </strong> <span class="invoiceHash"></span>
+							                	  <span class="creditNoteDetails">
+							                	  <br/><strong>Motivo: </strong> <span class="motiveCdDescription"></span>
+							                	  <br/> <strong>Nro Documento Referencia: </strong> <span class="invoiceNumberModified"></span>
+							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span class="dateOfInvoiceModified"></span>
+							                	  </span>
+							                	  <span class="toggleBonusNumber"><br/><strong>Número Bonus: </strong> <span class="bonusNumber"></span></span>
+							                	  <br/><strong>Atendido por: </strong> <span class="userName"></span>
+							                  </address>
+							                  <address>
+							                      <strong>Potenciado por:</strong>
+							                      <a> www.grifoslajoya.com </a>
+							                  </address>
+			                             </div>
+			                         </div>
+			                         <div class="col-xs-12 invoice-block">
+										<table class="table table-condensed table-hover">
+											<tbody>
+												<tr>
+													<td><strong>Sub-Total Ventas:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="subTotal"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Descuento:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="discount"></span></td>
+												</tr>
+												<tr>
+													<td><strong>IGV (18%):</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="totalIGV"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Importe Total:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="total"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Tarjeta de Crédito/Débito:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="electronicPmt"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Efectivo:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="cashPmt"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Evectivo Entregado:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="cashGiven"></span></td>
+												</tr>
+												<tr>
+													<td><strong>Vuelto:</strong></td>
+													<td>S/</td>
+													<td class="text-right sbold"><span id="change"></span></td>
+												</tr>
+											</tbody>
+										</table>
+			                             
+			                         </div>
+			                         <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+			                             <div >
+			                                  <address>
+							                	  <strong>Son: </strong> <span class="totalVerbiage"></span>
+							                      <br/> <strong>Código Hash: </strong> <span class="invoiceHash"></span>
+							                	  <span class="creditNoteDetails">
+							                	  <br/><strong>Motivo: </strong> <span class="motiveCdDescription"></span>
+							                	  <br/> <strong>Nro Documento Referencia: </strong> <span class="invoiceNumberModified"></span>
+							                	  <br/> <strong>Fecha Documento Referencia: </strong> <span class="dateOfInvoiceModified"></span>
+							                	  </span>
+							                	  <span class="toggleBonusNumber"><br/><strong>Número Bonus: </strong> <span class="bonusNumber"></span></span>
+							                	  <br/><strong>Atendido por: </strong> <span class="userName"></span>
+							                  </address>
+							                  <address>
+							                      <strong>Potenciado por:</strong>
+							                      <a> www.grifoslajoya.com </a>
+							                  </address>
+			                             </div>
+			                         </div>
+			                    </div>
+			                    <div class="row">
+								<div class="col-xs-4">
+									<div class="text-center">
+										<table class="table table-condensed table-hover">
+											<tbody>
+												<tr>
+													<td><strong>Código&nbsp;QR:</strong></td>
+													<td><div
+														style="width: '150px'; height: '150px'; display: 'block'; margin: 'auto'; zoom: 0.3">
+														<div id="qrcode1" class="col-xs-12 col-md-offset-3"></div>
+														</div>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+		                	</div>
+		                	<a class="btn blue hidden-print margin-bottom-5" onclick="javascript:window.print();" > Imprimir
+                                <i class="fa fa-print"></i>
+                            </a>
+	                	</div>
+                	</div>
+               	</div>
+	    </div>
+	
+	</div>
+	
+	<script type="text/javascript" src="webjars/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../js/qrcode.js"></script>
+	<script type="text/javascript" src="../../js/moment.js"></script>
+	<script type="text/javascript" src="../../js/moment-timezone-with-data.js"></script>
+	<script type="text/javascript" src="../../js/invoice-viewer.js"></script>
+	<div th:replace="fragments/invoice-footer :: invoice-footer"/>
+</body>
+</html>

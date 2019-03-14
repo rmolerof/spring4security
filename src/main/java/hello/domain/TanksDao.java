@@ -1,7 +1,7 @@
 package hello.domain;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -42,10 +42,10 @@ public class TanksDao {
 		this.id = new ObjectId();
 		this.pumpAttendantNames = new String(tanksVo.getPumpAttendantNames());
 		this.date = new Date(tanksVo.getDate().getTime());
-		this.tanks = new ArrayList<Tank>(tanksVo.getTanks());
-		this.supplierRUC = new String(tanksVo.getSupplierRUC());
-		this.truckDriverName = new String(tanksVo.getTruckDriverName());
-		this.truckPlateNumber = new String(tanksVo.getTruckPlateNumber());
+		this.tanks = new LinkedList<Tank>(tanksVo.getTanks());
+		this.supplierRUC = new String(tanksVo.getSupplierRUC() == null ? "": tanksVo.getSupplierRUC());
+		this.truckDriverName = new String(tanksVo.getTruckDriverName() == null ? "": tanksVo.getTruckDriverName());
+		this.truckPlateNumber = new String(tanksVo.getTruckPlateNumber() == null ? "": tanksVo.getTruckPlateNumber());
 		this.delivery = tanksVo.isDelivery();
 	}
 

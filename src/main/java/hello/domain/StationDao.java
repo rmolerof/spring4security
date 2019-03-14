@@ -3,6 +3,7 @@ package hello.domain;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,9 @@ import hello.businessModel.TotalDay;
 @Document(collection = "stations")
 public class StationDao {
 	
+	public static final String STATION_STATUS_NOT_FOUND = "STATION STATUS NOT FOUND";
+	public static final StationDao NOT_FOUND = new StationDao(STATION_STATUS_NOT_FOUND);
+	
 	@Id 
 	private ObjectId id;
 	
@@ -27,6 +31,7 @@ public class StationDao {
 	private String name;
 	private String pumpAttendantNames;
 	private String shift;
+	private String shiftDate = "";
 	@Indexed(unique = true)
 	private Date date;
 	private Map<String, Tank> tanks;
@@ -39,24 +44,33 @@ public class StationDao {
 		super();
 	}
 	
+	public StationDao(String name) {
+		this.name = name;
+	}
+	
 	public StationDao(Station original) {
 		this.id = null==original.getId() ? new ObjectId(): original.getId();
 		this.stationId = new Long(original.getStationId());
 	    this.name = new String(original.getName());
 	    this.pumpAttendantNames = new String(original.getPumpAttendantNames());
 	    this.shift = new String(original.getShift());
+	    this.shiftDate = new String(original.getShiftDate());
 	    this.date = new Date(original.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(original.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
 	    this.totalDay = new TotalDay(original.getTotalDay());
 	}
 	
+	
+
 	@Override
 	public String toString() {
-		return "Station [id=" + stationId + ", \nname=" + name + ", \npumpAttendantNames=" + pumpAttendantNames + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
-				+ ", \ndispensers=" + dispensers + "]";
+		return "StationDao [id=" + id + ", stationId=" + stationId + ", name=" + name + ", pumpAttendantNames="
+				+ pumpAttendantNames + ", shift=" + shift + ", shiftDate=" + shiftDate + ", date=" + date + ", tanks="
+				+ tanks + ", dispensers=" + dispensers + ", totalCash=" + totalCash + ", expensesAndCredits="
+				+ expensesAndCredits + ", totalDay=" + totalDay + "]";
 	}
 
 	public ObjectId getId() {
@@ -145,6 +159,14 @@ public class StationDao {
 
 	public void setTotalDay(TotalDay totalDay) {
 		this.totalDay = totalDay;
+	}
+
+	public String getShiftDate() {
+		return shiftDate;
+	}
+
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
 	}
 	
 }

@@ -155,6 +155,10 @@ class PriceForm extends React.Component {
   _fetchData(timeframe){
 			
 	  	var search = {};
+	  	var self = this; 
+	  	var errors = {
+	    	submit: ''
+	    };
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
 		
@@ -167,7 +171,11 @@ class PriceForm extends React.Component {
 			cache: false,
 			timeout: 600000,
 			success: (data) => {
-				if (data.result.length == 1) {
+				if (data.result.length == 0) {
+					errors["submit"] = data.msg;
+					self.setState({errors: errors});
+					self._toggleError();
+				} else if (data.result.length == 1) {
 					var gasPricesVo = data.result[0];
 					var currentDate = new Date();
 					

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8" />
-	<title>Control de Grifo</title>
+	<title>Reinicialize Datos de Grifo</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 	<meta content="width=device-width, initial-scale=1" name="viewport" />
 	<meta content="" name="description" />
@@ -481,11 +481,18 @@
                                 <span class="title">Facturación</span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item">
-                                    <a href="/invoicing-page" class="nav-link ">
-                                        <span class="title"><i class="icon-pencil"></i> Facturas/Boletas</span>
-                                    </a>
-                                </li>
+                                <li class="nav-item start">
+		                            <a href="/invoice-page" class="nav-link ">
+		                                <span class="title"><i class="icon-pencil"></i> Hacer Factura/Boleta/
+		                                	<br/>Nota de Crédito</span>
+		                            </a>
+		                        </li>
+		                        <li class="nav-item start">
+		                            <a href="/invoice-table-page" class="nav-link ">
+		                                <span class="title"><i class="icon-pencil"></i> Resumen de Facturas/Boletas/
+		                                	<br/>Notas de Crédito</span>
+		                            </a>
+		                        </li>
                             </ul>
                         </li>
                         <li class="nav-item start ">
@@ -512,7 +519,7 @@
                             </a>
                             <ul class="sub-menu">
                                 <li class="nav-item">
-                                    <a href="/user" class="nav-link ">
+                                    <a href="/inventory-control-page" class="nav-link ">
                                         <span class="title"><i class="icon-pencil"></i> Ingrese Números</span>
                                     </a>
                                 </li>

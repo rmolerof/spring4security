@@ -18,12 +18,14 @@ public class Station {
 	private String name;
 	private String pumpAttendantNames;
 	private String shift;
+	private String shiftDate = "";
 	private Date date;
 	private Map<String, Tank> tanks;
 	private Map<String, Dispenser> dispensers;
 	private Double totalCash;
 	private List<ExpenseOrCredit> expensesAndCredits;
 	private TotalDay totalDay;
+	private String process; // SC, PC, KC
 	
 	public Station() {
 		super();
@@ -38,8 +40,9 @@ public class Station {
 	    this.name = new String(original.name);
 	    this.pumpAttendantNames = new String(original.pumpAttendantNames);
 	    this.shift = new String(original.shift);
+	    this.shiftDate = new String(original.shiftDate);
 	    this.date = new Date(original.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(original.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(original.getTanks());
 	    this.dispensers = new HashMap<String, Dispenser>(original.getDispensers());
 	    this.totalCash = new Double(original.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(original.getExpensesAndCredits());
@@ -52,8 +55,9 @@ public class Station {
 	    this.name = new String(stationDao.getName());
 	    this.pumpAttendantNames = new String(stationDao.getPumpAttendantNames());
 	    this.shift = new String(stationDao.getShift());
+	    this.shiftDate = new String(stationDao.getShiftDate());
 	    this.date = new Date(stationDao.getDate().getTime());
-	    this.tanks = new HashMap<String, Tank>(stationDao.getTanks());
+	    this.tanks = new LinkedHashMap<String, Tank>(stationDao.getTanks());
 	    this.dispensers = orderDispensers(stationDao.getDispensers());
 	    this.totalCash = new Double(stationDao.getTotalCash());
 	    this.expensesAndCredits =  new ArrayList<ExpenseOrCredit>(stationDao.getExpensesAndCredits());
@@ -82,10 +86,11 @@ public class Station {
 	
 	@Override
 	public String toString() {
-		return "Station [id=" + stationId + ", \nname=" + name + ", \npumpAttendantNames=" + pumpAttendantNames + ", \nshift=" + shift + ", \ndate=" + date + ", \ntanks=" + tanks
-				+ ", \ndispensers=" + dispensers + "]";
+		return "Station [id=" + id + ", stationId=" + stationId + ", name=" + name + ", pumpAttendantNames="
+				+ pumpAttendantNames + ", shift=" + shift + ", shiftDate=" + shiftDate + ", date=" + date + ", tanks="
+				+ tanks + ", dispensers=" + dispensers + ", totalCash=" + totalCash + ", expensesAndCredits="
+				+ expensesAndCredits + ", totalDay=" + totalDay + "]";
 	}
-
 
 	public Long getStationId() {
 		return stationId;
@@ -162,6 +167,22 @@ public class Station {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+	public String getShiftDate() {
+		return shiftDate;
+	}
+
+	public void setShiftDate(String shiftDate) {
+		this.shiftDate = shiftDate;
+	}
+
+	public String getProcess() {
+		return process;
+	}
+
+	public void setProcess(String process) {
+		this.process = process;
 	}
 	
 }

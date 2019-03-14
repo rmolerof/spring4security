@@ -29,6 +29,6 @@ public class GasPricesRepositoryImpl implements GasPricesRepositoryCustom {
 		List<GasPricesDao> latestGasPrices = mongoTemplate.find(query, GasPricesDao.class);
 	    
 		
-		return latestGasPrices.size() == 0 ? null: latestGasPrices;
+		return latestGasPrices;
 	}	
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +18,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,14 +33,19 @@ import hello.businessModel.Station;
 import hello.businessModel.Tank;
 import hello.businessModel.TanksVo;
 import hello.businessModel.TotalDay;
+import hello.businessModel.TotalDayUnit;
+import hello.controller.SecurityController;
 import hello.domain.GasPricesDao;
 import hello.domain.GasPricesRepository;
+import hello.domain.InvoiceDao;
+import hello.domain.InvoicesRepository;
 import hello.domain.StationDao;
 import hello.domain.StationRepository;
 import hello.domain.TanksDao;
 import hello.domain.TanksRepository;
 import hello.model.DayDataCriteria;
 import hello.model.InvoiceVo;
+import hello.model.SubmitInvoiceGroupCriteria;
 import hello.model.User;
 import hello.sunat.XmlSunat;
 
@@ -50,6 +58,15 @@ public class UserService {
 	private Station currentStation;
 	private TanksVo currentTanksVo;
 	private GasPricesVo currentGasPricesVo;
+	public static final String FACTURA = "01";
+	public static final String BOLETA = "03";
+	public static final String NOTADECREDITO = "07";
+	public static final String SUNAT_PENDING_STATUS = "PENDIENTE";
+	public static final String SUNAT_SENT_STATUS = "ENVIADO";
+	public static final String SUNAT_VOIDED_STATUS = "ANULADO";
+	public static final String DNI = "1";
+	public static final String RUC = "6";
+	public static final String CLIENTES_VARIOS_DOC_NUMBER = "0";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -59,6 +76,16 @@ public class UserService {
     private GasPricesRepository gasPricesRepository;
 	@Autowired
 	private Utils utils;
+	@Autowired
+	private InvoicesRepository invoicesRepository;
+	@Autowired
+	private NextSequenceInvoiceService nextSequenceInvoiceService;
+	@Autowired
+	private ResourceLoader resourceLoader;
+	@Autowired
+	private GlobalProperties globalProperties;
+	@Autowired
+	private SecurityController securityController;
 	
 	@PostConstruct
 	private void initDataForTesting() {
@@ -80,17 +107,32 @@ public class UserService {
 			return new ArrayList<User>(Arrays.asList(new User(authentication.getName(), "*********", authentication.getAuthorities().toString())));
 		} else {
 			List<User> result = users.stream().
-					filter(x -> x.getUsername().equalsIgnoreCase(username)).
+					filter(x -> x.getName().equalsIgnoreCase(username)).
 					collect(Collectors.toList());
 			return result;
 		}
 		
 	}
 	
-	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg) {
-		Station laJoya = new Station();
-		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg);
+	public List<Station> findStationStatusByShiftDateAndShift(String shiftDate, String shift) {
+		StationDao stationDao = stationRepository.findFirsByShiftDateAndShift(shiftDate, shift);
+		StationDao stationDaoBeforeDate = stationRepository.findFirstBeforeDate(stationDao.getDate());
+		
+		// Update ObjectId and date from latest station status into current station as it is used lated to submit updated day status
+		stationDaoBeforeDate.setId(stationDao.getId());
+		stationDaoBeforeDate.setDate(stationDao.getDate());
+		
+		setCurrentStation(new Station(stationDaoBeforeDate));
+		
+		return new LinkedList<Station>(Arrays.asList(new Station(stationDao), new Station(stationDaoBeforeDate)));
+	}
+	
+	public List<Station> findLatestStationStatus(String dateEnd, String dateBeg, int backDataCount) {
+		Station station = new Station();
+		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg, backDataCount);
+		Station stationVo = null;
 		StationDao stationDao = null;
+		List<Station> stations = null;
 		
 		if (null == stationDaos) {
 			stationDao = new StationDao();
@@ -103,11 +145,17 @@ public class UserService {
 			stationDao.setTotalCash(0D);
 			stationDao.setExpensesAndCredits(Arrays.asList(new ExpenseOrCredit()));
 			
+			TotalDay totalDay = new TotalDay();
+			totalDay.setTotalDayUnits(new HashMap<String, TotalDayUnit>());
+			totalDay.setTotalSolesRevenueDay(0D);
+			totalDay.setTotalProfitDay(0D);
+			stationDao.setTotalDay(totalDay);
+			
 			Tank d2 = new Tank(1L, "d2", 0D, 0D);
 			Tank g90 = new Tank(2L, "g90", 0D, 0D);
 			Tank g95 = new Tank(3L, "g95", 0D, 0D);
 			
-			Map<String, Tank> tanks = new HashMap<String, Tank>();
+			Map<String, Tank> tanks = new LinkedHashMap<String, Tank>();
 			tanks.put(d2.getFuelType(), d2);
 			tanks.put(g90.getFuelType(), g90);
 			tanks.put(g95.getFuelType(), g95);
@@ -116,17 +164,16 @@ public class UserService {
 			
 			Dispenser d2_1 = new Dispenser(1, "d2", 0,	0,	0, 9);
 			Dispenser d2_2 = new Dispenser(2, "d2", 0,	0,	0, 9);
-			Dispenser d2_3 = new Dispenser(3, "d2", 0,	0,	0, 8);
+			Dispenser d2_3 = new Dispenser(3, "d2", 0,	0,	0, 9);
 			Dispenser d2_4 = new Dispenser(4, "d2", 0,	0,	0, 9);
 			Dispenser d2_5 = new Dispenser(5, "d2", 0,	0,	0, 9);
-			Dispenser d2_6 = new Dispenser(6, "d2", 0,	0,	0, 8);
-			Dispenser g90_1 = new Dispenser(1, "g90", 0, 0,	0, 8);
-			Dispenser g90_2 = new Dispenser(2, "g90", 0, 0,	0, 8);
-			Dispenser g90_3 = new Dispenser(3, "g90", 0, 0,	0, 8);
+			Dispenser d2_6 = new Dispenser(6, "d2", 0,	0,	0, 9);
+			Dispenser g90_1 = new Dispenser(1, "g90", 0, 0,	0, 9);
+			Dispenser g90_2 = new Dispenser(2, "g90", 0, 0,	0, 9);
+			Dispenser g90_3 = new Dispenser(3, "g90", 0, 0,	0, 9);
 			Dispenser g90_4 = new Dispenser(4, "g90", 0, 0,	0, 9);
-			Dispenser g95_1 = new Dispenser(1, "g95", 0, 0,	0, 8);
-			Dispenser g95_2 = new Dispenser(2, "g95", 0, 0,	0, 8);
-
+			Dispenser g95_1 = new Dispenser(1, "g95", 0, 0,	0, 9);
+			Dispenser g95_2 = new Dispenser(2, "g95", 0, 0,	0, 9);
 			
 			
 			Map<String, Dispenser> dispensers = new LinkedHashMap<String, Dispenser>();
@@ -146,27 +193,33 @@ public class UserService {
 			
 			
 			stationDao.setDispensers(dispensers);
-		}
+			updateStatus(stationDao);
+			stationVo = new Station(stationDao);
+			
+			setCurrentStation(stationVo);
+			stations = Stream.of(stationVo).collect(Collectors.toList());
+			
+		} else {
 		
-		List<Station> stations = null;
-		if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
-			updateStatus(stationDaos.get(0));
-			laJoya = new Station(stationDaos.get(0));
-			setCurrentStation(laJoya);
-			
-			stations = Stream.of(laJoya).collect(Collectors.toList());
-			
-		}  else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
-			
-			stations = stationDaos.stream().map(stationdao -> {
-				Station station = new Station(stationdao);
-				return station;
-			}).collect(Collectors.toList());
-			
-			// Update ObjectId and date from latest station status
-			stations.get(1).setId(stations.get(0).getId());
-			stations.get(1).setDate(stations.get(0).getDate());
-			setCurrentStation(stations.get(1));
+			if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("")) {
+
+				station = new Station(stationDaos.get(0));
+				setCurrentStation(station);
+				
+				stations = Stream.of(station).collect(Collectors.toList());
+				
+			}  else if (dateEnd.equalsIgnoreCase("latest") && dateBeg.equalsIgnoreCase("previous")) {
+				
+				stations = stationDaos.stream().map(stationdao -> {
+					Station st = new Station(stationdao);
+					return st;
+				}).collect(Collectors.toList());
+				
+				// Update ObjectId and date from latest station status
+				stations.get(1).setId(stations.get(0).getId());
+				stations.get(1).setDate(stations.get(0).getDate());
+				setCurrentStation(stations.get(1));
+			}
 		}
 		
 		return stations;
@@ -174,84 +227,7 @@ public class UserService {
 	
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
 		
-		/*Station laJoya = new Station();
-		laJoya.setStationId(101L);
-		laJoya.setName("La Joya");
-		laJoya.setShift("1");
-		laJoya.setPumpAttendantNames("miriam, sadit");
-		//laJoya.setDate(new Date(1533441600000L));
-		laJoya.setDate(new Date());
-		
-		Tank d2 = new Tank(1, "d2", 10000D);
-		Tank g90 = new Tank(2, "g90", 3000D);
-		Tank g95 = new Tank(3, "g95", 3000D);
-		
-		Map<String, Tank> tanks = new HashMap<String, Tank>();
-		tanks.put(d2.getFuelType(), d2);
-		tanks.put(g90.getFuelType(), g90);
-		tanks.put(g95.getFuelType(), g95);
-		
-		laJoya.setTanks(tanks);
-		
-		Dispenser d2_1 = new Dispenser(1, "d2", 288934.73,	12.39,	11.01, 9);
-		Dispenser d2_2 = new Dispenser(2, "d2", 144360.82,	12.39,	11.01, 9);
-		Dispenser d2_3 = new Dispenser(3, "d2", 73147.96,	12.39,	11.01, 8);
-		Dispenser d2_4 = new Dispenser(4, "d2", 211896.21,	12.39,	11.01, 9);
-		Dispenser d2_5 = new Dispenser(5, "d2", 723954.62,	12.39,	11.01, 9);
-		Dispenser d2_6 = new Dispenser(6, "d2", 83166.11,	12.39,	11.01, 8);
-		Dispenser g90_1 = new Dispenser(1, "g90", 39150.31,	12.89,	10.48, 8);
-		Dispenser g90_2 = new Dispenser(2, "g90", 32190.28,	12.89,	10.48, 8);
-		Dispenser g90_3 = new Dispenser(3, "g90", 64742.82,	12.89,	10.48, 8);
-		Dispenser g90_4 = new Dispenser(4, "g90", 174792.25, 12.89,	10.48, 9);
-		Dispenser g95_1 = new Dispenser(1, "g95", 96791.69,	13.99,	11.45, 8);
-		Dispenser g95_2 = new Dispenser(2, "g95", 98998.05,	13.99,	11.45, 8);
-
-		
-		
-		Map<String, Dispenser> dispensers = new LinkedHashMap<String, Dispenser>();
-		dispensers.put(d2_1.getName() + "_" + Long.toString(d2_1.getId()), d2_1);
-		dispensers.put(g90_1.getName() + "_" + Long.toString(g90_1.getId()), g90_1);
-		dispensers.put(d2_2.getName() + "_" + Long.toString(d2_2.getId()), d2_2);
-		dispensers.put(d2_3.getName() + "_" + Long.toString(d2_3.getId()), d2_3);
-		dispensers.put(g90_2.getName() + "_" + Long.toString(g90_2.getId()), g90_2);
-		dispensers.put(d2_4.getName() + "_" + Long.toString(d2_4.getId()), d2_4);
-		
-		dispensers.put(g95_1.getName() + "_" + Long.toString(g95_1.getId()), g95_1);
-		dispensers.put(g90_3.getName() + "_" + Long.toString(g90_3.getId()), g90_3);
-		dispensers.put(d2_5.getName() + "_" + Long.toString(d2_5.getId()), d2_5);
-		dispensers.put(g95_2.getName() + "_" + Long.toString(g95_2.getId()), g95_2);
-		dispensers.put(g90_4.getName() + "_" + Long.toString(g90_4.getId()), g90_4);
-		dispensers.put(d2_6.getName() + "_" + Long.toString(d2_6.getId()), d2_6);
-		
-		
-		laJoya.setDispensers(dispensers);
-		
-		laJoya.setTotalCash(300.98D);
-		
-		laJoya.setExpensesAndCredits(new ExpenseOrCredit[] {
-				new ExpenseOrCredit("uno", 1.1D),
-				new ExpenseOrCredit("dos", 2.2D)});
-		
-		StationDao stationDao = stationRepository.save(new StationDao(laJoya));
-		logger.info(stationDao);
-		return null;*/
-		
-		
-		/*StationDao s = new StationDao();
-		s.setId(new ObjectId("5b6b4c3c4ddd5a7f3c951838"));
-		Example<StationDao> example = Example.of(s);
-		StationDao stationDao = stationRepository.findOne(example);*/
-		
-		
-		//List<Station> laJoya = new Station();
 		List<StationDao> stationDaos = stationRepository.findLatestMonth();
-		/*List<Station> stations = new LinkedList<Station>();
-		stations.add(new Station(stationDaos.get(0)));
-		for (int i = 1; i < stationDaos.size(); i++) {
-			Station station = new Station(stationDaos.get(i));
-			stations.add(station);
-			stations.get(i - 1).setPriorStation(station);
-		}*/
 		
 		List<Station> stations = stationDaos.stream().map(stationDao -> {
 			Station station = new Station(stationDao);
@@ -293,9 +269,9 @@ public class UserService {
 		
 		StationDao stationdao = new StationDao(updatedStation);
 		stationdao.setId(new ObjectId());
-		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
+		StationDao stationDao = stationRepository.save(stationdao);
 		
-		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
+		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new LinkedList<>(stationDao.getTanks().values()));
 		submitTanksVo(tanksVo, "save");
 		
 		Station resetStationFromDB = new Station(stationDao);
@@ -304,19 +280,54 @@ public class UserService {
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
 	}
 	
-	public List<Station> updateLatestDayData(DayDataCriteria dateDataCriteria) {
+	public List<Station> updateLatestDayData(DayDataCriteria dayDataCriteria) {
 		
-		Station updatedStation = utils.updateStation(getCurrentStation(), dateDataCriteria);
+		Station updatedStation = utils.updateStation(getCurrentStation(), dayDataCriteria);
 		
 		StationDao stationDao = stationRepository.save(new StationDao(updatedStation));
 		
 		TanksVo tanksVo = new TanksVo(stationDao.getPumpAttendantNames(), stationDao.getDate(), new ArrayList<>(stationDao.getTanks().values()));
 		submitTanksVo(tanksVo, "update");
 		
+		//recalculateUpOf(dayDataCriteria.getShiftDate(), dayDataCriteria.getShift());
+		
 		Station resetStationFromDB = new Station(stationDao);
 		setCurrentStation(resetStationFromDB);
 		
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
+	}
+	
+	public void recalculateUpOf(String shiftDate, String shift) {
+		
+		// Find all later stations
+		List<StationDao> stationDaos = stationRepository.findLatestMonth();
+		
+		int index = 0;
+		for (StationDao stationDao: stationDaos) {
+			
+			if (stationDao.getShiftDate().trim().equals(shiftDate) && stationDao.getShift().trim().equals(shift)) {
+				break;
+			}
+			
+			index++;
+		}
+		
+		stationDaos = stationDaos.subList(0, index + 2);
+		
+		for (int i = stationDaos.size()-1; i >= 0 ; i--) {
+			
+			if (i > 0) {
+				DayDataCriteria dayDataCriteria = new DayDataCriteria(stationDaos.get(i - 1));
+				StationDao updatedStation = utils.updateStationDao(stationDaos.get(i), dayDataCriteria);
+				StationDao stationDao = stationRepository.save(updatedStation);
+			}
+		}
+		
+		/*
+		 *  change the update station to StationDao and make sure the save becomes update
+		 */
+		
+		
 	}
 	
 	public List<Station> resetStatus(DayDataCriteria dateDataCriteria) {
@@ -333,55 +344,6 @@ public class UserService {
 		return Stream.of(resetStationFromDB).collect(Collectors.toList());
 	}
 
-	/*private Station updateStation(Station currentStation, DayDataCriteria dayDataCriteria) {
-		
-		Map<String, Double> dayData = dayDataCriteria.getDayData();
-		String pumpAttendantNames = dayDataCriteria.getPumpAttendantNames();
-		Date date = dayDataCriteria.getDate();
-		String shift = dayDataCriteria.getShift();
-		Double totalCash = dayDataCriteria.getTotalCash();
-		List<ExpenseOrCredit> expensesAndCredits = dayDataCriteria.getExpensesAndCredits(); 
-		
-		TotalDay totalDay = new TotalDay();
-		
-		for (Entry<String, Dispenser> entry: currentStation.getDispensers().entrySet()) {
-			
-			double gallonsDiff = dayData.get(entry.getKey()) - entry.getValue().getGallons();
-			String name = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));
-			totalDay.setTotalGalsSoldDay(name, totalDay.getTotalGalsSoldDay(name) + dayData.get(entry.getKey()) - entry.getValue().getGallons());
-			totalDay.setTotalSolesRevenueDay(name, totalDay.getTotalSolesRevenueDay(name) + gallonsDiff * entry.getValue().getPrice());
-			totalDay.setTotalSolesRevenueDay(totalDay.getTotalSolesRevenueDay() + gallonsDiff * entry.getValue().getPrice());
-			totalDay.setTotalProfitDay(name, totalDay.getTotalGalsSoldDay(name) * (entry.getValue().getPrice() - entry.getValue().getCost()));
-			totalDay.setTotalProfitDay(totalDay.getTotalProfitDay() + gallonsDiff * (entry.getValue().getPrice() - entry.getValue().getCost()));
-			totalDay.setStockGals(name, currentStation.getTanks().get(name).getGals() - totalDay.getTotalGalsSoldDay(name));
-		}
-		
-		// Update Station numbers
-		Station newCurrentStation = new Station(currentStation);
-		
-		newCurrentStation.setPumpAttendantNames(pumpAttendantNames);
-		newCurrentStation.setDate(date);
-		newCurrentStation.setShift(shift);
-		newCurrentStation.setTotalCash(totalCash);
-		newCurrentStation.setExpensesAndCredits(expensesAndCredits);
-		
-		
-		// Update gallons counter
-		for (Entry<String, Dispenser> entry: newCurrentStation.getDispensers().entrySet()) {
-			entry.getValue().setGallons(dayData.get(entry.getKey()));
-		}
-		
-		// Update tanks' stock
-		for (Entry<String, Tank> entry: newCurrentStation.getTanks().entrySet()) {
-			entry.getValue().setGals(totalDay.getStockGals(entry.getKey()));
-		}
-		
-		// Save updated station status
-		System.out.println(newCurrentStation);
-		
-		return newCurrentStation;
-	}*/
-	
 	private Station resetStation(Station currentStation, DayDataCriteria dayDataCriteria) {
 		
 		Map<String, Double> dayData = dayDataCriteria.getDayData();
@@ -409,42 +371,83 @@ public class UserService {
 	
 	public List<TanksVo> findStockByDates(String dateEnd, String dateBeg) {
 
-		//TanksVo latestTankStatus = null;
 		List<TanksDao> tanksDaos = tanksRepository.findLatest(dateEnd, dateBeg);
+		List<TanksVo> tanksVos = null;
 		
-		/*latestTankStatus = new TanksVo(tanksDao);
-		setCurrentTanksVo(latestTankStatus);
-		
-		return Stream.of(latestTankStatus).collect(Collectors.toList());*/
-		
-		
-		List<TanksVo> tanksVos = tanksDaos.stream().map(tanksDao -> {
-			TanksVo tanksVo = new TanksVo(tanksDao);
-			return tanksVo;
-		}).collect(Collectors.toList());
+		if (tanksDaos.size() == 0) {
+			List<Tank> defaultStock = new LinkedList<Tank>();
+			defaultStock.add(new Tank(1L, "d2", 0D, 0D));
+			defaultStock.add(new Tank(2L, "g90", 0D, 0D));
+			defaultStock.add(new Tank(3L, "g95", 0D, 0D));
+			TanksVo tanksVo = new TanksVo("", new Date(), defaultStock);
+			tanksVos = Stream.of(tanksVo).collect(Collectors.toList());
+		} else {
+			tanksVos = tanksDaos.stream().map(tanksDao -> {
+				TanksVo tanksVo = new TanksVo(tanksDao);
+				return tanksVo;
+			}).collect(Collectors.toList());
+		}
 		
 		return tanksVos;
 		
-		/*Tank tank = new Tank();
-		tank.setTankId(1L);
-		tank.setFuelType("d2");
-		tank.setGals(0D);
+	}
+	
+	public Station updateTanksToStation(TanksVo tanksVoCriteria) {
+		// Find latest station
+		//List<StationDao> stationDaos = stationRepository.findLatest("latest", "", 0);
 		
-		Tank tank2 = new Tank();
-		tank2.setTankId(2L);
-		tank2.setFuelType("g91");
-		tank2.setGals(10D);
+		StationDao sD = stationRepository.findFirsByShiftDateAndShift(tanksVoCriteria.getShiftDate(), "2");
+		if (null == sD) {
+			sD = stationRepository.findFirsByShiftDateAndShift(tanksVoCriteria.getShiftDate(), "1");
+		}
 		
-		Tank tank3 = new Tank();
-		tank3.setTankId(3L);
-		tank3.setFuelType("g95");
-		tank3.setGals(20D);
+		List<StationDao> stationDaos = Arrays.asList(sD);
 		
-		TanksVo tanksVo = new TanksVo(new Date(), new ArrayList<Tank>(Arrays.asList(tank, tank2, tank3)));
+		Station station = null;
 		
-		TanksDao tanksDao = tanksRepository.save(new TanksDao(tanksVo));
-		return null;*/
+		if (null != stationDaos) {
 		
+			// Update Stock
+			for (Entry<String, Tank> entry: stationDaos.get(0).getTanks().entrySet()) {
+				for (Tank tank: tanksVoCriteria.getTanks()) {
+					if (entry.getKey().contains(tank.getFuelType())) {
+						entry.getValue().setGals(tank.getGals());
+						entry.getValue().setTankId(tank.getTankId());
+						entry.getValue().setCost(tank.getCost());
+						entry.getValue().setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+						entry.getValue().setSaveOrUpdate(tanksVoCriteria.getSaveOrUpdate());
+						entry.getValue().setSupplierRUC(tanksVoCriteria.getSupplierRUC());
+						entry.getValue().setTruckDriverName(tanksVoCriteria.getTruckDriverName());
+						entry.getValue().setDelivery(tanksVoCriteria.isDelivery());
+						entry.getValue().setDate(tanksVoCriteria.getDate());
+						entry.getValue().setShiftDate(tanksVoCriteria.getShiftDate());
+					}
+				}
+			}
+			
+			// save station
+			StationDao stationDao = stationDaos.get(0);
+			stationDao.setId(new ObjectId());
+			stationDao.setDate(new Date(stationDao.getDate().getTime() + 1L));
+			stationDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
+			stationDao.setTotalCash(0D);
+			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
+				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
+				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
+				totalDayUnit.getValue().setTotalProfitDay(0D);
+				totalDayUnit.getValue().setStockGals(0D);
+			}
+			stationDao.getTotalDay().setTotalSolesRevenueDay(0D);
+			stationDao.getTotalDay().setTotalProfitDay(0D);
+			stationDao.setExpensesAndCredits(new ArrayList<ExpenseOrCredit>());
+			
+			//recalculateUpOf(tanksVoCriteria.getShiftDate(), "1");
+			
+			station = new Station(stationRepository.save(stationDao));
+			setCurrentStation(station);
+		}
+		
+		return station;
 	}
 	
 	public List<TanksVo> submitTanksVo(TanksVo tanksVoCriteria, String operation) {
@@ -456,7 +459,8 @@ public class UserService {
 			tanksVo = new TanksVo(tanksDao);
 			setCurrentTanksVo(tanksVo);
 		} else if (operation.equals("update"))  {
-			tanksDao = tanksRepository.findLatest("latest", "").get(0);
+			//tanksDao = tanksRepository.findLatest("latest", "").get(0);
+			tanksDao = tanksRepository.findFirstByDate(tanksVoCriteria.getDate());
 			tanksDao.setDate(tanksVoCriteria.getDate());
 			tanksDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
 			tanksDao.setTanks(tanksVoCriteria.getTanks());
@@ -469,64 +473,74 @@ public class UserService {
 	}
 	
 	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
-		//GasPricesVo latestGasPricesVo = new GasPricesVo();
 		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatest(dateEnd, dateBeg);
+		List<GasPricesVo> gasPricesVos = null;
 		
-		/*latestGasPricesVo = new GasPricesVo(gasPricesDao);
-		setCurrentGasPricesVo(latestGasPricesVo);
-		
-		return Stream.of(latestGasPricesVo).collect(Collectors.toList());*/
-		
-		List<GasPricesVo> gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
-			GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
-			return gasPricesVo;
-		}).collect(Collectors.toList());
+		if (gasPricesDaos.size() == 0) {
+			List<GasPrice> defaultPrices = new LinkedList<GasPrice>();
+			defaultPrices.add(new GasPrice("d2", 0D, 0D));
+			defaultPrices.add(new GasPrice("g90", 0D, 0D));
+			defaultPrices.add(new GasPrice("g95", 0D, 0D));
+			GasPricesVo gasPricesVo = new GasPricesVo("", new Date(), defaultPrices);
+			gasPricesVos = Stream.of(gasPricesVo).collect(Collectors.toList());
+		} else {
+			gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
+				GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
+				return gasPricesVo;
+			}).collect(Collectors.toList());
+		}
 		
 		return gasPricesVos;
-		
-		
-		
-		/*GasPrice gasPrice = new GasPrice();
-		gasPrice.setFuelType("d2");
-		gasPrice.setCost(11D);
-		gasPrice.setPrice(12D);
-		
-		GasPrice gasPrice1 = new GasPrice();
-		gasPrice1.setFuelType("d2");
-		gasPrice1.setCost(12D);
-		gasPrice1.setPrice(122D);
-		
-		GasPrice gasPrice2 = new GasPrice();
-		gasPrice2.setFuelType("d2");
-		gasPrice2.setCost(13D);
-		gasPrice2.setPrice(133D);
-		
-		GasPricesVo gasPricesVo = new GasPricesVo(new Date(), new ArrayList<GasPrice>(Arrays.asList(gasPrice, gasPrice1, gasPrice2)));
-		
-		GasPricesDao gasPriceDao = gasPricesRepository.save(new GasPricesDao(gasPricesVo));
-		return null;*/
 	}
 	
-	public List<GasPricesVo> submitGasPricesVo(GasPricesVo tanksVoCriteria, String saveOrUpdate) {
+	public Station updateGasPricesToStation(GasPricesVo gasPricesVoCriteria) {
+		// Find latest station
+		List<StationDao> stationDaos = stationRepository.findLatest("latest", "", 0);
+		Station station = null; 
 		
-		/*GasPricesDao gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
+		if (null != stationDaos) {
+			// update prices
+			for (Entry<String, Dispenser> entry: stationDaos.get(0).getDispensers().entrySet()) {
+				for (GasPrice gasPrice: gasPricesVoCriteria.getGasPrices()) {
+					if (entry.getKey().contains(gasPrice.getFuelType())) {
+						entry.getValue().setPrice(gasPrice.getPrice());
+						entry.getValue().setCost(gasPrice.getCost());
+					}
+				}
+			}
+			
+			// save station
+			StationDao stationDao = stationDaos.get(0);
+			stationDao.setId(new ObjectId());
+			stationDao.setDate(new Date());
+			stationDao.setPumpAttendantNames(gasPricesVoCriteria.getPumpAttendantNames());
+			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
+				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
+				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
+				totalDayUnit.getValue().setTotalProfitDay(0D);
+				totalDayUnit.getValue().setStockGals(0D);
+			}
+			
+			station = new Station(stationRepository.save(stationDao));
+			setCurrentStation(station);
+		}
 		
-		GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
-		setCurrentGasPricesVo(gasPricesVo);
-		
-		return Stream.of(gasPricesVo).collect(Collectors.toList());*/
+		return station;
+	}
+	
+	public List<GasPricesVo> submitGasPricesVo(GasPricesVo gasPricesVoCriteria, String saveOrUpdate) {
 		
 		GasPricesVo gasPricesVo = null;
 		GasPricesDao gasPricesDao = null;
 		if (saveOrUpdate.equals("save")) {
-			gasPricesDao = gasPricesRepository.save(new GasPricesDao(tanksVoCriteria));
+			gasPricesDao = gasPricesRepository.save(new GasPricesDao(gasPricesVoCriteria));
 			gasPricesVo = new GasPricesVo(gasPricesDao);
 			setCurrentGasPricesVo(gasPricesVo);
 		} else if (saveOrUpdate.equals("update"))  {
 			gasPricesDao = gasPricesRepository.findLatest("latest", "").get(0);
-			gasPricesDao.setDate(tanksVoCriteria.getDate());
-			gasPricesDao.setPumpAttendantNames(tanksVoCriteria.getPumpAttendantNames());
-			gasPricesDao.setGasPrices(tanksVoCriteria.getGasPrices());
+			gasPricesDao.setDate(gasPricesVoCriteria.getDate());
+			gasPricesDao.setPumpAttendantNames(gasPricesVoCriteria.getPumpAttendantNames());
+			gasPricesDao.setGasPrices(gasPricesVoCriteria.getGasPrices());
 			
 			gasPricesVo = new GasPricesVo(gasPricesRepository.save(gasPricesDao));
 			setCurrentGasPricesVo(gasPricesVo);
@@ -535,24 +549,244 @@ public class UserService {
 		return Stream.of(gasPricesVo).collect(Collectors.toList());
 	}
 	
+	public List<InvoiceVo> submitInvoicesToSunat(String processingType) {
+		
+		List<InvoiceVo> invalidInvoiceVos = null;
+		List<InvoiceDao> pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex("PENDIENTE", new Sort(Sort.Direction.ASC, "date"));
+		
+		InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastSentInvoice(FACTURA);
+		InvoiceDao lastSunatProcessedBoleta = invoicesRepository.findLastSentInvoice(BOLETA);
+		
+		if (processingType.equalsIgnoreCase(SubmitInvoiceGroupCriteria.NORMAL)) {
+			if(validateInvoices(pendingInvoiceDaos, lastSunatProcessedBoleta, lastSunatProcessedFacturaOrNotaDeCredito)) {
+				return submitInvoices(pendingInvoiceDaos);
+			} else {
+				invalidInvoiceVos = pendingInvoiceDaos.stream().map(invoiceDao -> {
+					InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+					return invoiceVo;
+				}).collect(Collectors.toList());
+				return invalidInvoiceVos;
+			}
+		} else {
+			return submitInvoices(pendingInvoiceDaos);
+		}
+		
+	}
+	
+	public boolean validateInvoices(List<InvoiceDao> invoiceDaos, InvoiceDao lastSunatProcessedBoleta, InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito) {
+		
+		boolean isPendingInvoiceGroupValidated = true; 
+		
+		try {
+			Long lastFacturaOrNotaDeCreditoNumberInLong = invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber());
+			Long lastBoletaNumberInLong = invoiceNumberToLong(lastSunatProcessedBoleta.getInvoiceNumber());
+			
+			for (InvoiceDao invoiceDao: invoiceDaos) {
+				
+				if (invoiceDao.getInvoiceType().equals(UserService.BOLETA) || invoiceDao.getInvoiceTypeModified().equals(UserService.BOLETA)) {
+					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+					
+					if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {
+						invoiceDao.setSunatValidated(false);
+						isPendingInvoiceGroupValidated = false;
+					} else {
+						invoiceDao.setSunatValidated(true);
+					}
+					
+					lastBoletaNumberInLong = nextInvoiceNumber;
+				} else {
+					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
+					
+					if (nextInvoiceNumber - lastFacturaOrNotaDeCreditoNumberInLong != 1) {
+						invoiceDao.setSunatValidated(false);
+						isPendingInvoiceGroupValidated = false;
+					} else {
+						invoiceDao.setSunatValidated(true);
+					}
+					
+					lastFacturaOrNotaDeCreditoNumberInLong = nextInvoiceNumber;
+				}
+			}
+		} catch(Exception e) {
+			return false;
+		}
+		
+		return isPendingInvoiceGroupValidated;
+		
+	}
+	
+	public long invoiceNumberToLong(String invoiceNumber) {
+		StringBuilder invoiceNumberImmutable = new StringBuilder(invoiceNumber);
+		return Integer.parseInt(invoiceNumberImmutable.substring(5, invoiceNumberImmutable.length())); 
+	}
+	
+	List<InvoiceVo> submitInvoices(List<InvoiceDao> invoiceDaos){
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			
+			// Sunat
+			String basePath;
+			String deliveryResponse = "";
+			try {
+				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
+				XmlSunat.invokeSunat(invoiceVo, basePath);
+				XmlSunat.firma(invoiceVo, basePath, globalProperties.getSunatSignatureFileName(), globalProperties.getSunatSignaturePassword());
+				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL(), globalProperties.getSunatSolUsername(), globalProperties.getSunatSolPassword());
+				
+			} catch (Exception e) {
+				invoiceVo.setStatus("0");
+				invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());
+			}
+			
+			InvoiceDao invDao = new InvoiceDao(invoiceVo);
+
+			if (deliveryResponse.charAt(0) == '1') {
+				invDao.setSunatStatus("ENVIADO");
+				invoiceVo.setSunatStatus("ENVIADO");
+				invoicesRepository.save(invDao);
+				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked ENVIADO.");
+			}
+			
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
+	}
+	
+	public Long getNextInvoiceSequence(String invoiceType) {
+		
+		if (invoiceType.equals(BOLETA)) {
+			InvoiceDao lastSunatProcessedBoletaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(BOLETA);
+			return invoiceNumberToLong(lastSunatProcessedBoletaOrNotaDeCredito.getInvoiceNumber()) + 1;
+		} else if (invoiceType.equals(FACTURA)){
+			InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(FACTURA);
+			return invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber()) + 1;
+		}
+		
+		return 0L;
+	}
+	
 	public List<InvoiceVo> submitInvoice(InvoiceVo invoiceVo) {
 		
 		try {
+			
+			invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
+			
 			if (invoiceVo.getSaveOrUpdate().equals("save")) {
-				// generate xml
-				invoiceVo.setTotalVerbiage(XmlSunat.Convertir(invoiceVo.getTotal().toString(), true, "PEN"));
-				XmlSunat.invokeSunat(invoiceVo);
-				XmlSunat.firma(invoiceVo);
-				XmlSunat.envio(invoiceVo);
+				
+				if (invoiceVo.getInvoiceNumber().contains("XXXXXXXX")) {
+					if (invoiceVo.getInvoiceType().equalsIgnoreCase(BOLETA)) {
+						// Boleta
+						Long receiptNbr = getNextInvoiceSequence(BOLETA);
+						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+						invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(FACTURA)) {
+						// Factura
+						Long receiptNbr = getNextInvoiceSequence(FACTURA);
+						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+						invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(NOTADECREDITO)) {
+						// Nota de credito
+						if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(BOLETA)) {
+							Long receiptNbr = getNextInvoiceSequence(BOLETA);
+							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+							invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+						} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(FACTURA)) {
+							Long receiptNbr = getNextInvoiceSequence(FACTURA);
+							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
+							invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+						}
+					}
+				}
+				
+				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
+				// Find out any existing invoice with the same invoice number
+				InvoiceDao existingInvoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceDao.getInvoiceNumber());
+				
+				if (existingInvoiceDao.getClientName().equals(InvoiceDao.INVOICE_NOT_FOUND_NAME)) {
+					invoicesRepository.save(invoiceDao);
+					logger.info("Unprocessed invoice " + invoiceDao.getInvoiceNumber() + " sent to database");
+				} else {
+					throw new Exception("Comprobante Nro " + invoiceDao.getInvoiceNumber() + " ya existe.");
+				}
 
+				invoiceVo.setStatus("1");
+				invoiceVo.setSunatErrorStr("1");
 			} else if (invoiceVo.getSaveOrUpdate().equals("update")) {
 				
+				InvoiceDao invoiceDao = new InvoiceDao(invoiceVo);
+				invoicesRepository.save(invoiceDao);
+				logger.info("Unprocessed invoice " + invoiceDao.getInvoiceNumber() + " updated in database");
+				
+				invoiceVo.setSunatErrorStr("1|Updated");
+				invoiceVo.setStatus("1");
 			}
+			
+			// Save Bonus Number if present
+			if (null != invoiceVo.getBonusNumber() && !invoiceVo.getBonusNumber().trim().equals("")) {
+				utils.saveBonusNumber(invoiceVo);
+			}
+			
+			// Save address if present for DNI
+			if (null != invoiceVo.getClientAddress() && !invoiceVo.getClientAddress().trim().equals("")) {
+				utils.saveClientAddressForDNIOrRUC(invoiceVo);
+			}
+			
 		} catch (Exception e) {
-			invoiceVo.setSunatErrorStr(e.getMessage());
+			invoiceVo.setStatus("0");
+			invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());
 		}
 		
 		return Stream.of(invoiceVo).collect(Collectors.toList());
+	}
+	
+	public List<InvoiceVo> findInvoicesSummaryData(String dateEnd, String dateBeg) {
+
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatest(dateEnd, dateBeg);
+		
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
+	}
+	
+	public List<InvoiceVo> findInvoice(String invoiceNbr) {
+
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
+		if (!invoiceDao.getClientName().equals(InvoiceDao.INVOICE_NOT_FOUND_NAME)) {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			
+			invoiceVo.setUser(securityController.getCurrentUser());
+		
+			return Stream.of(invoiceVo).collect(Collectors.toList());
+		} else {
+			return Stream.of(InvoiceVo.NOT_FOUND).collect(Collectors.toList());
+		}
+	}
+	
+	public String deleteInvoice(String invoiceNbr) {
+
+		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
+		invoiceDao.setSunatStatus(SUNAT_VOIDED_STATUS);
+		InvoiceDao savedInvoiceDao = invoicesRepository.save(invoiceDao);
+		
+		if (null != savedInvoiceDao) {
+			return "0";
+		} else {
+			return "1";
+		}
+		
+		/*invoicesRepository.delete(invoiceDao);
+		
+		invoiceDao = invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceNbr);
+		if (null != invoiceDao) {
+		
+			return "0";
+		} else {
+			return "1";
+		}*/
 	}
 	
 	public TanksVo getCurrentTanksVo() {

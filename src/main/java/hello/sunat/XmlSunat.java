@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.xml.crypto.MarshalException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.bean.CpeBean;
@@ -32,6 +34,8 @@ import hello.model.InvoiceVo;
 
 public class XmlSunat {
 	
+	private static Logger logger = LogManager.getLogger(XmlSunat.class);
+	
 	public static final String myRUC = "20501568776";
 	private static final String[] UNIDADES = { "", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", "siete ", "ocho ", "nueve " };
 	private static final String[] DECENAS  = { "diez ", "once ", "doce ", "trece ", "catorce ", "quince ", "dieciseis ",
@@ -39,11 +43,9 @@ public class XmlSunat {
 											   "setenta ", "ochenta ", "noventa " };
 	private static final String[] CENTENAS = { "", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ",
 											   "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos " };
-//	private static final String userHomeDir = System.getProperty("user.home");
-	private static final String userHomeDir = "/home/ec2-user"; 
 	
 	// OBLIGATORIO
-	public static int invokeSunat(InvoiceVo invoiceVo) {
+	public static int invokeSunat(InvoiceVo invoiceVo, String basePath) throws Exception {
 		CpeBean cpe = new CpeBean();
 	    cpe.setTIPO_OPERACION("0101");// OBLIGATORIO 0101 venta interna (grifo), venta itinerante
 	    cpe.setTOTAL_GRAVADAS(invoiceVo.getSubTotal());// OBLIGATORIO IGUAL A SUB_TOTAL
@@ -54,7 +56,7 @@ public class XmlSunat {
 	    cpe.setTOTAL_RETENCIONES(0);
 	    cpe.setTOTAL_DETRACCIONES(0);
 	    cpe.setTOTAL_BONIFICACIONES(0);
-	    cpe.setTOTAL_DESCUENTO(0);
+	    cpe.setTOTAL_DESCUENTO(invoiceVo.getDiscount());
 	    cpe.setSUB_TOTAL(invoiceVo.getSubTotal());// OBLIGATORIO
 	    cpe.setPOR_IGV(18);//UBL2.1 // OBLIGATORIO
 	    cpe.setTOTAL_IGV(invoiceVo.getTotalIGV());// OBLIGATORIO
@@ -71,6 +73,13 @@ public class XmlSunat {
 	    cpe.setFECHA_VTO(formatDate(invoiceVo.getDate()));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
 	    cpe.setCOD_TIPO_DOCUMENTO(invoiceVo.getInvoiceType());//01=factura, 03=boleta, 07=nota credito, 08=nota debito
 	    cpe.setCOD_MONEDA("PEN");
+	    
+	  //=================REFERENCIA DE LA NOTA DE CREDITO================
+        cpe.setTIPO_COMPROBANTE_MODIFICA(invoiceVo.getInvoiceTypeModified());//01=FACTURA, 03=BOLETA
+		cpe.setNRO_DOCUMENTO_MODIFICA(invoiceVo.getInvoiceNumberModified());
+		cpe.setCOD_TIPO_MOTIVO(invoiceVo.getMotiveCd());//CATALOGO 09 SEGUN SUNAT
+		cpe.setDESCRIPCION_MOTIVO(invoiceVo.getMotiveCdDescription());//CATALOGO 09 SEGUN SUNAT
+        //==============FIN DE LA REFERENCIA NOTA 
 	    
 	    cpe.setNRO_DOCUMENTO_CLIENTE(invoiceVo.getClientDocNumber()); // OBLIGATORIO PARA CLIENTES CON COMPRAS >= 700 CASO CONTRARIO "00000000", RUC PARA FACTURA
 	    cpe.setRAZON_SOCIAL_CLIENTE(invoiceVo.getClientName()); // PARA COMPRAS < 700 "CLIENTES VARIOS"
@@ -109,55 +118,55 @@ public class XmlSunat {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsD2());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceD2() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesD2() / 1.18D));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesD2() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesD2() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");// 10: grabado (01 tipo codigo), 31 (gratuito), 20 (exonerado), inefectas 30
 		    cpe_Detalle.setCODIGO("01");//codigo interno
-		    cpe_Detalle.setDESCRIPCION("Diesel 2");//nombre interno
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setDESCRIPCION("MAX-D BIODIESEL B.A (UV)");//nombre interno
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG90() != 0D) {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG90());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG90() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG90() / 1.18));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG90() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
-		    cpe_Detalle.setCODIGO("0001");
-		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setCODIGO("02");
+		    cpe_Detalle.setDESCRIPCION("GASOHOL PRIMAX 90");
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    } 
 	    if (invoiceVo.getGalsG95() != 0D) {
 	    	itemCount++;
 	    	Cpe_DetalleBean cpe_Detalle = new Cpe_DetalleBean();
 		    cpe_Detalle.setITEM(itemCount); // PONDER CONSEQU
-		    cpe_Detalle.setUNIDAD_MEDIDA("ZZ");
+		    cpe_Detalle.setUNIDAD_MEDIDA("GLL");
 		    cpe_Detalle.setCANTIDAD(invoiceVo.getGalsG95());//hasta 5 decimales
 		    cpe_Detalle.setPRECIO(roundTwo(invoiceVo.getPriceG95() / 1.18D));
-		    cpe_Detalle.setIMPORTE(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));//PRECIO X CANTIDAD
+		    cpe_Detalle.setIMPORTE(roundTwo(invoiceVo.getSolesG95() / 1.18D));//PRECIO X CANTIDAD
 		    cpe_Detalle.setPRECIO_TIPO_CODIGO("01");// ????? 01: afectado por igv, 02: venta gratuita
-		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() - cpe_Detalle.getIMPORTE()));
+		    cpe_Detalle.setIGV(roundTwo(invoiceVo.getSolesG95() / 1.18 * 0.18));
 		    cpe_Detalle.setISC(0);
 		    cpe_Detalle.setCOD_TIPO_OPERACION("10");
-		    cpe_Detalle.setCODIGO("0001");
-		    cpe_Detalle.setDESCRIPCION("PRUEBA");
-		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(roundTwo(cpe_Detalle.getPRECIO() * cpe_Detalle.getCANTIDAD()));
+		    cpe_Detalle.setCODIGO("03");
+		    cpe_Detalle.setDESCRIPCION("GASOHOL PRIMAX 95");
+		    cpe_Detalle.setPRECIO_SIN_IMPUESTO(cpe_Detalle.getIMPORTE());
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = userHomeDir + "/xmlsSunat/" + myRUC + "-" + cpe.getCOD_TIPO_DOCUMENTO() + "-" + cpe.getNRO_COMPROBANTE() + ".XML";
+	    String rutaXMLCPE = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 	    boolean alreadyExists = new File(rutaXMLCPE).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -165,24 +174,29 @@ public class XmlSunat {
 			(new File(rutaXMLCPE)).getParentFile().mkdirs();
 		}
 	    
-	    return CPESunat.GenerarXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    if (invoiceVo.getInvoiceType().equalsIgnoreCase("07")) {
+	    	return CPESunat.GenerarXML_NC(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    } else {
+	    	return CPESunat.GenerarXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
+	    }
+	    
 	}
 	
-	public static void firma(InvoiceVo invoiceVo) throws FileNotFoundException, NoSuchAlgorithmException,
+	public static void firma(InvoiceVo invoiceVo, String basePath, String sunatSignatureFileName, String passFirma) throws FileNotFoundException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, ParserConfigurationException, SAXException, MarshalException,
 			KeyStoreException, IOException, CertificateException, Exception {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = userHomeDir + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
-		String rutaFirma = userHomeDir + "/xmlsSunat/signatureSunat/FIRMABETA.pfx";
+		String rutaXML = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String rutaFirma = basePath + "/certificatesAndTemplates/" + sunatSignatureFileName;
+		
 		boolean alreadyExists = new File(rutaFirma).exists();
 	    
 	    // Create path if basePath doesn't exist
 	    if(!alreadyExists){
 			(new File(rutaFirma)).getParentFile().mkdirs();
 		}
-		String passFirma = "123456";
 
 		// String nomArchivo = "20100078792-20-R002-41372";
 		int signingResult = FirmaCPESunat.Signature(flg_firma, rutaXML, rutaFirma, passFirma);
@@ -193,17 +207,16 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static void envio(InvoiceVo invoiceVo) {
-		String UsuSol = "MODDATOS";// pruebas de sunat
-		String PassSol = "moddatos";// password de prueba de sunat
-		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber(); // xml firmado
+	public static String envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL, String sunatSolUsername, String sunatSolPassword) {
+		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
-		String RutaArchivo = userHomeDir + "/xmlsSunat/";
-		String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
-		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, UsuSol, PassSol, NombreCPE, NombreCDR, RutaArchivo, RutaWS);
+		String RutaArchivo = basePath + "/xmlsSunat/";
+		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
-		System.out.println("\nSubmit to SUNAT response for " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
-		System.out.println("hash: " + invoiceVo.getInvoiceHash());
+		invoiceVo.setSunatErrorStr(sunatResponse);
+		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
+		logger.info("hash: " + invoiceVo.getInvoiceHash());
+		return sunatResponse;
 	}
 	
 	private static String formatDate(Date date) {
@@ -211,6 +224,10 @@ public class XmlSunat {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(isoDatePattern);
 
 		return simpleDateFormat.format(date);
+	}
+	
+	public static String rightPadZeros(String str, int num) {
+		return String.format("%1$-" + num + "s", str).replace(' ', '0');
 	}
 	
     public static String Convertir(String numero, boolean mayusculas, String moneda) {
@@ -230,7 +247,7 @@ public class XmlSunat {
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
-            parte_decimal = "CON " + Num[1] + "/100 " + moneda + ".";
+            parte_decimal = "CON " + rightPadZeros(Num[1], 2) + "/100 " + moneda;
             //se convierte el numero a literal
             if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";
@@ -326,91 +343,3 @@ public class XmlSunat {
 		return Math.round(amt * 100.0) / 100.0;
 	}
 }
-
-/*private ApiComprobantSunat cpeSunat = new ApiComprobanteSunat;
-private CpeBean cpe;
-private Cpe_DetalleBean cpe_detalle;
-
-public submitReceipt(InvoiceVo invoiceVo) throws Exception {
-	
-	cpe = new CpeBean();
-    //=================datos del comprobante=================
-    cpe.setTIPO_OPERACION("");
-    cpe.setTOTAL_GRAVADAS(invoiceVo.getSubTotal());
-    cpe.setSUB_TOTAL(invoiceVo.getSubTotal());
-    cpe.setTOTAL_IGV(invoiceVo.getTotalIGV());
-    cpe.setTOTAL(invoiceVo.getTotal());
-    cpe.setTOTAL_LETRAS("SETECIENTOS TREINTA Y SIETE CON 50/100 SOLES");
-    cpe.setNRO_COMPROBANTE("B020-" + "188278");// generate autmatically
-    cpe.setFECHA_DOCUMENTO(formatDate(invoiceVo.getDate()));// what format for date
-    cpe.setCOD_TIPO_DOCUMENTO(invoiceVo.getBillType().equalsIgnoreCase("factura") ? "01": "03"); // boletas = 03, factura = 01
-    cpe.setCOD_MONEDA("PEN");
-    //==================datos del cliente===================
-    //-- como separo estos datos
-    cpe.setNRO_DOCUMENTO_CLIENTE("44791512");
-    cpe.setRAZON_SOCIAL_CLIENTE("MIGUEL CHINCHAY");
-    cpe.setTIPO_DOCUMENTO_CLIENTE("1");
-    cpe.setDIRECCION_CLIENTE("HUAMPANI ALTO");
-    cpe.setCIUDAD_CLIENTE("LIMA");
-    cpe.setCORREO("miguel.peru.seo@gmail.com");
-    cpe.setCOD_PAIS_CLIENTE("PE");
-    //==================datos de la empresa===================
-    cpe.setNRO_DOCUMENTO_EMPRESA(invoiceVo.getRucNumber());
-    cpe.setTIPO_DOCUMENTO_EMPRESA("6");
-    cpe.setNOMBRE_COMERCIAL_EMPRESA(invoiceVo.getClientName());
-    cpe.setCODIGO_UBIGEO_EMPRESA("070104");
-    cpe.setDIRECCION_EMPRESA(invoiceVo.getClientAddress());
-    cpe.setDEPARTAMENTO_EMPRESA("LIMA");
-    cpe.setPROVINCIA_EMPRESA("LIMA");
-    cpe.setDISTRITO_EMPRESA("CHACLACAYO");
-    cpe.setCODIGO_PAIS_EMPRESA("PE");
-    cpe.setRAZON_SOCIAL_EMPRESA(invoiceVo.getClientName());
-    //===================datos sunat==================
-    cpe.setUSUARIO_SOL_EMPRESA("MODDATOS");
-    cpe.setPASS_SOL_EMPRESA("moddatos");
-    //==============datos del server==============
-    cpe.setCONTRA("123456");
-    cpe.setTIPO_PROCESO(3);//1=PRODUCCION,2=HOMOLOGACION,3=PRUEBA
-    
-    //==============datos de facturas x anticipo==============
-
-    List<Cpe_DetalleBean> lstCpe_Detalle = new ArrayList<Cpe_DetalleBean>();
-
-    cpe_Detalle = new Cpe_DetalleBean();
-    cpe_Detalle.setITEM(1);
-    cpe_Detalle.setUNIDAD_MEDIDA("NIU");
-    cpe_Detalle.setCANTIDAD(1);
-    cpe_Detalle.setPRECIO(invoiceVo.getSubTotal());
-    cpe_Detalle.setIMPORTE(invoiceVo.getTotal());
-    cpe_Detalle.setPRECIO_TIPO_CODIGO("02");
-    cpe_Detalle.setIGV(invoiceVo.getTotalIGV());
-    cpe_Detalle.setISC(0);
-    cpe_Detalle.setCOD_TIPO_OPERACION("20");
-    cpe_Detalle.setCODIGO("0001");
-    cpe_Detalle.setDESCRIPCION("PRUEBA");
-    cpe_Detalle.setPRECIO_SIN_IMPUESTO(invoiceVo.getSubTotal());
-    lstCpe_Detalle.add(cpe_Detalle);
-    //================CARGAMOS DETALLE EN LA CABECERA================
-    cpe.setDetalle(lstCpe_Detalle);
-    
-    // llamar al metodo
-    public int cpeSunat(cpe, lstCpe_Detalle);
-    
-    String rutaXMLCPE = "C:\\" + cpe.getNRO_DOCUMENTO_EMPRESA() + "-" + Cpe.getCOD_TIPO_DOCUMENTO() + cpe.getNRO_TIPO_DOCUMENTO() + cpe.getNRO_COMPROBANTE();
-    
-    if (cpe.getCOD_TIPO_DOCUMENTO().equals("01") || cpe.getCOD_TIPO_DOCUMENTO().equals("03")) {
-    	cpeSunat.GENERARXMLCPE(rutaXMLCPE, cpe, lstCpe_Detalle);
-    } else if (cpe.getCOD_TIPO_DOCUMENTO().equals("07")) {
-    	cpeSunat.GENERARXML_NC(rutaXMLCPE, cpe, lstCpe_Detalle);
-    } else if (cpe.getCOD_TIPO_DOCUMENTO().equals("08")){
-    	cpeSunat.GENERARXML_ND(rutaXMLCPE, cpe, lstCpe_Detalle);
-    }
-    
-}
-
-private String formatDate(Date date) {
-	String isoDatePattern = "yyyy-MM-dd";
-	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(isoDatePattern);
-
-	return simpleDateFormat.format(date);
-} */

@@ -22,9 +22,9 @@ public class DefaultController {
 		return "admin";
 	}
 	
-	@RequestMapping("user")
-	public String user(){
-		return "user";
+	@RequestMapping("inventory-control-page")
+	public String inventoryControlPage(){
+		return "inventory-control-page";
 	}
 	
 	@RequestMapping("about")
@@ -57,9 +57,19 @@ public class DefaultController {
 		return "dashboard-table-summary-page";
 	}
 	
-	@GetMapping("invoicing-page")
-	public String invoicingPage(){
-		return "invoicing-page";
+	@GetMapping("invoice-page")
+	public String invoicePage(){
+		return "invoice-page";
+	}
+	
+	@GetMapping("invoice-table-page")
+	public String invoiceTablePage(){
+		return "invoice-table-page";
+	}
+	
+	@GetMapping("invoice-viewer-page")
+	public String invoiceViewerPage(){
+		return "invoice-viewer-page";
 	}
 	
 }

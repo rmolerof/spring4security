@@ -13,7 +13,9 @@ class StockForm extends React.Component {
       supplierRUC: '',
       truckDriverName: '',
       truckPlateNumber: '',
-      delivery: true
+      delivery: true,
+      inputStyle: {color: 'black'},
+      shiftDate: ''
     };
   }
   
@@ -40,15 +42,36 @@ class StockForm extends React.Component {
   }
   
   handleNewGalsChange = (idx) => (evt) => {
+	  var self = this;
+	  
 	  const newTanks = this.state.tanks.map((tank, sidx) => {
 	      if (idx !== sidx) {
 	    	  return tank;
 	      }
 	      
-	      return { ...tank, newGals: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100)};
+	      var variationOfGals = (evt.target.value  == '' ? 0: (Math.floor(evt.target.value * 100) / 100)) - self.state.tanks[idx].gals; 
+	      
+	      return { ...tank, newGals: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100), variationOfGals: variationOfGals};
 	    });
 	    
 	    this.setState({ tanks: newTanks });
+	    
+  }
+  
+  handleVariationOfGalsChange = (idx) => (evt) => {
+	  var self = this;
+	  
+      const newTanks = this.state.tanks.map((tank, sidx) => {
+	      if (idx !== sidx) {
+	    	  return tank;
+	      }
+	      
+	      var newGals = self.state.tanks[idx].gals + (evt.target.value  == '' ? 0: (Math.floor(evt.target.value * 100) / 100));
+	      
+	      return { ...tank, newGals: (Math.floor(newGals * 100) / 100), variationOfGals: evt.target.value};
+	    });
+	    
+      this.setState({ tanks: newTanks });
 	    
   }
   
@@ -58,18 +81,54 @@ class StockForm extends React.Component {
 	    	  return tank;
 	      }
 	      
-	      return { ...tank, cost: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100)};
+	      return { ...tank, cost: evt.target.value  == '' ? '': ((evt.target.value * 10000).toFixed() / 10000)};
 	    });
 	    
 	    this.setState({ tanks: newTanks });
 	    
   }
   
+  _isValidDate(dateString)
+  {
+      // First check for the pattern
+      if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+          return false;
+
+      // Parse the date parts to integers
+      var parts = dateString.split("/");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+
+      // Check the ranges of month and year
+      if(year < 1000 || year > 3000 || month == 0 || month > 12)
+          return false;
+
+      var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+      // Adjust for leap years
+      if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+          monthLength[1] = 29;
+
+      // Check the range of the day
+      return day > 0 && day <= monthLength[month - 1];
+  };
+  
+  handleShiftDateChange = evt => {
+	  this.setState({shiftDate: evt.target.value.trim()});
+	  
+	  if (this._isValidDate(evt.target.value.trim())) {
+		  this.setState({inputStyle: {color: 'black'}});
+	  } else {
+		  this.setState({inputStyle: {color: 'red'}});
+	  }
+  }
+  
   handleSubmit = (evt) => {
 	
 	evt.preventDefault();
     
-	const { pumpAttendantNames, date, tanks, saveOrUpdate, supplierRUC, truckDriverName, truckPlateNumber, delivery} = this.state;
+	const { pumpAttendantNames, date, shiftDate, tanks, saveOrUpdate, supplierRUC, truckDriverName, truckPlateNumber, delivery} = this.state;
     var self = this;
     var errors = {
     		submit: '',
@@ -82,6 +141,7 @@ class StockForm extends React.Component {
     var tanksVo = {
     	pumpAttendantNames: pumpAttendantNames,
     	date: date,
+    	shiftDate: shiftDate,
     	tanks: [],
     	saveOrUpdate: saveOrUpdate,
     	supplierRUC: supplierRUC,
@@ -95,6 +155,14 @@ class StockForm extends React.Component {
     
     } else {
     	errors["pumpAttendantNames"] = "Falta nombre(s) de grifer@(s)";
+		formIsValid = false;
+    }
+    
+    // Validation shift date
+    if (shiftDate && shiftDate.trim().length >= 0 && this.state.inputStyle.color == 'black') {
+    
+    } else {
+    	errors["submit"] = "Falta o corregir fecha";
 		formIsValid = false;
     }
     
@@ -176,6 +244,7 @@ class StockForm extends React.Component {
 						tank = tanksVo.tanks[i];
 						tank["newGals"] = '';
 						tank["cost"] = '';
+						tank["variationOfGals"] = '';
 					}
 					
 					this.setState({tanks: tanksVo.tanks});
@@ -193,6 +262,7 @@ class StockForm extends React.Component {
 						tankLatest["newGals"] = tankLatest["gals"];
 						tankLatest["gals"] = tankPrevious["gals"];
 						tankLatest["cost"] = '';
+						tank["variationOfGals"] = tankLatest["newGals"] - tankLatest["gals"];
 					}
 					
 					this.setState({pumpAttendantNames: tanksVoLatest.pumpAttendantNames});
@@ -275,8 +345,14 @@ class StockForm extends React.Component {
 			    	          </div>
 			    	          <div className="col-md-2">
 			    	              <div className="form-group">
-			    	                  <label className="control-label">Fecha</label>
+			    	                  <label className="control-label">Marca Horaria</label>
 			    	                  <input type="text" id="lastName" className="form-control" placeholder="Fecha" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			    	              </div>
+			    	          </div>
+			    	          <div className="col-md-2">
+			    	              <div className="form-group">
+			    	                  <label className="control-label">Fecha</label>
+			    	                  <input type="text" id="shiftDate" style={this.state.inputStyle} className="form-control" placeholder="Fecha de Turno" value={this.state.shiftDate} onChange={this.handleShiftDateChange}/>
 			    	              </div>
 			    	          </div>
 			    	          <div className="col-md-1">
@@ -320,7 +396,7 @@ class StockForm extends React.Component {
 			          	  
 			          	  <div className="row">
 			    		      
-			    		      <div className="col-md-4">
+			    		      <div className="col-md-6">
 			    		          <div className="portlet box green">
 			    		              <div className="portlet-title">
 			    		                  <div className="caption">
@@ -343,6 +419,9 @@ class StockForm extends React.Component {
 				  					            			<th>
 				  					            				Actual
 				  					            			</th>
+			  					            				<th>
+				  					            				Carga
+				  					            			</th>
 				  					            			<th>
 				  					            				Reactualizado
 				  					            			</th>
@@ -362,10 +441,13 @@ class StockForm extends React.Component {
 					  						            			<input style={{width: '85px'}} type="text" key={`gals${idx}`} onKeyPress={this.onKeyPress} value={tank.gals} readOnly/>
 				  						            			</td>
 				  						            			<td>
-					  						            			<input type="number" style={{size:10, width:'100px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`newGals${idx}`} placeholder={`Ingr Stock`} inputMode="numeric" value={tank.newGals}  onChange={this.handleNewGalsChange(idx)}/>
+					  						            			<input type="number" style={{size:10, width:'100px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`variationOfGals${idx}`} placeholder={`Carga`} inputMode="numeric" value={tank.variationOfGals}  onChange={this.handleVariationOfGalsChange(idx)}/>
+					  						            		</td>
+				  						            			<td>
+					  						            			<input type="number" style={{size:10, width:'100px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`newGals${idx}`} placeholder={`Stock`} inputMode="numeric" value={tank.newGals}  onChange={this.handleNewGalsChange(idx)}/>
 					  						            		</td>
 					  						            		{this.state.delivery && <td>
-					  						            			<input type="number" style={{size:10, width:'100px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`newCost${idx}`} placeholder={`Ingr Costo`} inputMode="numeric" value={tank.cost}  onChange={this.handleCostChange(idx)}/>
+					  						            			<input type="number" style={{size:10, width:'100px', textAlign: 'right'}} pattern="[0-9]*" onKeyPress={this.onKeyPress} key={`newCost${idx}`} placeholder={`Costo`} inputMode="numeric" value={tank.cost}  onChange={this.handleCostChange(idx)}/>
 					  						            		</td>}	
 					  						            	</tr>
 				  					            		))}
