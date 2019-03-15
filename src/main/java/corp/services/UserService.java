@@ -742,7 +742,7 @@ public class UserService {
 	
 	public List<InvoiceVo> findInvoicesSummaryData(String dateEnd, String dateBeg) {
 
-		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatest(dateEnd, dateBeg);
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatestPendingaAndVoidedInvoices();
 		
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);

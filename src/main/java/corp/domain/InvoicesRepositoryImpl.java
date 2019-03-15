@@ -34,6 +34,16 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return invoiceDaos;
 	}
 	
+	public List<InvoiceDao> findLatestPendingaAndVoidedInvoices() {
+		
+		Query query = new Query(Criteria.where("sunatStatus").ne(UserService.SUNAT_SENT_STATUS));
+		query.with(new Sort(Direction.DESC, "date"));
+		
+		List<InvoiceDao> invoiceDaos = mongoTemplate.find(query, InvoiceDao.class);
+
+		return invoiceDaos;
+	}
+	
 	public InvoiceDao findLastSentInvoice(String invoiceType) {
 		
 		Query query = null;
