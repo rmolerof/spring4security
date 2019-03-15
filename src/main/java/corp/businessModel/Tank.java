@@ -1,7 +1,6 @@
 package corp.businessModel;
 
 import java.util.Date;
-import java.util.List;
 
 public class Tank {
 	public Long tankId;
@@ -12,7 +11,6 @@ public class Tank {
 	private Date date;
 	private String saveOrUpdate;
 	private String shiftDate;
-	private List<Tank> tanks;
 	public String supplierRUC;
 	public String truckDriverName;
 	public String truckPlateNumber;
@@ -89,14 +87,6 @@ public class Tank {
 
 	public void setShiftDate(String shiftDate) {
 		this.shiftDate = shiftDate;
-	}
-
-	public List<Tank> getTanks() {
-		return tanks;
-	}
-
-	public void setTanks(List<Tank> tanks) {
-		this.tanks = tanks;
 	}
 
 	public String getSupplierRUC() {
