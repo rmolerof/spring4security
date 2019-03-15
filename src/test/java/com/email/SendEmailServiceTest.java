@@ -29,9 +29,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import hello.Application;
-import hello.services.GlobalProperties;
-import hello.services.Utils;
+import corp.Application;
+import corp.services.GlobalProperties;
+import corp.services.Utils;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)

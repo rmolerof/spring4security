@@ -307,7 +307,7 @@ class InvoiceTableSummary extends React.Component {
 			data: JSON.stringify(sunatSubmitCriteria),
 			datatype: 'json',
 			cache: false,
-			timeout: 3600000,
+			timeout: 600000,
 			success: (data) => {
 				
 				if (data.result.length > 0) {

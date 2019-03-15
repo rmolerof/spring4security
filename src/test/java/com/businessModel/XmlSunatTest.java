@@ -19,10 +19,10 @@ import com.bean.CpeBean;
 import com.bean.Cpe_DetalleBean;
 
 import apiclienteenviosunat.ApiClienteEnvioSunat;
+import corp.model.InvoiceVo;
+import corp.sunat.XmlSunat;
 import firmacpesunat.FirmaCPESunat;
 import generadorxmlcpe.CPESunat;
-import hello.model.InvoiceVo;
-import hello.sunat.XmlSunat;
 
 public class XmlSunatTest {
 	

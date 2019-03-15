@@ -16,10 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import hello.Application;
-import hello.domain.DNIDao;
-import hello.domain.DNIsRepository;
-import hello.services.Utils;
+import corp.Application;
+import corp.domain.DNIDao;
+import corp.domain.DNIsRepository;
+import corp.services.Utils;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.Columns;
