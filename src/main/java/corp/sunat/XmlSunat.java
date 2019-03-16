@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import javax.xml.crypto.MarshalException;
@@ -33,6 +34,7 @@ public class XmlSunat {
 	private static Logger logger = LogManager.getLogger(XmlSunat.class);
 	
 	public static final String myRUC = "20501568776";
+	public static final String timeZoneID = "America/Lima";
 	private static final String[] UNIDADES = { "", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", "siete ", "ocho ", "nueve " };
 	private static final String[] DECENAS  = { "diez ", "once ", "doce ", "trece ", "catorce ", "quince ", "dieciseis ",
 											   "diecisiete ", "dieciocho ", "diecinueve", "veinte ", "treinta ", "cuarenta ", "cincuenta ", "sesenta ",
@@ -65,8 +67,8 @@ public class XmlSunat {
 	    cpe.setNRO_OTR_COMPROBANTE("");
 	    cpe.setCOD_OTR_COMPROBANTE("");
 	    cpe.setNRO_COMPROBANTE(invoiceVo.getInvoiceNumber());// OBLIGATORIO  ????
-	    cpe.setFECHA_DOCUMENTO(formatDate(invoiceVo.getDate()));// OBLIGATORIO YYYY-MM-DD
-	    cpe.setFECHA_VTO(formatDate(invoiceVo.getDate()));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
+	    cpe.setFECHA_DOCUMENTO(formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID)));// OBLIGATORIO YYYY-MM-DD
+	    cpe.setFECHA_VTO(formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID)));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
 	    cpe.setCOD_TIPO_DOCUMENTO(invoiceVo.getInvoiceType());//01=factura, 03=boleta, 07=nota credito, 08=nota debito
 	    cpe.setCOD_MONEDA("PEN");
 	    
@@ -337,5 +339,10 @@ public class XmlSunat {
     
     public static double roundTwo(double amt) {
 		return Math.round(amt * 100.0) / 100.0;
+	}
+    
+    public static Date transformGMTDateToZone(Date date, String timeZoneID) {
+		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
+		return new Date(date.getTime() + tz.getOffset(date.getTime()));
 	}
 }

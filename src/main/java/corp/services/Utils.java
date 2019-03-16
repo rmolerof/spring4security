@@ -2,13 +2,11 @@ package corp.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +33,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import corp.businessModel.Dispenser;
-import corp.businessModel.ExpenseOrCredit;
 import corp.businessModel.Station;
 import corp.businessModel.Tank;
 import corp.businessModel.TotalDay;
@@ -246,7 +243,7 @@ public class Utils {
 				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
 				
 				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
-				invoiceDao.setDate(new Date(invoiceDao.getDate().getTime() - TimeUnit.HOURS.toMillis(5)));
+				invoiceDao.setDate(XmlSunat.transformGMTDateToZone(invoiceDao.getDate(), globalProperties.getTimeZoneID()));
 				List<InvoiceDao> custList = Stream.of(invoiceDao).collect(Collectors.toList());
 				
 				CustomJRDataSource<InvoiceDao> dataSource = new CustomJRDataSource<InvoiceDao>().initBy(custList);

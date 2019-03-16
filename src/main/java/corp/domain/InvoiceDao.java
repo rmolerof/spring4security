@@ -21,6 +21,7 @@ public class InvoiceDao {
 	private ObjectId id;
 	private User user;
 	private String username;
+	@Indexed(unique = true)
 	private String invoiceNumber;
 	// customer
 	private String clientDocNumber;
@@ -30,7 +31,6 @@ public class InvoiceDao {
 	private String clientEmailAddress;
 	private String truckPlateNumber;
 	// invoice breakdown
-	@Indexed(unique = true)
 	private Date date;
 	private String invoiceType;
 	// Break-down

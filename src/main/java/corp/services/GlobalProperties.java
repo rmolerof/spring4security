@@ -17,6 +17,8 @@ public class GlobalProperties {
 	public String sunatSignaturePassword;
 	public String sunatSolUsername;
 	public String sunatSolPassword;
+	public String timeZoneID;
+	
 	
 	public String getEmailUsername() {
 		return emailUsername;
@@ -77,6 +79,12 @@ public class GlobalProperties {
 	}
 	public void setSunatSolPassword(String sunatSolPassword) {
 		this.sunatSolPassword = sunatSolPassword;
+	}
+	public String getTimeZoneID() {
+		return timeZoneID;
+	}
+	public void setTimeZoneID(String timeZoneID) {
+		this.timeZoneID = timeZoneID;
 	}
 	
 }

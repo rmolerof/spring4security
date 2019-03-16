@@ -644,7 +644,7 @@ public class UserService {
 				invDao.setSunatStatus("ENVIADO");
 				invoiceVo.setSunatStatus("ENVIADO");
 				invoicesRepository.save(invDao);
-				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked ENVIADO.");
+				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
 			}
 			
 			return invoiceVo;
@@ -742,7 +742,7 @@ public class UserService {
 	
 	public List<InvoiceVo> findInvoicesSummaryData(String dateEnd, String dateBeg) {
 
-		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatestPendingaAndVoidedInvoices();
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatest(dateEnd, dateBeg);
 		
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
@@ -770,12 +770,15 @@ public class UserService {
 
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		invoiceDao.setSunatStatus(SUNAT_VOIDED_STATUS);
-		InvoiceDao savedInvoiceDao = invoicesRepository.save(invoiceDao);
+		invoiceDao.setInvoiceNumber(makeInvoiceNumberVoided(invoiceDao.getInvoiceNumber()));
+		
+		
+		InvoiceDao savedInvoiceDao = saveVoidedInvoice(invoiceDao);
 		
 		if (null != savedInvoiceDao) {
-			return "0";
-		} else {
 			return "1";
+		} else {
+			return "0";
 		}
 		
 		/*invoicesRepository.delete(invoiceDao);
@@ -787,6 +790,28 @@ public class UserService {
 		} else {
 			return "1";
 		}*/
+	}
+	
+	public InvoiceDao saveVoidedInvoice(InvoiceDao invoiceDao) {
+		
+		while (!isInvoiceNotFound(invoiceDao)) {
+			invoiceDao.setInvoiceNumber(incrementVoidedInvoiceNumberSequence(invoiceDao.getInvoiceNumber()));
+		}
+		
+		return invoicesRepository.save(invoiceDao);
+	}
+	
+	public String incrementVoidedInvoiceNumberSequence(String invoiceNumber) {
+		Integer incrementedVoidedInvoiceNumberCount = Integer.valueOf(invoiceNumber.substring(2, 4)) + 1;
+		return (new StringBuilder(invoiceNumber).replace(2, 4, String.format("%02d", incrementedVoidedInvoiceNumberCount))).toString(); 
+	}
+	
+	public boolean isInvoiceNotFound(InvoiceDao invoiceDao) {
+		return null == invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceDao.getInvoiceNumber(), UserService.SUNAT_VOIDED_STATUS);
+	}
+	
+	public String makeInvoiceNumberVoided(String invoiceNumber) {
+		return (new StringBuilder(invoiceNumber).replace(1, 2, "A")).toString();
 	}
 	
 	public TanksVo getCurrentTanksVo() {

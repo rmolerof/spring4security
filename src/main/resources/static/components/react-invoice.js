@@ -69,6 +69,7 @@ class TableDashboard extends React.Component {
       notaDeCreditoDisabled: false,
       submitDisabled: false,
       printDisabled: true,
+      emailDisabled: true,
       showBoletaRadioButton: 'btn blue active btn-sm',
       showFacturaRadioButton: 'btn btn-default btn-sm',
       showNotaDeCreditoRadioButton: 'btn btn-default btn-sm',
@@ -108,7 +109,9 @@ class TableDashboard extends React.Component {
 	    ZERO_FACTURA_NUMBER: 'F001-00000000',
 	    BONUS_NUMBER_PREFIX: '7027661',
 	    EDIT_ENABLED_TIME_IN_MS: 600000,
-	    LARGE_AMOUNT: 500.00
+	    LARGE_AMOUNT: 500.00,
+	    SUNAT_PENDING_STATUS: 'PENDIENTE',
+	    SUNAT_SENT_STATUS: 'ENVIADO'
     }
   }
   
@@ -563,7 +566,7 @@ class TableDashboard extends React.Component {
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
 		  this._invoiceSearchAjax(invoiceNumber);
-		  this.setState({printDisabled: false, showNewInvoiceButton: false});
+		  this.setState({emailDisabled: false, printDisabled: false, showNewInvoiceButton: false});
 	  } else {
 		  this._getUser();
 		  this._fetchGasPrices({dateEnd: "latest", dateBeg: ""});  
@@ -910,7 +913,12 @@ class TableDashboard extends React.Component {
 				  self.setState({showNotaDeCreditoRadioButton: cssNV});
 				  
 				  if (self._getQueryVariable('id')) {
-					 self.setState({submitDisabled: self._getSubmitInvoiceButtonStatus(data.result[0].user)});
+					  
+					  if (data.result[0].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ){
+						  self.setState({submitDisabled: self._getSubmitInvoiceButtonStatus(data.result[0].user)});
+					  } else {
+						  self.setState({submitDisabled: true});
+					  }
 				  }
 				  
 			  } else {
@@ -1159,6 +1167,7 @@ class TableDashboard extends React.Component {
 	      facturaDisabled: false,
 	      notaDeCreditoDisabled: false,
 	      submitDisabled: false,
+	      emailDisabled: true,
 	      printDisabled: true,
 	      showBoletaRadioButton: 'btn blue active btn-sm',
 	      showFacturaRadioButton: 'btn btn-default btn-sm',
@@ -1488,7 +1497,7 @@ class TableDashboard extends React.Component {
 								invoiceVoResp.clientDocType + "|" +
 								invoiceVoResp.clientDocNumber
 								);
-						self.setState({emailingGif: false, showSuccess: true, submitDisabled: true,  printDisabled: false});
+						self.setState({emailingGif: false, showSuccess: true, submitDisabled: true,  emailDisabled: false, printDisabled: false});
 						
 						setTimeout(function() {
 						    ReactDOM.findDOMNode(self.refs['refResultModal']).focus();
@@ -1886,12 +1895,12 @@ class TableDashboard extends React.Component {
 		          		  </div>
 			          </div>
 			          
-	                  {this.state.status && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
-	                  {!this.state.status && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
+	                  {!this.state.printDisabled && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+	                  {this.state.printDisabled && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
 	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-check"></i> Enviar
 	    	          </button>&nbsp;
-	    	          <button type="button" onClick={this.emailInvoice} disabled={this.state.printDisabled} className="btn green-meadow hidden-print margin-bottom-5">
+	    	          <button type="button" onClick={this.emailInvoice} disabled={this.state.emailDisabled} className="btn green-meadow hidden-print margin-bottom-5">
 	    	          	<i className="fa fa-envelope"></i> Email 
 	    	          </button>&nbsp;
 	    	          {/*<a type="submit" onClick={this.emailInvoice.bind(this)} disabled={!this.state.submitDisabled} className="btn green-meadow margin-bottom-5"><i className="fa fa-envelope"></i> Email</a>&nbsp;*/}
