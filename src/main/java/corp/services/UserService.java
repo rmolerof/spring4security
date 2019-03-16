@@ -24,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import corp.Application;
 import corp.businessModel.Dispenser;
 import corp.businessModel.ExpenseOrCredit;
 import corp.businessModel.GasPrice;
@@ -514,12 +513,18 @@ public class UserService {
 			stationDao.setId(new ObjectId());
 			stationDao.setDate(new Date());
 			stationDao.setPumpAttendantNames(gasPricesVoCriteria.getPumpAttendantNames());
-			for (Entry<String, TotalDayUnit> totalDayUnit: stationDao.getTotalDay().getTotalDayUnits().entrySet()) {
+			TotalDay totalDay = stationDao.getTotalDay();
+			for (Entry<String, TotalDayUnit> totalDayUnit: totalDay.getTotalDayUnits().entrySet()) {
 				totalDayUnit.getValue().setTotalGalsSoldDay(0D);
 				totalDayUnit.getValue().setTotalSolesRevenueDay(0D);
 				totalDayUnit.getValue().setTotalProfitDay(0D);
 				totalDayUnit.getValue().setStockGals(0D);
 			}
+			
+			totalDay.setTotalSolesRevenueDay(0D);
+			totalDay.setTotalProfitDay(0D);
+			stationDao.setExpensesAndCredits(new ArrayList<ExpenseOrCredit>());
+			stationDao.setTotalCash(0D);
 			
 			station = new Station(stationRepository.save(stationDao));
 			setCurrentStation(station);

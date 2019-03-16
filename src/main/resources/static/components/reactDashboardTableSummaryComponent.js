@@ -47,6 +47,7 @@ class TableDashboard extends React.Component {
 					var deposits = 0.0;
 					var expensesOnly = 0.0;
 					var expensesAndCredits = 0.0;
+					var isEditDisabled = false;
 					for(var j = 0; j < stationSummaryData[i].expensesAndCredits.length; j++) {
 						expenseOrCredit = stationSummaryData[i].expensesAndCredits[j];
 						if (expenseOrCredit.item.toLowerCase().includes("visa")) {
@@ -65,6 +66,12 @@ class TableDashboard extends React.Component {
 					deposits = deposits.toFixed(2);
 					credits = credits.toFixed(2);
 					visas = visas.toFixed(2);
+					
+					if ((!stationSummaryData[i].totalDay.totalDayUnits.d2 || stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay == 0)
+							&& (!stationSummaryData[i].totalDay.totalDayUnits.g90 || stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay == 0) 
+									&& (!stationSummaryData[i].totalDay.totalDayUnits.g95 || stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay == 0)) {
+						isEditDisabled = true;
+					}
 					
 					count++;
 					var row = [
@@ -94,7 +101,7 @@ class TableDashboard extends React.Component {
 						expensesOnly,
 						(stationSummaryData[i].totalDay.totalSolesRevenueDay - stationSummaryData[i].totalCash - expensesAndCredits).toFixed(2),
 						stationSummaryData[i].totalDay.totalProfitDay,
-						"<a class='view' href='/inventory-control-page?id=" + stationSummaryData[i].shiftDate + "-" + stationSummaryData[i].shift + "'>Editar</a>"
+						isEditDisabled ? "": "<a class='view' href='/inventory-control-page?id=" + stationSummaryData[i].shiftDate + "-" + stationSummaryData[i].shift + "'>Editar</a>"
 						];
 					
 					tableData[i] = row;

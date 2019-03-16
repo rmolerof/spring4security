@@ -27,7 +27,8 @@ class IncorporationForm extends React.Component {
       inputStyle: {color: 'black'},
       excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'},
       fetchBackDataCount: 0,
-      normalPrintEnabled: false
+      normalPrintEnabled: false,
+      submitDisabled: false
     };
   }
   
@@ -303,7 +304,7 @@ class IncorporationForm extends React.Component {
 				console.log("submitDayData -> SUCCESS: ", data);
 				var json = "<h4>submitDayData Response</h4><pre>" + JSON.stringify(data, null, 4) + "</pre>";
 				var station = data.result[0];
-				self.setState({ showSuccess: true });
+				self.setState({ showSuccess: true, submitDisabled: true});
 				
 			},
 			error: function(e){
@@ -530,10 +531,10 @@ class IncorporationForm extends React.Component {
 					this.setState({totalCredits: totalCredits.toFixed(2)});
 					this.setState({totalExpenses: totalExpenses.toFixed(2)});
 					
-					if (exessOrMissing && exessOrMissing.toFixed(2) <= 0) {
-						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
-					  } else {
+					if (exessOrMissing && exessOrMissing.toFixed(2) < 0) {
 						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'red'}});
+					  } else {
+						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
 					  }
 					
 				}
@@ -985,7 +986,7 @@ class IncorporationForm extends React.Component {
 					  </div>
 					  
 					  <div className="form-actions">
-					      <button type="submit" className="btn blue">
+					      <button type="submit" disabled={this.state.submitDisabled} className="btn blue">
 				          	<i className="fa fa-check"></i> Enviar
 				          </button>
 					      <button type="button" className="btn default">Cancelar</button>
