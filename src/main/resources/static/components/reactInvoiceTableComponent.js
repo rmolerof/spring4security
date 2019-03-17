@@ -31,7 +31,9 @@ class InvoiceTableSummary extends React.Component {
 	    NORMAL_PROCESSING_TYPE: 'NORMAL',
 	    FORCED_PROCESSING_TYPE: 'FORCED',
 	    EDIT_ENABLED_TIME_IN_MS: 600000,
-	    NUMBER_OF_RECORDS_TO_LOAD: 5000
+	    NUMBER_OF_RECORDS_TO_LOAD: 5000,
+	    ELECTRONIC_PAYMENT_MSG: "VISA",
+	    CASH_PAYMENT_MSG: "EFECTIVO"
     }
   }
   
@@ -95,6 +97,15 @@ class InvoiceTableSummary extends React.Component {
 						editInvoice = "<a ></a>";
 					}
 					
+					var electronicOrCashPmtMsg = "";
+					if (invoicesSummaryData[i].electronicPmt > 0 && invoicesSummaryData[i].cashPmt <= 0) {
+						electronicOrCashPmtMsg = self.CONSTANTS.ELECTRONIC_PAYMENT_MSG;
+					} else if (invoicesSummaryData[i].electronicPmt <= 0 && invoicesSummaryData[i].cashPmt > 0) {
+						electronicOrCashPmtMsg = self.CONSTANTS.CASH_PAYMENT_MSG;
+					} else if (invoicesSummaryData[i].electronicPmt > 0 && invoicesSummaryData[i].cashPmt > 0) {
+						electronicOrCashPmtMsg = self.CONSTANTS.ELECTRONIC_PAYMENT_MSG + "/" +self.CONSTANTS.CASH_PAYMENT_MSG; 
+					}
+					
 					count++;
 					var row = [
 						count,
@@ -115,6 +126,7 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].galsG95,
 						invoicesSummaryData[i].subTotal,
 						invoicesSummaryData[i].totalIGV,
+						electronicOrCashPmtMsg,
 						invoicesSummaryData[i].total,
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
@@ -480,6 +492,7 @@ class InvoicesTbl extends React.Component {
 		            { title: "Gals G95" },
 		            { title: "Subtotal" },
 		            { title: "IGV" },
+		            { title: "Forma Pago" },
 		            { title: "Total" },
 		            { title: "Nro hash" },
 		            { title: "Bonus" },

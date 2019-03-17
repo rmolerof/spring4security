@@ -1547,397 +1547,370 @@ class TableDashboard extends React.Component {
 			  
       <form onSubmit={this.handleSubmit}>
       	  
-	      {/*{this.state.showError && 
-		        <div className="alert alert-danger">
-	      <strong>¡Error!</strong>{" " + this.state.errors.submit + " - " + this.state.errors.clientName + " - " + this.state.errors.clientDocNumber + " - " + this.state.errors.clientAddress + " - " + this.state.errors.truckPlateNumber}  
-		      	</div>
-	      }
-
-	      {this.state.showSuccess && 
-	      	<div className="alert alert-success">
-	      		<strong>Éxito!</strong> {this.state.sunatErrorStr}
-	      	</div>
-	      }*/}
-	      
-	      
-	      <div className="row">
-      		<div className="form-inline" style={{marginLeft: '15px'}}>
-	            <div className="form-group" style={{marginRight: "7px"}}>
-	                <h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.selectedOption} ELECTRÓNICA</h1>
-	            </div>
-	            <div className="form-group" style={{marginRight: "7px"}}>
-	                {this.state.invoiceNumberEditorDisabled && <div><h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.invoiceNumber}</h1></div>}
-		      		{!this.state.invoiceNumberEditorDisabled && <div><input type="text" className="form-control" style={{borderColor: '#26344b', width: "130px", marginBottom: "-1px", height: 25}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
-	      		</div>
-	      		<div className="form-group">
-	            	{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
-		      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i></a>
-		            }
-	      		</div>
-	        </div>
-          </div>
-	      
-	      <div className="invoice margin-bottom-20 margin-top-10">
-              <div className="portlet-body form">
-        		
-	              <div className="row">
-	              	  <div style={{marginLeft: '15px'}}>
-			              <div className="form-group">
-			                  <label className="control-label">Tipo de Comprobante</label>
-		    	              <div className="clearfix">
-					    	      <div className="btn-group btn-group-xs">
-			                      <label className={this.state.showBoletaRadioButton}>
-			                          <input type="radio" value="boleta" disabled={this.state.boletaDisabled} className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
-			                      <label className={this.state.showFacturaRadioButton}>
-			                          <input type="radio" value="factura" disabled={this.state.facturaDisabled} className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange}/> FACTURA </label>
-			                      <label className={this.state.showNotaDeCreditoRadioButton}>
-			                          <input type="radio" value="nota de credito" disabled={this.state.notaDeCreditoDisabled} className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
-			                      </div>
-		                      </div>
-		                  </div>
-	                  </div>
-	                  
-			          <div className="col-md-2">
-				          <div className="form-group">
-		            	  	<label className="control-label">Bonus</label><br></br>  
-		            	  	<input name="bonusNumberDisp" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNumberDisp} onChange={this.bonusNumberDispChange}/>
-		                  </div>
-		              </div>
-		              <div className="col-md-2">
-			              <div className="form-group">
-		            	  	<label className="control-label">Ir a</label><br></br>  
-		            	  	<div style={{textAlign: 'left'}}>
-					      		  <a href="/invoice-table-page" className="btn btn-sm yellow margin-bottom-5">
+	      <div className="row" style={{marginTop: '-20px'}}>
+	          <div className="portlet light ">  
+		      	  <div className="portlet-title" style={{marginTop: '-35px'}}>
+				          <div className="caption form-inline">
+					          <div className="form-group">
+					            <label className="control-label bold"></label>
+					            <div className="clearfix">
+						    	      <div className="btn-group btn-group-xs">
+					                    <label className={this.state.showBoletaRadioButton}>
+					                        <input type="radio" value="boleta" disabled={this.state.boletaDisabled} className="toggle" checked={this.state.selectedOption === 'boleta'} onChange={this.handleOptionChange}/> BOLETA </label>
+					                    <label className={this.state.showFacturaRadioButton}>
+					                        <input type="radio" value="factura" disabled={this.state.facturaDisabled} className="toggle" checked={this.state.selectedOption === 'factura'} onChange={this.handleOptionChange}/> FACTURA </label>
+					                    <label className={this.state.showNotaDeCreditoRadioButton}>
+					                        <input type="radio" value="nota de credito" disabled={this.state.notaDeCreditoDisabled} className="toggle" checked={this.state.selectedOption === 'nota de credito'} onChange={this.handleOptionChange}/> NOTA DE CRÉDITO </label>
+					                </div>
+					            </div>
+						      </div>&nbsp;
+			      		      
+						      <div className="form-group hidden-xs" style={{marginRight: "7px"}}>
+			      					<label className="control-label bold"></label><br></br>
+			      					<h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.selectedOption} ELECTRÓNICA</h1>
+				              </div>
+					          <div className="form-group hidden-xs" style={{marginRight: "7px"}}>
+					          		<label></label>
+					                {this.state.invoiceNumberEditorDisabled && <div><h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.invoiceNumber}</h1></div>}
+						      		{!this.state.invoiceNumberEditorDisabled && <div><input type="text" className="form-control" style={{borderColor: '#26344b', width: "130px", marginBottom: "-1px", height: 25}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
+					          </div>&nbsp;
+					          
+					          <div className="form-group hidden-xs" style={{marginRight: "7px"}}>
+			      				<label className="control-label bold"></label><br></br>
+			      				{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
+					      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} > <i className="fa fa-edit"></i></a>}
+			      			  </div>
+			      			  
+			      			  <div className="form-group hidden-sm hidden-md hidden-lg">
+			      			  		<label className="control-label uppercase bold">{this.state.selectedOption} ELECTRÓNICA</label> 
+			      			  		<table >
+					      			  <tbody>
+			      			  			<tr>
+					      			    <th>{this.state.invoiceNumberEditorDisabled && <div><h1 className="page-title uppercase bold" style={{fontSize: "20px", marginBottom: "-1px"}}> {this.state.invoiceNumber}</h1></div>}
+								      		{!this.state.invoiceNumberEditorDisabled && <div><input type="text" className="form-control" style={{borderColor: '#26344b', width: "130px", marginBottom: "-1px", height: 25}} placeholder={"[B,F]001-00000000"} onKeyPress={this.onKeyPress} value={this.state.invoiceNumber} onChange={this.invoiceNumberChange}/></div>}
+  										</th>
+					      			    <th>{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
+							      			<a type="button" onClick={this.editInvoiceNumber.bind(this)} >&nbsp;<i className="fa fa-edit"></i></a>}</th> 
+					      			  </tr>
+					      			  </tbody>
+					      			</table>
+				              </div>
+			              
+			              </div>
+			              
+				          <div className="actions">
+				          	  <div className="form-group form-group hidden-xs">
+					          	  <label className="control-label bold"></label><br></br>
+					          	  <a href="/invoice-table-page" className="btn btn-sm yellow btn-circle margin-bottom-5">
 							          <i className="fa fa-table"></i>&nbsp;Tabla Comprobantes
-								  </a>
-				      	      </div>
-		                  </div>
+								  </a>&nbsp;&nbsp;
+								  {this.state.showNewInvoiceButton && 
+					            	  <a type="submit" onClick={this.newInvoice} className="btn btn-sm purple btn-circle hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>}
+							  </div>
+							  
+							  <div className="form-group form-group hidden-sm hidden-md hidden-lg">
+					          	  <label className="control-label bold"></label>
+					          	  <a href="/invoice-table-page" className="btn btn-sm yellow btn-circle margin-bottom-5">
+							          <i className="fa fa-table"></i>&nbsp;Tabla Comprobantes
+								  </a>&nbsp;&nbsp;
+								  {this.state.showNewInvoiceButton && 
+					            	  <a type="submit" onClick={this.newInvoice} className="btn btn-sm purple btn-circle hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>}
+							  </div>
+				          </div>
+				  </div>
+	      
+			      <div className="invoice margin-bottom-20 margin-top-10">
+		              <div className="portlet-body form">
+		        		
+			              {this.state.selectedOption == 'nota de credito' &&
+			              <div className="row">
+				              <div className="col-md-2">
+						          <div className="form-group">
+				            	  	<label className="control-label">{invoicePrefix}</label><br></br>  
+				            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn btn-sm green-meadow">{this.state.invoiceTypeModifiedToggle} {!this.state.invoiceTypeModifiedToggle} {buttonText}</a>
+				                  </div>
+				              </div>
+				              <div className="col-md-2">
+			    	              <div className="form-group">
+			    	              	  <table style={{width:'30%'}}>
+				  	                  	<tbody>
+				  	                  	  <tr>
+				    	                    <td><label className="control-label">Nro</label></td>
+				    	                    <td>{this.state.loadingGif &&
+				  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
+				    	                  </tr>
+				    	                </tbody>
+				    	              </table>
+			    	                  <input type="number" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onBlur={this.invoiceSearchForCreditNote.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
+				                  </div>
+			    	          </div>
+				    	      <div className="col-md-2">
+					              <div className="form-group">
+					                  <label className="control-label">Fecha Referencia</label>
+					                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+					              </div>
+					          </div>
+			    	          <div className="col-md-2">
+			    	              <div className="form-group">
+			    	                  <label className="control-label">Seleccione Motivo</label>
+			    	                  <select className="ticket-assign form-control input-medium selectHeight" style={{borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
+			    	                  	  <option value=""></option>
+			    	                  	  <option value="01">Anulacion de la Operacion</option>
+			    	                  	  <option value="02">Anulacion por error en el RUC</option>
+			    	                  	  <option value="03">Correccion por error en la descripcion</option>
+			    	                  	  <option value="04">Descuento global</option>
+			    	                  	  <option value="05">Descuento por item</option>
+			    	                  	  <option value="06">Devolucion total</option>
+			    	                  	  <option value="07">Devolucion por item</option>
+			    	                  	  <option value="08">Bonificacion</option>
+			    	                  	  <option value="09">Disminucion en el valor</option>
+			    	                  	  <option value="10">Otros conceptos</option>
+					                  </select>
+			    	              </div>
+			    	          </div>
+			              </div>
+			              }
+		              	  <div className="row">
+				    	      <div className="col-md-2">
+					              <div className="form-group">
+					                  <label className="control-label">Fecha&nbsp; {this.state.user.roles.ROLE_ADMIN && <a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a>}</label>
+					                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
+					                  
+					            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
+					              </div>
+					          </div>
+			    	      	  <div className="col-md-2">
+			    	              <div className="form-group">
+			    	                  <table style={{width:'100%'}}>
+			    	                  	<tbody>
+			    	                  	  <tr>
+				    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}&nbsp;<a type="button" onClick={this.searchButton.bind(this)} > <i className="fa fa-edit">Buscar</i></a></label></td>
+				    	                    <td>{this.state.loadingGif &&
+				  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
+				    	                  </tr>
+				    	                </tbody>
+				    	              </table>
+			    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
+			                	  </div>
+			    	          </div>
+			    	          <div className="col-md-2">
+			    	              <div className="form-group">
+			    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
+			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientNameDisabled} placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
+			    	              </div>
+			    	          </div>
+			              
+			              
+			    	          <div className="col-md-3">
+			    	              <div className="form-group">
+			    	                  <label className="control-label">Dirección</label>
+			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
+			    	              </div>
+			    	          </div>
+			    	          <div className="col-md-1">
+			    	              <div className="form-group">
+			    	                  <label className="control-label">Placa: </label>
+			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
+			    	              </div>
+			    	          </div>
+			    	          <div className="col-md-2">
+				    	          <div className="form-group">
+					        	  	<label className="control-label">Bonus</label><br></br>  
+					        	  	<input name="bonusNumberDisp" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.bonusNbrDisabled} placeholder={'Nro Bonus'} onKeyPress={this.onKeyPress.bind(this)} value={this.state.bonusNumberDisp} onChange={this.bonusNumberDispChange}/>
+					        	  </div>
+				        	  </div>
+				          </div>
 		              </div>
-		              {this.state.showNewInvoiceButton && <div className="col-md-2">
-			              <div className="form-group">
-		            	  	<label className="control-label">Crear</label><br></br>  
-		            	  	<div style={{textAlign: 'left'}}>
-		            	  		<a type="submit" onClick={this.newInvoice} className="btn btn-sm purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>
-				      	    </div>
-		                  </div>
-		              </div>}
-	              </div>
-	              {this.state.selectedOption == 'nota de credito' &&
-	              <div className="row">
-		              <div className="col-md-2">
-				          <div className="form-group">
-		            	  	<label className="control-label">{invoicePrefix}</label><br></br>  
-		            	  	<a onClick={this._invoiceTypeHandleClick.bind(this)} className="btn btn-sm green-meadow">{this.state.invoiceTypeModifiedToggle} {!this.state.invoiceTypeModifiedToggle} {buttonText}</a>
-		                  </div>
-		              </div>
-		              <div className="col-md-2">
-	    	              <div className="form-group">
-	    	              	  <table style={{width:'30%'}}>
-		  	                  	<tbody>
-		  	                  	  <tr>
-		    	                    <td><label className="control-label">Nro</label></td>
-		    	                    <td>{this.state.loadingGif &&
-		  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
-		    	                  </tr>
-		    	                </tbody>
-		    	              </table>
-	    	                  <input type="number" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} placeholder={"Nro Comprobante"} onBlur={this.invoiceSearchForCreditNote.bind(this)} onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.invoiceNumberModifiedDisp} onChange={this.invoiceNumberModifiedDispChange}/>
-		                  </div>
-	    	          </div>
-		    	      <div className="col-md-2">
-			              <div className="form-group">
-			                  <label className="control-label">Fecha Comprobante Referencia</label>
-			                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+			          <div className="row">
+			              <div className="col-xs-12">
+			                  <table className="table table-condensed table-hover">
+			                      <thead>
+			                          <tr>
+			                              <th className="hidden-xs"> Prod </th>
+			                              <th className="hidden-sm-up"> Descr </th>
+			                              <th className="hidden-sm-up"> Cantidad </th>
+			                              <th> Valor Unitario </th>
+			                              <th className="hidden-sm-up"> Importe </th>
+			                          </tr>
+			                      </thead>
+			                      <tbody>
+			                      	  <tr>
+			                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
+			                              <td className="hidden-sm-up"> D2 </td>
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
+			                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
+			                          </tr>
+			                          <tr>
+			                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
+			                              <td className="hidden-sm-up"> G90 </td>
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
+			                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
+			                          </tr>
+			                          <tr>
+			                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
+			                              <td className="hidden-sm-up"> G95 </td>
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
+			                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
+			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
+			                          </tr>
+			                      </tbody>
+			                  </table>
 			              </div>
 			          </div>
-	    	          <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">Seleccione Motivo</label>
-	    	                  <select className="ticket-assign form-control input-medium selectHeight" style={{borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
-	    	                  	  <option value=""></option>
-	    	                  	  <option value="01">Anulacion de la Operacion</option>
-	    	                  	  <option value="02">Anulacion por error en el RUC</option>
-	    	                  	  <option value="03">Correccion por error en la descripcion</option>
-	    	                  	  <option value="04">Descuento global</option>
-	    	                  	  <option value="05">Descuento por item</option>
-	    	                  	  <option value="06">Devolucion total</option>
-	    	                  	  <option value="07">Devolucion por item</option>
-	    	                  	  <option value="08">Bonificacion</option>
-	    	                  	  <option value="09">Disminucion en el valor</option>
-	    	                  	  <option value="10">Otros conceptos</option>
-			                  </select>
-	    	              </div>
-	    	          </div>
-	              </div>
-	              }
-              	  <div className="row">
-		    	      <div className="col-md-2">
-			              <div className="form-group">
-			                  <label className="control-label">Fecha&nbsp; {this.state.user.roles.ROLE_ADMIN && <a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a>}</label>
-			                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
-			                  
-			            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
+			          <div className="row">
+			              <div className="hidden-xs col-sm-3">
+			                  <div className="well">
+			                      <address>
+			                          <strong>Código Hash: </strong> {this.state.invoiceHash}
+			                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
+			                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
+				                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
+				                      }
+		                          </address>
+			                      <address>
+			                          <strong>Consulte su documento en:</strong>
+			                          <a> www.grifoslajoya.com </a>
+			                      </address>
+			                  </div>
+			              </div>
+				          <div className="hidden-xs col-sm-3">
+			                  <div className="well">
+				                  <address>
+				                      <strong>Código QR:</strong>
+				                      <br/>  
+				                  </address>
+				                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+						          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode1" className="col-xs-12 col-md-offset-3" ></div>
+						          </div>
+			                  </div>
+			              </div>
+			              <div className="col-xs-12 col-sm-6 invoice-block">
+			                  <div className="row invoice-subtotal">
+						          <div className="col-xs-12">
+							          <table className="table table-condensed table-hover">
+							              <tbody>
+							                  <tr>
+							                      <td>
+							                      	<strong>Sub-Total Ventas:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold">{this.state.subTotal}</td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+							                      	<strong>Descuento:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+							                      	<strong>IGV (18%):</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold">{this.state.totalIGV} </td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+						                      		<strong>Importe Total:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold">{this.state.total}</td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+						                      		<strong>Tarjeta Crédito/Débito <i className="fa fa-cc-visa"></i>:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="VISA" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+						                      		<strong>Efectivo:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold">{this.state.cashPmt}</td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+						                      		<strong>Efectivo Entregado <i className="fa fa-money"></i>:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b', borderWidth: '2px'}} pattern="[0-9]*" className="form-control" placeholder="Efectivo" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
+							                  </tr>
+							                  <tr>
+							                      <td>
+						                      		<strong>Vuelto:</strong>
+							                      </td>
+							                      <td>
+							                      	S/ 
+							                      </td>
+							                      <td className="text-right sbold">{this.state.change}</td>
+							                  </tr>
+							              </tbody>
+							          </table>	
+				          		  </div>
+					          </div>
+					          
+			                  {!this.state.printDisabled && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue btn-sm hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
+			                  {this.state.printDisabled && <a type="submit" className="btn blue btn-sm hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;&nbsp;
+			                  <button type="submit" disabled={this.state.submitDisabled} className="btn btn-sm green hidden-print margin-bottom-5">
+			    	          	<i className="fa fa-check"></i> Enviar
+			    	          </button>&nbsp;&nbsp;
+			    	          <button type="button" onClick={this.emailInvoice} disabled={this.state.emailDisabled} className="btn btn-sm green-meadow hidden-print margin-bottom-5">
+			    	          	<i className="fa fa-envelope"></i> Email 
+			    	          </button>&nbsp;
+			    	          {this.state.emailingGif &&
+		    	                  <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 			              </div>
 			          </div>
-	    	      	  <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <table style={{width:'100%'}}>
-	    	                  	<tbody>
-	    	                  	  <tr>
-		    	                    <td><label className="control-label">{this.state.docLabelObj.clientDocType}&nbsp;<a type="button" onClick={this.searchButton.bind(this)} > <i className="fa fa-edit">Buscar</i></a></label></td>
-		    	                    <td>{this.state.loadingGif &&
-		  	    	                  <img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" />}</td> 
-		    	                  </tr>
-		    	                </tbody>
-		    	              </table>
-	    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
-	                	  </div>
-	    	          </div>
-	    	          <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
-	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientNameDisabled} placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
-	    	              </div>
-	    	          </div>
-	              
-	              
-	    	          <div className="col-md-4">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">Dirección</label>
-	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
-	    	              </div>
-	    	          </div>
-	    	          <div className="col-md-2">
-	    	              <div className="form-group">
-	    	                  <label className="control-label">Nro de Placa: </label>
-	    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>
-	    	              </div>
-	    	          </div>
-		          </div>
-              </div>
-             {/* <div className="row">
-	              <div className="col-xs-4">
-	                  <h3>About:</h3>
-	                  <ul className="list-unstyled">
-	                      <li> Drem psum dolor sit amet </li>
-	                      <li> Laoreet dolore magna </li>
-	                      <li> Consectetuer adipiscing elit </li>
-	                      <li> Magna aliquam tincidunt erat volutpat </li>
-	                      <li> Olor sit amet adipiscing eli </li>
-	                      <li> Laoreet dolore magna </li>
-	                  </ul>
-	              </div>
-	              <div className="col-xs-4 invoice-payment">
-	                  <h3>Payment Details:</h3>
-	                  <ul className="list-unstyled">
-	                      <li>
-	                          <strong>V.A.T Reg #:</strong> 542554(DEMO)78 </li>
-	                      <li>
-	                          <strong>Account Name:</strong> FoodMaster Ltd </li>
-	                      <li>
-	                          <strong>SWIFT code:</strong> 45454DEMO545DEMO </li>
-	                      <li>
-	                          <strong>Account Name:</strong> FoodMaster Ltd </li>
-	                      <li>
-	                          <strong>SWIFT code:</strong> 45454DEMO545DEMO </li>
-	                  </ul>
-	              </div>
-	          </div>*/}
-	          <div className="row">
-	              <div className="col-xs-12">
-	                  <table className="table table-condensed table-hover">
-	                      <thead>
-	                          <tr>
-	                              <th className="hidden-xs"> Prod </th>
-	                              <th className="hidden-sm-up"> Descr </th>
-	                              <th className="hidden-sm-up"> Cantidad </th>
-	                              <th> Valor Unitario </th>
-	                              <th className="hidden-sm-up"> Importe </th>
-	                          </tr>
-	                      </thead>
-	                      <tbody>
-	                      	  <tr>
-	                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
-	                              <td className="hidden-sm-up"> D2 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
-	                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
-	                          </tr>
-	                          <tr>
-	                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
-	                              <td className="hidden-sm-up"> G90 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
-	                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
-	                          </tr>
-	                          <tr>
-	                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
-	                              <td className="hidden-sm-up"> G95 </td>
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
-	                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
-	                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
-	                          </tr>
-	                      </tbody>
-	                  </table>
-	              </div>
-	          </div>
-	          <div className="row">
-	              <div className="hidden-xs col-sm-3">
-	                  <div className="well">
-	                      <address>
-	                          <strong>Código Hash: </strong> {this.state.invoiceHash}
-	                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
-	                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
-		                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
-		                      }
-                          </address>
-	                      <address>
-	                          <strong>Consulte su documento en:</strong>
-	                          <a> www.grifoslajoya.com </a>
-	                      </address>
-	                  </div>
-	              </div>
-		          <div className="hidden-xs col-sm-3">
-	                  <div className="well">
-		                  <address>
-		                      <strong>Código QR:</strong>
-		                      <br/>  
-		                  </address>
-		                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
-				          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode1" className="col-xs-12 col-md-offset-3" ></div>
-				          </div>
-	                  </div>
-	              </div>
-	              <div className="col-xs-12 col-sm-6 invoice-block">
-	                  <div className="row invoice-subtotal">
-				          <div className="col-xs-12">
-					          <table className="table table-condensed table-hover">
-					              <tbody>
-					                  <tr>
-					                      <td>
-					                      	<strong>Sub-Total Ventas:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold">{this.state.subTotal}</td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-					                      	<strong>Descuento:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.discount} onChange={this.discountChange}/></td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-					                      	<strong>IGV (18%):</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold">{this.state.totalIGV} </td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong>Importe Total:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold">{this.state.total}</td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong><u>Forma de Pago:</u></strong>
-					                      </td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong>Tarjeta Crédito/Débito <i className="fa fa-cc-visa"></i>:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b'}} pattern="[0-9]*" className="form-control" placeholder="VISA" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.electronicPmt} onChange={this.electronicPmtChange}/></td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong>Efectivo:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold">{this.state.cashPmt}</td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong>Efectivo Entregado <i className="fa fa-money"></i>:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold"><input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: '#26344b', borderWidth: '2px'}} pattern="[0-9]*" className="form-control" placeholder="Efectivo" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.cashGiven} onChange={this.cashGivenChange}/></td>
-					                  </tr>
-					                  <tr>
-					                      <td>
-				                      		<strong>Vuelto:</strong>
-					                      </td>
-					                      <td>
-					                      	S/ 
-					                      </td>
-					                      <td className="text-right sbold">{this.state.change}</td>
-					                  </tr>
-					              </tbody>
-					          </table>	
-		          		  </div>
+			          <div className="row">
+			              <div className="hidden-sm hidden-md hidden-lg">
+			                  <div className="well">
+			                      <address>
+				                      <strong>Código Hash: </strong> {this.state.invoiceHash}
+			                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
+			                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
+				                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
+				                      }
+			                      </address>
+			                      <address>
+			                          <strong>Consulte su documento en:</strong>
+			                          <a> www.grifoslajoya.com </a>
+			                      </address>
+			                  </div>
+			              </div>
 			          </div>
-			          
-	                  {!this.state.printDisabled && <ReactToPrint trigger={() => <a id="printInvoiceButton" type="submit" className="btn blue hidden-print margin-bottom-5" > <i className="fa fa-print"></i> Imprimir</a>} content={() => this.componentRef}></ReactToPrint>}&nbsp;
-	                  {this.state.printDisabled && <a type="submit" className="btn blue hidden-print margin-bottom-5" disabled={!this.state.status} > <i className="fa fa-print"></i> Imprimir</a>}&nbsp;
-	                  <button type="submit" disabled={this.state.submitDisabled} className="btn green hidden-print margin-bottom-5">
-	    	          	<i className="fa fa-check"></i> Enviar
-	    	          </button>&nbsp;
-	    	          <button type="button" onClick={this.emailInvoice} disabled={this.state.emailDisabled} className="btn green-meadow hidden-print margin-bottom-5">
-	    	          	<i className="fa fa-envelope"></i> Email 
-	    	          </button>&nbsp;
-	    	          {/*<a type="submit" onClick={this.emailInvoice.bind(this)} disabled={!this.state.submitDisabled} className="btn green-meadow margin-bottom-5"><i className="fa fa-envelope"></i> Email</a>&nbsp;*/}
-	    	          {/*<a type="submit" onClick={this.newInvoice} className="btn purple hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>*/}
-	    	          {this.state.emailingGif &&
-    	                  <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
-	              </div>
-	          </div>
-	          <div className="row">
-	              <div className="hidden-sm hidden-md hidden-lg">
-	                  <div className="well">
-	                      <address>
-		                      <strong>Código Hash: </strong> {this.state.invoiceHash}
-	                          <br/> <strong>Son: </strong> {this.state.totalVerbiage}
-	                          <br/> {this.state.selectedOption == 'nota de credito' && <div> <strong>Nro Documento Referencia: </strong> {this.state.invoiceNumberModified}
-		                      <br/> <strong>Fecha Documento Referencia: </strong> {`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
-		                      }
-	                      </address>
-	                      <address>
-	                          <strong>Consulte su documento en:</strong>
-	                          <a> www.grifoslajoya.com </a>
-	                      </address>
-	                  </div>
-	              </div>
-	          </div>
-	          <div className="row">
-		          <div className="hidden-sm hidden-md hidden-lg">
-	                  <div className="well">
-		                  <address>
-		                      <strong>Código QR:</strong>
-		                  </address>
-		                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
-				          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode3" className="col-xs-12 col-md-offset-3" ></div>
-				          </div>
-	                  </div>
-	              </div>
-	          </div>
+			          <div className="row">
+				          <div className="hidden-sm hidden-md hidden-lg">
+			                  <div className="well">
+				                  <address>
+				                      <strong>Código QR:</strong>
+				                  </address>
+				                  <div style={{width: '300px', height: '300px', display: 'block', margin: 'auto', zoom: 0.5}} >
+						          	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="qrcode3" className="col-xs-12 col-md-offset-3" ></div>
+						          </div>
+			                  </div>
+			              </div>
+			          </div>
+			      </div>
+		      </div>
 	      </div>
 	      
 	      <div className="invoice-content-2" ref={el => (this.componentRef = el)} style={{fontFamily:"sans-serif", fontSize: 11}}>

@@ -1,11 +1,11 @@
 input[type=text] {
-  height: 25px;
+  height: 22px;
 }
 
 input[type=number] {
-  height: 25px;
+  height: 22px;
 }
 
 .selectHeight {
-   height: 25px;
+   height: 32px;
 } 
