@@ -1599,13 +1599,13 @@ class TableDashboard extends React.Component {
 			              </div>
 			              
 				          <div className="actions">
-				          	  <div className="form-group form-group hidden-xs">
+				          	  <div className="form-group form-group hidden-xs" style={{paddingTop: "3px"}}>
 					          	  <label className="control-label bold"></label><br></br>
-					          	  <a href="/invoice-table-page" className="btn btn-sm yellow btn-circle margin-bottom-5">
+					          	  <a href="/invoice-table-page" className="btn btn-sm yellow btn-circle">
 							          <i className="fa fa-table"></i>&nbsp;Tabla Comprobantes
 								  </a>&nbsp;&nbsp;
 								  {this.state.showNewInvoiceButton && 
-					            	  <a type="submit" onClick={this.newInvoice} className="btn btn-sm purple btn-circle hidden-print margin-bottom-5" > <i className="fa fa-edit"></i> Nuevo</a>}
+					            	  <a type="submit" onClick={this.newInvoice} className="btn btn-sm purple btn-circle hidden-print" > <i className="fa fa-edit"></i> Nuevo</a>}
 							  </div>
 							  
 							  <div className="form-group form-group hidden-sm hidden-md hidden-lg">
@@ -1723,7 +1723,7 @@ class TableDashboard extends React.Component {
 		              </div>
 			          <div className="row">
 			              <div className="col-xs-12">
-			                  <table className="table table-condensed table-hover">
+			                  <table className="table table-condensed table-hover table-striped">
 			                      <thead>
 			                          <tr>
 			                              <th className="hidden-xs"> Prod </th>
@@ -1789,7 +1789,7 @@ class TableDashboard extends React.Component {
 			              <div className="col-xs-12 col-sm-6 invoice-block">
 			                  <div className="row invoice-subtotal">
 						          <div className="col-xs-12">
-							          <table className="table table-condensed table-hover">
+							          <table className="table table-condensed table-hover table-striped">
 							              <tbody>
 							                  <tr>
 							                      <td>

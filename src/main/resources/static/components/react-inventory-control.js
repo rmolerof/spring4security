@@ -50,7 +50,7 @@ class IncorporationForm extends React.Component {
   }
   
   handlePumpAttendantNamesChange = (evt) => {
-    this.setState({ pumpAttendantNames: evt.target.value });
+    this.setState({ pumpAttendantNames: evt.target.value.toUpperCase() });
   }
   
   handleShiftDateChange = evt => {
@@ -658,7 +658,7 @@ class IncorporationForm extends React.Component {
 	                    </div>
 	                </div>
 				    <div className="form-body" >
-				      <div ref={el => (this.dispensersStatusRef = el)}>
+				      <div>
 					      <div className="row">
 					          <div className="col-md-3">
 					              <div className="form-group">
@@ -994,8 +994,8 @@ class IncorporationForm extends React.Component {
 					  
 					  <br/>
 					  
-					  <div className="row" ref={el => (this.normalPrintStatusRef = el)}>
-					      <div className="col-md-7">
+					  <div className="row">
+					      <div className="col-md-7" ref={el => (this.normalPrintStatusRef = el)}>
 					          <div className="portlet box red">
 					              <div className="portlet-title">
 					                  <div className="caption">
@@ -1332,6 +1332,218 @@ class IncorporationForm extends React.Component {
 					              
 					          </div>
 					      </div>
+					      
+					      <div className="col-md-3" ref={el => (this.dispensersStatusRef = el)} >
+					          <div className="portlet box red">
+					              <div className="portlet-title">
+					                  <div className="caption">
+					                      <i className="fa fa-gift"></i>Cuadre {this.state.shiftDate} - {this.state.shift} </div>
+					              </div>
+					              
+					              <div className="portlet-body form" style={{fontFamily:"sans-serif"}}>
+						              <div className="portlet-body">
+							              <table className="table table-borderless">
+								              <tbody>
+						            			  <tr>
+											          <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+											              <div className="form-group">
+											                  <label className="control-label">Nombres de Grifero(s)</label>
+											                  <div>{this.state.pumpAttendantNames}</div>
+											              </div>
+											          </td>
+											          <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+											          <div className="form-group">
+										                  <label className="control-label">Creado Fecha</label>
+										                  <div>{`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}</div>
+										              </div>
+											          </td>
+											      </tr>
+											  </tbody>
+									      </table>
+									      <div className="table-responsive" style={{marginTop: '-30px'}}>
+										      <table className="table table-condensed">
+											  	  <tbody> 
+												      <tr>
+													  	<td>
+												              <table className="table table-condensed table-bordered">
+												            	<tbody>
+											          			  <tr>
+												          				{this.state.tanks.map((tank, idx) => (
+													            	    <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}} key={`col${idx}`}>
+													            				<label className="control-label" key={`name${idx}`}>Gal {tank.fuelType.toUpperCase()}</label>
+													            				<div>{tank.gals.toFixed(2)}</div>
+												          				</td>))}
+													              </tr>
+												                  <tr>
+											            				{this.state.gasPrices.map((gasPrice, idx) => (
+												            			<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}} key={`col${idx}`}>
+												            				<label className="control-label" key={`name${idx}`}>S/ {gasPrice.name.toUpperCase()}</label>
+												            				<div>{gasPrice.price.toFixed(2)}</div>
+											            				</td>
+											            				))}
+												                    </tr>
+											                    </tbody>
+												              </table>
+												        </td>
+												      </tr>
+											      </tbody>
+										      </table>
+									      </div>
+						              		
+									      <div className="table-responsive" style={{marginTop: '-40px'}}>
+									      	<table className="table table-hover">
+									      		<thead>
+		      					            		<tr>
+		      					            			<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		      					            				Prod
+		      					            			</th>
+		      					            			<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		      					            				Anterior
+		      					            			</th>
+		  					            				<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		  					            					Actual
+		      					            			</th>
+		  					            				<th className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		  					            					Gals
+		      					            			</th>
+		  					            				<th className="text-right " style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+		  					            					Soles
+		      					            			</th>
+		      					            		</tr>
+	      					            		</thead>
+	      					            		<tbody>
+		      					            		{this.state.shareholders1.map((shareholder, idx) => (
+				      					            <tr key={`d1${idx}`}>
+				      					            	<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.name.toUpperCase()}</td>
+				      					            	<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.numBeg}</td>
+				      					            	<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.numEnd}</td>
+				      					            	<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`}</td>
+				      					            	<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`}</td>
+				      					            </tr>))}
+		      					            		{this.state.shareholders2.map((shareholder, idx) => (
+		      					            		<tr key={`d1${idx}`}>
+			      					            		<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.name.toUpperCase()}</td>
+				      					            	<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.numBeg}</td>
+				      					            	<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{shareholder.numEnd}</td>
+				      					            	<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${(shareholder.numEnd - shareholder.numBeg).toFixed(2)}`}</td>
+				      					            	<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>{`${(((shareholder.numEnd - shareholder.numBeg) * shareholder.price * 100).toFixed() / 100)}`}</td>
+		      					            		</tr>))}
+		  					            		</tbody>
+							            		</table>
+									      </div>
+									      
+									      <div className="table-responsive" style={{marginTop: '-15px'}}>
+									      	<table className="table table-hover">
+										      	<thead>
+		      					            		<tr>
+			      					            		<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				VDCG
+			  					            			</th>
+			  					            			<th className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				Monto S/
+			  					            			</th>
+		      					            		</tr>
+		  					            		</thead>
+									      		<tbody>
+			  					            		{this.state.expensesAndCredits.map((expenseOrCredit, idx) => (	
+			  					            		<tr key={`trItem${idx}`}>
+			  						            		<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  						            			{expenseOrCredit.item}
+		  						            			</td>
+			  						            		<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  						            			{parseFloat(expenseOrCredit.amt || '0').toFixed(2)}
+			  						            		</td>
+			  						            	</tr>))}
+			  					            	</tbody>
+						            		</table>
+									      </div>
+									      
+									      <div className="table-responsive" style={{marginTop: '-15px'}}>
+										      <table className="table table-hover table-condensed">
+											    <thead>
+		      					            		<tr>
+			      					            		<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				Resumen
+			  					            			</th>
+			  					            			<th style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				
+			  					            			</th>
+		      					            		</tr>
+		  					            		</thead>
+										      	<tbody>
+			  					            		<tr>
+			  					            			<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				<label className="control-label" key="revenueLabel">Venta Total: S/.</label>&nbsp;&nbsp;
+			  					            			</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				{parseFloat(this.state.totalRevenue || '0').toFixed(2)}
+			  					            			</td>
+		  					            			</tr>
+		  					            			<tr>
+							      	        			<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				<label className="control-label" key="cashLabel">Effectivo: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				{parseFloat(this.state.totalCash || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				<label className="control-label" key="gastosOrCreditsLabel">VDCG: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				{parseFloat(this.state.totalExpensesAndCredits || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+						      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalVisasLabel">Solo Visas: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				{parseFloat(this.state.totalVisas || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+						      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalDepositsLabel">Solo Depósitos: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				{parseFloat(this.state.totalDeposits || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+						      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalCreditsLabel">Solo Créditos: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				{parseFloat(this.state.totalCredits || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+						      	        					&nbsp;&nbsp;&nbsp;&nbsp;<label className="control-label" key="totalExpensesLabel">Solo Gastos: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            				{parseFloat(this.state.totalExpenses || '0').toFixed(2)}
+							      	        			</td>
+							      	        		</tr>
+							      	        		<tr>
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
+						      	        				</td>
+			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+							      	        				{`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`}
+							      	        			</td>
+							      	        		</tr>
+		  					            		</tbody>
+						            		</table>
+						            	 </div>
+				                      </div>
+					              </div>
+					          </div>
+					      </div>
+					      
+					      
 					   </div>
 				    </div>
 			  </div>
