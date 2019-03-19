@@ -26,7 +26,8 @@ public class ScheduledTasks {
 	@Autowired
 	private Utils utils;
 	
-	@Scheduled(cron = "0 0 2 * * *")
+	// 7 am => 2am GMT-5 Lima Peru 
+	@Scheduled(cron = "0 0 7 * * *") 
 	public void reportCurrentTime() {
 		logger.info("Cron job is starting at " + dateFormat.format(new Date()));
 		

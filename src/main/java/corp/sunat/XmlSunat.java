@@ -212,7 +212,7 @@ public class XmlSunat {
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
 		invoiceVo.setSunatErrorStr(sunatResponse);
-		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse);
+		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse + "| Invoice Date: " + formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID)));
 		logger.info("hash: " + invoiceVo.getInvoiceHash());
 		return sunatResponse;
 	}

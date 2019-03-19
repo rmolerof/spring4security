@@ -154,10 +154,10 @@ class IncorporationForm extends React.Component {
 	  this.setState({totalCredits: totalCredits.toFixed(2)});
 	  this.setState({totalExpenses: totalExpenses.toFixed(2)});
 	  
-	  if (exessOrMissing && exessOrMissing.toFixed(2) <= 0) {
-		  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
-	  } else {
+	  if (exessOrMissing && exessOrMissing.toFixed(2) >= 0) {
 		  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'red'}});
+	  } else {
+		  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
 	  }
   }
   
@@ -531,7 +531,7 @@ class IncorporationForm extends React.Component {
 					this.setState({totalCredits: totalCredits.toFixed(2)});
 					this.setState({totalExpenses: totalExpenses.toFixed(2)});
 					
-					if (exessOrMissing && exessOrMissing.toFixed(2) < 0) {
+					if (exessOrMissing && exessOrMissing.toFixed(2) >= 0) {
 						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'red'}});
 					  } else {
 						  this.setState({excessOrMissingStyle: {width: '80px', textAlign: 'right', color: 'blue'}});
@@ -931,7 +931,7 @@ class IncorporationForm extends React.Component {
 								      	        		</tr>
 								      	        		<tr>
 							      	        				<td>
-								      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra:</label>&nbsp;&nbsp;
+								      	        				<label className="control-label" key="excessOrMissingLabel">{`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100) < 0 ? 'SOBRA': 'FALTA'}`}</label>&nbsp;&nbsp;
 							      	        				</td>
 							      	        				<td>
 								      	        				<input style={this.state.excessOrMissingStyle} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
@@ -1279,7 +1279,7 @@ class IncorporationForm extends React.Component {
 															      	        		</tr>
 															      	        		<tr>
 														      	        				<td>
-															      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
+															      	        				<label className="control-label" key="excessOrMissingLabel">{`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100) < 0 ? 'SOBRA': 'FALTA'}`} S/.</label>&nbsp;&nbsp;
 														      	        				</td>
 											  					            			<td>
 															      	        				<input style={{width: '80px', textAlign: 'right'}} key="excessOrMissing" type="text" value={`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`} readOnly/>
@@ -1472,18 +1472,18 @@ class IncorporationForm extends React.Component {
 		  					            		</thead>
 										      	<tbody>
 			  					            		<tr>
-			  					            			<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-			  					            				<label className="control-label" key="revenueLabel">Venta Total: S/.</label>&nbsp;&nbsp;
+			  					            			<td style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
+			  					            				<label className="control-label bold" key="revenueLabel">Venta Total: S/.</label>&nbsp;&nbsp;
 			  					            			</td>
-			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            			<td className="text-right bold" style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
 			  					            				{parseFloat(this.state.totalRevenue || '0').toFixed(2)}
 			  					            			</td>
 		  					            			</tr>
 		  					            			<tr>
-							      	        			<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-							      	        				<label className="control-label" key="cashLabel">Effectivo: S/.</label>&nbsp;&nbsp;
+							      	        			<td style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
+							      	        				<label className="control-label bold" key="cashLabel">Effectivo: S/.</label>&nbsp;&nbsp;
 						      	        				</td>
-			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            			<td className="text-right bold" style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
 							      	        				{parseFloat(this.state.totalCash || '0').toFixed(2)}
 							      	        			</td>
 							      	        		</tr>
@@ -1528,10 +1528,10 @@ class IncorporationForm extends React.Component {
 							      	        			</td>
 							      	        		</tr>
 							      	        		<tr>
-						      	        				<td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
-							      	        				<label className="control-label" key="excessOrMissingLabel">Falta/Sobra: S/.</label>&nbsp;&nbsp;
+						      	        				<td style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
+							      	        				<label className="control-label bold" key="excessOrMissingLabel">{`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100) < 0 ? 'SOBRA': 'FALTA'}`} S/.</label>&nbsp;&nbsp;
 						      	        				</td>
-			  					            			<td className="text-right" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
+			  					            			<td className="text-right bold" style={{fontFamily:"sans-serif", fontSize: 12, padding: "2px"}}>
 							      	        				{`${(((this.state.totalRevenue - this.state.totalCash - this.state.totalExpensesAndCredits) * 100).toFixed() / 100)}`}
 							      	        			</td>
 							      	        		</tr>
