@@ -1,5 +1,6 @@
 package com.businessModel;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -11,8 +12,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bean.CpeBean;
@@ -32,7 +35,12 @@ public class XmlSunatTest {
     public static void main(String[] args) throws Exception {
     	
     	//processInvoice();
-    	ConexionCPEConsultaTicketTest();
+    	//conexionCPEConsultaTicketTest();
+    	conexionCPEStatusCDRTest();
+    	// To recover hash CPE
+    	/*String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\";
+    	String NombreCPE = "20501568776-03-B001-00000038";
+    	System.out.println(valorXML(RutaArchivo + NombreCPE, "", "DigestValue"));*/
     }
 	
     public static void processInvoice() throws FileNotFoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, KeyStoreException, CertificateException, ParserConfigurationException, SAXException, MarshalException, IOException, Exception {
@@ -115,7 +123,7 @@ public class XmlSunatTest {
 		XmlSunat.envio(invoiceVo3, System.getProperty("user.home"), "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService", "MODDATOS", "moddatos");
 	}
 	
-	public static void ConexionCPEConsultaTicketTest() {
+	public static void conexionCPEConsultaTicketTest() {
 		
 		String ruc = "20501568776";
 		String UsuarioSol = "LAJOYA40";
@@ -128,6 +136,45 @@ public class XmlSunatTest {
 		
 		ApiClienteEnvioSunat.ConexionCPEConsultaEstadoFactura(ruc, UsuarioSol, PassSol, rucCliente, tipoDocumento, serie, numero, RutaWS);
 	}
+	
+	public static void conexionCPEStatusCDRTest() throws SAXException, IOException, ParserConfigurationException {
+		
+		String ruc = "20501568776";
+		String UsuarioSol = "LAJOYA40";
+		String PassSol = "Lajoya@4";
+		String tipoDocumento = "03";
+		String nro_comprobante = "B001-00000809";
+		String RutaWS = "https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService";
+		String NombreCPE = "20501568776-" + tipoDocumento + "-" + nro_comprobante ;
+		String NombreCDR = "R-" + NombreCPE;
+		String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\CDR\\";
+		
+		String response = ApiClienteEnvioSunat.ConexionCPEStatusCDR(ruc, UsuarioSol, PassSol, tipoDocumento, nro_comprobante, NombreCPE,  NombreCDR,  RutaArchivo, RutaWS);
+		System.out.println("\n" + response);
+		
+		//String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\";
+    	//String NombreCPE = "20501568776-03-B001-00000038";
+    	//System.out.println("Hash CPE: " + valorXML(RutaArchivo + NombreCPE, "", "DigestValue"));
+		
+	}
+	
+    public static String valorXML(String rutaArchivo, String Nspace, String TagName) throws SAXException, IOException, ParserConfigurationException {
+        String rta = "";
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().parse(new FileInputStream(rutaArchivo + ".XML"), "ISO-8859-1");//origen
+            doc.getDocumentElement().normalize();
+            if (Nspace.length() > 0) {
+                rta = doc.getDocumentElement().getElementsByTagNameNS("*", TagName).item(0).getTextContent();//cbc:ResponseCode
+            } else {
+                rta = doc.getDocumentElement().getElementsByTagName(TagName).item(0).getTextContent();
+            }
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+        return rta;
+    }
 	
 	public static void firma() throws FileNotFoundException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException, ParserConfigurationException, SAXException, MarshalException,

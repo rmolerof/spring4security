@@ -324,8 +324,8 @@ public class Utils {
 	
 	public String saveBonusNumber(InvoiceVo invoiceVo) {
 		
-		if (!invoiceVo.getClientDocNumber().equals(UserService.CLIENTES_VARIOS_DOC_NUMBER)) {
-			if (invoiceVo.getClientDocType().equals(UserService.DNI)) {
+		if (!invoiceVo.getClientDocNumber().equals(ApplicationService.CLIENTES_VARIOS_DOC_NUMBER)) {
+			if (invoiceVo.getClientDocType().equals(ApplicationService.DNI)) {
 				
 				// search DNI in DB
 				DNIDao dniDao = dnisRepository.findFirstByDni(invoiceVo.getClientDocNumber());
@@ -341,7 +341,7 @@ public class Utils {
 				}
 				
 				return "1";
-			} else if (invoiceVo.getClientDocType().equals(UserService.RUC)) {
+			} else if (invoiceVo.getClientDocType().equals(ApplicationService.RUC)) {
 	
 				RUCDao rucDao = rucsRepository.findFirstByRuc(invoiceVo.getClientDocNumber());
 				
@@ -364,8 +364,8 @@ public class Utils {
 	
 	public String saveClientAddressForDNIOrRUC(InvoiceVo invoiceVo) {
 		
-		if (!invoiceVo.getClientDocNumber().equals(UserService.CLIENTES_VARIOS_DOC_NUMBER)) {
-			if (invoiceVo.getClientDocType().equals(UserService.DNI)) {
+		if (!invoiceVo.getClientDocNumber().equals(ApplicationService.CLIENTES_VARIOS_DOC_NUMBER)) {
+			if (invoiceVo.getClientDocType().equals(ApplicationService.DNI)) {
 				
 				// search DNI in DB
 				DNIDao dniDao = dnisRepository.findFirstByDni(invoiceVo.getClientDocNumber());
@@ -381,7 +381,7 @@ public class Utils {
 				}
 				
 				return "1";
-			} else if (invoiceVo.getClientDocType().equals(UserService.RUC)) {
+			} else if (invoiceVo.getClientDocType().equals(ApplicationService.RUC)) {
 				
 				RUCDao rucDao = rucsRepository.findFirstByRuc(invoiceVo.getClientDocNumber());
 				

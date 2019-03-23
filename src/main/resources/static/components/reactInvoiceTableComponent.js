@@ -19,7 +19,8 @@ class InvoiceTableSummary extends React.Component {
       invoicesSummaryData: null,
       invoicesSummaryConcarData: null,
       processingTypeButtonToggle: true,
-      processingType: 'NORMAL'
+      processingType: 'NORMAL',
+      voidedInvoicesIncluded: false
     };
     
     this.CONSTANTS = {
@@ -29,11 +30,16 @@ class InvoiceTableSummary extends React.Component {
 	    SUNAT_PENDING_STATUS: 'PENDIENTE',
 	    SUNAT_SENT_STATUS: 'ENVIADO',
 	    NORMAL_PROCESSING_TYPE: 'NORMAL',
-	    FORCED_PROCESSING_TYPE: 'FORCED',
+	    FORCED_PROCESSING_TYPE: 'FORZADO',
 	    EDIT_ENABLED_TIME_IN_MS: 600000,
 	    NUMBER_OF_RECORDS_TO_LOAD: 5000,
 	    ELECTRONIC_PAYMENT_MSG: "VISA",
-	    CASH_PAYMENT_MSG: "EFECTIVO"
+	    CASH_PAYMENT_MSG: "EFECTIVO",
+	    TOTAL_INVOICES_TODAY: "TOTAL_TODAY",
+	    TOTAL_INVOICES_LAST7DAYS: "TOTAL_LAST7DAYS",
+	    TOTAL_PENDING_INVOICES: "TOTAL_PENDING",
+	    TOTAL_INVOICES_MONTH: "TOTAL_MONTH",
+	    TOTAL_INVOICES_YEAR: "TOTAL_YEAR"
     }
   }
   
@@ -43,12 +49,13 @@ class InvoiceTableSummary extends React.Component {
 	  })
   };
   
-  _fetchInvoiceData(timeframe){
+  _fetchInvoiceData(criteria){
 			
 	  	var self = this;
 	  	var search = {};
-		search["dateEnd"] = timeframe.dateEnd;
-		search["dateBeg"] = timeframe.dateBeg;
+		search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
+		search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
+		self.setState({invoicesSummaryData: null, processingGif: true});
 		
 		jQuery.ajax({
 			type: "POST",
@@ -139,7 +146,8 @@ class InvoiceTableSummary extends React.Component {
 					tableData[i] = row;
 				}
 				
-				self.setState({invoicesSummaryData: tableData});
+				self.setState({invoicesSummaryData: tableData, processingGif: false});
+				
 			},
 			error: function(e){
 
@@ -147,12 +155,14 @@ class InvoiceTableSummary extends React.Component {
 		});
   }
   
-  _fetchInvoiceConcarData(timeframe){
+  _fetchInvoiceConcarData(criteria){
 		
+	  	var self = this
 	  	var search = {};
-		search["dateEnd"] = timeframe.dateEnd;
-		search["dateBeg"] = timeframe.dateBeg;
-		
+	  	search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
+	  	search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
+	  	self.setState({invoicesSummaryConcarData: null, processingGif: true});
+	  	
 		jQuery.ajax({
 			type: "POST",
 			contentType: "application/json", 
@@ -232,7 +242,7 @@ class InvoiceTableSummary extends React.Component {
 					tableData[i] = row;
 				}
 				
-				this.setState({invoicesSummaryConcarData: tableData});
+				self.setState({invoicesSummaryConcarData: tableData, processingGif: false});
 			},
 			error: function(e){
 
@@ -261,8 +271,8 @@ class InvoiceTableSummary extends React.Component {
   
   componentWillMount(){
 	  this._getUser();
-	  this._fetchInvoiceData({dateEnd: "latest", dateBeg: this.CONSTANTS.NUMBER_OF_RECORDS_TO_LOAD});
-	  this._fetchInvoiceConcarData({dateEnd: "latest", dateBeg: this.CONSTANTS.NUMBER_OF_RECORDS_TO_LOAD});
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
   }
   
   onKeyPress(event) {
@@ -374,6 +384,11 @@ class InvoiceTableSummary extends React.Component {
 		}
   }
   
+  _loadInvoicesByCriteria = (loadInvoiceAmountCriteria) => (evt) => {
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded}); 
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
+  }
+  
   render() {    
 	  
 	let processingTypeButtonText = this.CONSTANTS.NORMAL_PROCESSING_TYPE;
@@ -408,6 +423,14 @@ class InvoiceTableSummary extends React.Component {
 	      {this.state.user.roles.ROLE_ADMIN && <div style={{textAlign: 'right'}}>
 		      {this.state.processingGif &&
                   <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
+		      
+		      <div className="btn-group">
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_TODAY")}>Hoy</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_LAST7DAYS")}>Últimos 7 Días</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_PENDING_INVOICES")}>Total Pendientes</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_MONTH")}>Total Mes</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_YEAR")}>Total Año</button>
+	          </div>&nbsp;
 		      
 		      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5"> 
 		      	<i className="fa fa-forward"></i>&nbsp;{processingTypeButtonText}

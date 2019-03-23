@@ -8,6 +8,8 @@ public class SearchDateCriteria {
 	int backDataCount;
 	String shiftDate;
 	String shift;
+	String loadInvoiceAmountCriteria;
+	boolean voidedInvoicesIncluded;
 	
 	public String getShift() {
 		return shift;
@@ -39,6 +41,17 @@ public class SearchDateCriteria {
 	public void setShiftDate(String shiftDate) {
 		this.shiftDate = shiftDate;
 	}
-	
-	
+	public String getLoadInvoiceAmountCriteria() {
+		return loadInvoiceAmountCriteria;
+	}
+	public void setLoadInvoiceAmountCriteria(String loadInvoiceAmountCriteria) {
+		this.loadInvoiceAmountCriteria = loadInvoiceAmountCriteria;
+	}
+	public boolean isVoidedInvoicesIncluded() {
+		return voidedInvoicesIncluded;
+	}
+	public void setVoidedInvoicesIncluded(boolean voidedInvoicesIncluded) {
+		this.voidedInvoicesIncluded = voidedInvoicesIncluded;
+	}
+
 }

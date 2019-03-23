@@ -38,15 +38,15 @@ import corp.rucdnisearch.DNIVo;
 import corp.rucdnisearch.RUCVo;
 import corp.services.GlobalProperties;
 import corp.services.RucDniService;
-import corp.services.UserService;
+import corp.services.ApplicationService;
 import corp.services.Utils;
 
 @RestController
-public class ServiceController {
+public class ApplicationController {
 
-	UserService userService;
+	ApplicationService userService;
 	@Autowired
-	public void setUserService(UserService userService) {
+	public void setUserService(ApplicationService userService) {
 		this.userService = userService;
 	}
 	@Autowired
@@ -338,7 +338,7 @@ public class ServiceController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<InvoiceVo> users = userService.findInvoicesSummaryData(search.getDateEnd(), search.getDateBeg());
+		List<InvoiceVo> users = userService.findInvoicesSummaryData(search.getLoadInvoiceAmountCriteria(), search.isVoidedInvoicesIncluded());
 		if(users.isEmpty()) {
 			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
 		} else {

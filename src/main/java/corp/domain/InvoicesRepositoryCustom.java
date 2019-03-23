@@ -4,9 +4,7 @@ import java.util.List;
 
 public interface InvoicesRepositoryCustom {
 
-	List<InvoiceDao> findLatest(String dateEnd, String dateBeg);
-	
-	List<InvoiceDao> findLatestPendingaAndVoidedInvoices();
+	List<InvoiceDao> findInvoicesByAmountCriteriaAndVoidedIncludedFlag(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded);
 	
 	InvoiceDao findLastSentInvoice(String invoiceType);
 	

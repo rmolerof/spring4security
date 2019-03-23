@@ -1701,13 +1701,13 @@ class TableDashboard extends React.Component {
 			    	          </div>
 			              
 			              
-			    	          <div className="col-md-3">
+			    	          <div className="col-md-2">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Dirección</label>
 			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
 			    	              </div>
 			    	          </div>
-			    	          <div className="col-md-1">
+			    	          <div className="col-md-2">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Placa: </label>
 			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="Ingrese placa" onKeyPress={this.onKeyPress} value={this.state.truckPlateNumber} onChange={this.truckPlateNumberChange}/>

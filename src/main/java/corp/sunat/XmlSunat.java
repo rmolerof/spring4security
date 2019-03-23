@@ -345,4 +345,9 @@ public class XmlSunat {
 		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
 		return new Date(date.getTime() + tz.getOffset(date.getTime()));
 	}
+    
+    public static Date transformZoneToGMTDate(Date date, String timeZoneID) {
+		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
+		return new Date(date.getTime() - tz.getOffset(date.getTime()));
+	}
 }

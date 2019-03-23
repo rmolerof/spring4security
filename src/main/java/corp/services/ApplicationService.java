@@ -49,9 +49,9 @@ import corp.model.User;
 import corp.sunat.XmlSunat;
 
 @Service
-public class UserService {
+public class ApplicationService {
 
-	private static Logger logger = LogManager.getLogger(UserService.class);
+	private static Logger logger = LogManager.getLogger(ApplicationService.class);
 	
 	private List<User> users;
 	private Station currentStation;
@@ -588,7 +588,7 @@ public class UserService {
 			
 			for (InvoiceDao invoiceDao: invoiceDaos) {
 				
-				if (invoiceDao.getInvoiceType().equals(UserService.BOLETA) || invoiceDao.getInvoiceTypeModified().equals(UserService.BOLETA)) {
+				if (invoiceDao.getInvoiceType().equals(ApplicationService.BOLETA) || invoiceDao.getInvoiceTypeModified().equals(ApplicationService.BOLETA)) {
 					Long nextInvoiceNumber = invoiceNumberToLong(invoiceDao.getInvoiceNumber());
 					
 					if (nextInvoiceNumber - lastBoletaNumberInLong != 1) {
@@ -745,9 +745,9 @@ public class UserService {
 		return Stream.of(invoiceVo).collect(Collectors.toList());
 	}
 	
-	public List<InvoiceVo> findInvoicesSummaryData(String dateEnd, String dateBeg) {
+	public List<InvoiceVo> findInvoicesSummaryData(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded) {
 
-		List<InvoiceDao> invoiceDaos = invoicesRepository.findLatest(dateEnd, dateBeg);
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findInvoicesByAmountCriteriaAndVoidedIncludedFlag(loadInvoiceAmountCriteria, voidedInvoicesIncluded);
 		
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
@@ -812,7 +812,7 @@ public class UserService {
 	}
 	
 	public boolean isInvoiceNotFound(InvoiceDao invoiceDao) {
-		return null == invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceDao.getInvoiceNumber(), UserService.SUNAT_VOIDED_STATUS);
+		return null == invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceDao.getInvoiceNumber(), ApplicationService.SUNAT_VOIDED_STATUS);
 	}
 	
 	public String makeInvoiceNumberVoided(String invoiceNumber) {

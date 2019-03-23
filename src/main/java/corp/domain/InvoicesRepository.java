@@ -7,6 +7,15 @@ import org.springframework.data.mongodb.repository.Query;
 
 public interface InvoicesRepository extends MongoRepository<InvoiceDao, Long>, InvoicesRepositoryCustom {
 	
+	public static String TOTAL_INVOICES_TODAY = "TOTAL_TODAY";
+	public static String TOTAL_INVOICES_LAST7DAYS = "TOTAL_LAST7DAYS";
+	public static String TOTAL_PENDING_INVOICES = "TOTAL_PENDING";
+	public static String TOTAL_INVOICES_MONTH = "TOTAL_MONTH";
+	public static String TOTAL_INVOICES_YEAR = "TOTAL_YEAR";
+	public static Integer WEEK = 7;
+	public static Integer MONTH = 30;
+	
+    
 	InvoiceDao findFirstByInvoiceNumberAndSunatStatus(String invoiceNbr, String sunatStatus);
 	
 	@Query("{sunatStatus: {$regex: ?0}}")
