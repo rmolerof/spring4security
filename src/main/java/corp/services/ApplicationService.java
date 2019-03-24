@@ -562,7 +562,7 @@ public class ApplicationService {
 		if (null == processPendingInvoicesTillDate) {
 			pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex(SUNAT_PENDING_STATUS, new Sort(Sort.Direction.ASC, "date"));
 		} else {
-			pendingInvoiceDaos = invoicesRepository.findAllPendingInvoicesTillDate(processPendingInvoicesTillDate);
+			pendingInvoiceDaos = invoicesRepository.findAllPendingInvoicesTillDate(processPendingInvoicesTillDate, new Sort(Sort.Direction.ASC, "date"));
 		}
 		
 		if (pendingInvoiceDaos.size() > 0) {

@@ -59,7 +59,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
 		}
 		
-		return findInvoicesByCriteria(criteria);
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesCurrentYear(boolean isVoidedInvoicesIncluded) {
@@ -69,7 +69,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
 		}
 		
-		return findInvoicesByCriteria(criteria);
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesLastNdays(Integer numberOfDaysAgo, boolean isVoidedInvoicesIncluded) {
@@ -79,7 +79,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
 		}
 		
-		return findInvoicesByCriteria(criteria);
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
 	public Date getTodayDateAtMidnight() {
@@ -139,12 +139,12 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			criteria = new Criteria().andOperator(notSentInvoicesCriteria, notVoidedInvoicesCriteria);
 		}
 		
-		return findInvoicesByCriteria(criteria);
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
-	public List<InvoiceDao> findInvoicesByCriteria(Criteria criteria) {
+	public List<InvoiceDao> findInvoicesByCriteria(Criteria criteria, Sort sort) {
 		Query query = new Query(criteria);
-		query.with(new Sort(Direction.DESC, "date"));
+		query.with(sort);
 		
 		List<InvoiceDao> invoiceDaos = mongoTemplate.find(query, InvoiceDao.class);
 
@@ -209,11 +209,11 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return invoiceDaos.size() > 0 ? invoiceDaos.get(0): InvoiceDao.NOT_FOUND;
 	}
 
-	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate) {
+	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort) {
 
 		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(XmlSunat.transformZoneToGMTDate(addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
 		
-		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate);
+		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}
 
 }

@@ -93,7 +93,7 @@ class InvoiceTableSummary extends React.Component {
 	  	var search = {};
 		search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
 		search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
-		self.setState({invoicesSummaryData: null, processingGif: true});
+		self.setState({invoicesSummaryData: null, processingGif: true, showError: false, showSuccess: false});
 		
 		jQuery.ajax({
 			type: "POST",
@@ -199,7 +199,7 @@ class InvoiceTableSummary extends React.Component {
 	  	var search = {};
 	  	search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
 	  	search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
-	  	self.setState({invoicesSummaryConcarData: null, processingGif: true});
+	  	self.setState({invoicesSummaryConcarData: null, processingGif: true, showError: false, showSuccess: false});
 	  	
 		jQuery.ajax({
 			type: "POST",
@@ -318,29 +318,6 @@ class InvoiceTableSummary extends React.Component {
 		event.preventDefault();
 	}
   }
-  
-/*  validatePendingInvoices() {
-	  	var search = {};
-		search["dateEnd"] = "latest";
-		search["dateBeg"] = "-31";
-		
-		jQuery.ajax({
-			type: "POST",
-			contentType: "application/json", 
-			url:"/api/validatePendingInvoices",
-			data: JSON.stringify(search),
-			datatype: 'json',
-			cache: false,
-			timeout: 600000,
-			success: (data) => {
-				
-				
-			},
-			error: function(e){
-
-			}	
-		});
-  }*/
   
   _convertStringToDate(stringDate) {
 	  var parts = stringDate.split("/");
