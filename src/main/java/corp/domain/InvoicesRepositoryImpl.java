@@ -93,6 +93,14 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return date.getTime();
 	}
 	
+	public Date addNDaysToDate(Date date, Integer nbrOfDays) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_MONTH, nbrOfDays);
+		
+		return calendar.getTime();
+	}
+	
 	public Date getDateAtMidnightByDayOfYear(Integer dayOfTheYear) {
 		Calendar date = getCurrentCalendarAtMidnight();
 		date.set(Calendar.DAY_OF_YEAR, dayOfTheYear);
@@ -191,7 +199,6 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return invoiceDaos.size() > 0 ? invoiceDaos.get(0): InvoiceDao.NOT_FOUND;
 	}
 
-	@Override
 	public InvoiceDao findFirstByInvoiceNumberNotVoided(String invoiceNumber) {
 		
 		Query query = new Query(Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceNumber").is(invoiceNumber));
@@ -200,6 +207,13 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		
 		List<InvoiceDao> invoiceDaos = mongoTemplate.find(query, InvoiceDao.class);
 		return invoiceDaos.size() > 0 ? invoiceDaos.get(0): InvoiceDao.NOT_FOUND;
+	}
+
+	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate) {
+
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(XmlSunat.transformZoneToGMTDate(addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		
+		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate);
 	}
 
 }

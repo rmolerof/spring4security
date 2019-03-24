@@ -554,26 +554,36 @@ public class ApplicationService {
 		return Stream.of(gasPricesVo).collect(Collectors.toList());
 	}
 	
-	public List<InvoiceVo> submitInvoicesToSunat(String processingType) {
+	public List<InvoiceVo> submitInvoicesToSunat(String processingType, Date processPendingInvoicesTillDate) {
 		
 		List<InvoiceVo> invalidInvoiceVos = null;
-		List<InvoiceDao> pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex("PENDIENTE", new Sort(Sort.Direction.ASC, "date"));
+		List<InvoiceDao> pendingInvoiceDaos = null;
 		
-		InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastSentInvoice(FACTURA);
-		InvoiceDao lastSunatProcessedBoleta = invoicesRepository.findLastSentInvoice(BOLETA);
+		if (null == processPendingInvoicesTillDate) {
+			pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex(SUNAT_PENDING_STATUS, new Sort(Sort.Direction.ASC, "date"));
+		} else {
+			pendingInvoiceDaos = invoicesRepository.findAllPendingInvoicesTillDate(processPendingInvoicesTillDate);
+		}
 		
-		if (processingType.equalsIgnoreCase(SubmitInvoiceGroupCriteria.NORMAL)) {
-			if(validateInvoices(pendingInvoiceDaos, lastSunatProcessedBoleta, lastSunatProcessedFacturaOrNotaDeCredito)) {
-				return submitInvoices(pendingInvoiceDaos);
+		if (pendingInvoiceDaos.size() > 0) {
+			InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastSentInvoice(FACTURA);
+			InvoiceDao lastSunatProcessedBoleta = invoicesRepository.findLastSentInvoice(BOLETA);
+			
+			if (processingType.equalsIgnoreCase(SubmitInvoiceGroupCriteria.NORMAL)) {
+				if(validateInvoices(pendingInvoiceDaos, lastSunatProcessedBoleta, lastSunatProcessedFacturaOrNotaDeCredito)) {
+					return submitInvoices(pendingInvoiceDaos);
+				} else {
+					invalidInvoiceVos = pendingInvoiceDaos.stream().map(invoiceDao -> {
+						InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+						return invoiceVo;
+					}).collect(Collectors.toList());
+					return invalidInvoiceVos;
+				}
 			} else {
-				invalidInvoiceVos = pendingInvoiceDaos.stream().map(invoiceDao -> {
-					InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
-					return invoiceVo;
-				}).collect(Collectors.toList());
-				return invalidInvoiceVos;
+				return submitInvoices(pendingInvoiceDaos);
 			}
 		} else {
-			return submitInvoices(pendingInvoiceDaos);
+			return new ArrayList<InvoiceVo>();
 		}
 		
 	}

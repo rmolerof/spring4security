@@ -314,7 +314,7 @@ public class ApplicationController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<InvoiceVo> invoiceVos = userService.submitInvoicesToSunat(submitInvoiceGroupCriteria.getProcessingType());
+		List<InvoiceVo> invoiceVos = userService.submitInvoicesToSunat(submitInvoiceGroupCriteria.getProcessingType(), submitInvoiceGroupCriteria.getProcessPendingInvoicesTillDate());
 		
 		if(invoiceVos.isEmpty()) {
 			result.setMsg("No hay comprobantes para enviar a SUNAT.");

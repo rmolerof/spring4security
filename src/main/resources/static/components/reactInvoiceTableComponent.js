@@ -20,7 +20,9 @@ class InvoiceTableSummary extends React.Component {
       invoicesSummaryConcarData: null,
       processingTypeButtonToggle: true,
       processingType: 'NORMAL',
-      voidedInvoicesIncluded: false
+      voidedInvoicesIncluded: false,
+      processPendingInvoicesTillDate: '',
+      processPendingInvoicesTillDateStyle: {color: 'black'},
     };
     
     this.CONSTANTS = {
@@ -47,6 +49,42 @@ class InvoiceTableSummary extends React.Component {
 	  this.setState((prevState, props) => {
 		  return {showError: !prevState.showError}
 	  })
+  };
+  
+  _handleProcessPendingInvoicesTillDateChange = evt => {
+	  this.setState({processPendingInvoicesTillDate: evt.target.value.trim()});
+	  
+	  if (this._isValidDate(evt.target.value.trim())) {
+		  this.setState({processPendingInvoicesTillDateStyle: {color: 'black'}});
+	  } else {
+		  this.setState({processPendingInvoicesTillDateStyle: {color: 'red'}});
+	  }
+  }
+  
+  _isValidDate(dateString)
+  {
+      // First check for the pattern
+      if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+          return false;
+
+      // Parse the date parts to integers
+      var parts = dateString.split("/");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+
+      // Check the ranges of month and year
+      if(year < 1000 || year > 3000 || month == 0 || month > 12)
+          return false;
+
+      var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+      // Adjust for leap years
+      if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+          monthLength[1] = 29;
+
+      // Check the range of the day
+      return day > 0 && day <= monthLength[month - 1];
   };
   
   _fetchInvoiceData(criteria){
@@ -304,74 +342,101 @@ class InvoiceTableSummary extends React.Component {
 		});
   }*/
   
-  _toggleError = () => {
-	  this.setState((prevState, props) => {
-		  return {showError: !prevState.showError}
-	  })
+  _convertStringToDate(stringDate) {
+	  var parts = stringDate.split("/");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+      
+      return new Date(year + "-" + month + "-" + day);
   }
   
   submitPendingInvoiceGroup = (evt) => {
 		evt.preventDefault();
 		
-		if (confirm("¿Está seguro de procesar comprobantes pendientes?") == false) {
-            return;
-        }
-		
 		var self = this;
-		self.setState({ showError: false, processingGif: true});
+		const {processPendingInvoicesTillDate, 
+			processPendingInvoicesTillDateStyle} = self.state;
+		var confirmMsg = "";
+		var formIsValid = true;
 		var sunatSubmitCriteria = {};
+		var errors = {};
+		
+		if (processPendingInvoicesTillDate) {
+			if (processPendingInvoicesTillDate.trim().length >= 0 && processPendingInvoicesTillDateStyle.color == 'black') {
+				confirmMsg = "¿Está seguro de procesar comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
+				sunatSubmitCriteria["processPendingInvoicesTillDate"] = this._convertStringToDate(processPendingInvoicesTillDate);
+		    } else {
+		    	errors["submit"] = "Falta o corregir fecha";
+				formIsValid = false;
+		    } 
+		} else {
+			confirmMsg = "¿Está seguro de procesar TODOS los comprobantes pendientes hasta la presente fecha?";
+		}
+		
+		self.setState({ showError: false, processingGif: true});
 		sunatSubmitCriteria["processingType"] = this.state.processingType;
 		
-		jQuery.ajax({
-			type: "POST",
-			contentType: "application/json", 
-			url:"/api/submitInvoicesToSunat",
-			data: JSON.stringify(sunatSubmitCriteria),
-			datatype: 'json',
-			cache: false,
-			timeout: 600000,
-			success: (data) => {
-				
-				if (data.result.length > 0) {
-					var submittedInvoices = data.result;
-					var errors = [];
-					var invoiceSequenceValidationErrorMsg = "Secuencia incompleta en: ";
-					var sunatFailedToSendMsg = "Comprobantes no enviados: ";
-					var sunatErrorCount = 0;
+		if (formIsValid) {
+			if (confirm(confirmMsg) == false) {
+	            return;
+	        }
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json", 
+				url:"/api/submitInvoicesToSunat",
+				data: JSON.stringify(sunatSubmitCriteria),
+				datatype: 'json',
+				cache: false,
+				timeout: 600000,
+				success: (data) => {
 					
-					for (var i = 0; i < submittedInvoices.length; i++) {
-						if (!submittedInvoices[i].sunatValidated) {
-							invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
-							sunatErrorCount++;
+					if (data.result.length > 0) {
+						var submittedInvoices = data.result;
+						//var errors = [];
+						var invoiceSequenceValidationErrorMsg = "Secuencia incompleta en: ";
+						var sunatFailedToSendMsg = "Comprobantes no enviados: ";
+						var sunatErrorCount = 0;
+						
+						for (var i = 0; i < submittedInvoices.length; i++) {
+							if (!submittedInvoices[i].sunatValidated) {
+								invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
+								sunatErrorCount++;
+							}
+							
+							if (submittedInvoices[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
+								sunatFailedToSendMsg += submittedInvoices[i].invoiceNumber + " "
+								sunatErrorCount++;
+							}
 						}
 						
-						if (submittedInvoices[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
-							sunatFailedToSendMsg += submittedInvoices[i].invoiceNumber + " "
-							sunatErrorCount++;
+						if (sunatErrorCount > 0) {
+							errors["sunatValidationMsg"] = invoiceSequenceValidationErrorMsg + sunatFailedToSendMsg;
+							this.setState({errors: errors, showError: true});
+						} else {
+							this.setState({showSuccess: true});
 						}
-					}
-					
-					if (sunatErrorCount > 0) {
-						errors["sunatValidationMsg"] = invoiceSequenceValidationErrorMsg + sunatFailedToSendMsg;
-						this.setState({errors: errors, showError: true});
+						
+						self.setState({processingGif: false});
 					} else {
-						this.setState({showSuccess: true});
+						/*var errors = {
+				    		submit: data.msg
+					    };*/
+						errors["submit"] = data.msg;
+						self.setState({errors: errors, processingGif: false}); 
+						self._toggleError();
 					}
 					
+				},
+				error: function(e){
 					self.setState({processingGif: false});
-				} else {
-					var errors = {
-			    		submit: data.msg
-				    };
-					self.setState({errors: errors, processingGif: false}); 
-					self._toggleError();
-				}
-				
-			},
-			error: function(e){
-				self.setState({processingGif: false});
-			}	
-		});
+				}	
+			});
+		
+	  	} else {
+	  		self.setState({errors: errors, processingGif: false}); 
+			this._toggleError();
+		}
   }
   
   _processingTypeButtonHandleClick(){
@@ -387,6 +452,14 @@ class InvoiceTableSummary extends React.Component {
   _loadInvoicesByCriteria = (loadInvoiceAmountCriteria) => (evt) => {
 	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded}); 
 	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
+  }
+  
+  handleVoidedInvoicesIncludedChange(event) {
+	  const target = event.target;
+	  const value = target.type === 'checkbox' ? target.checked : target.value;
+	  const name = target.name;
+
+	  this.setState({[name]: value});
   }
   
   render() {    
@@ -420,10 +493,16 @@ class InvoiceTableSummary extends React.Component {
 	          </div>
 	      </div>*/}
 	      
-	      {this.state.user.roles.ROLE_ADMIN && <div style={{textAlign: 'right'}}>
+	      {this.state.user.roles.ROLE_ADMIN && <div className="form-inline" style={{textAlign: 'right'}}>
 		      {this.state.processingGif &&
                   <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
 		      
+		      <label className="mt-checkbox">
+	              <input name="voidedInvoicesIncluded" type="checkbox" checked={this.state.voidedInvoicesIncluded} onChange={this.handleVoidedInvoicesIncludedChange.bind(this)}/>
+	              Incluir Anulados
+	              <span></span>
+	          </label>
+	          
 		      <div className="btn-group">
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_TODAY")}>Hoy</button>
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_LAST7DAYS")}>Últimos 7 Días</button>
@@ -431,7 +510,12 @@ class InvoiceTableSummary extends React.Component {
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_MONTH")}>Total Mes</button>
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_YEAR")}>Total Año</button>
 	          </div>&nbsp;
-		      
+		     
+	          <div className="form-group" style={{marginBottom: '5px'}}>
+	              <label className="sr-only">Procesar Hasta Fecha</label>
+	              <input type="text" className="form-control" placeholder="Procesar Hasta Fecha" style={this.state.processPendingInvoicesTillDateStyle} value={this.state.processPendingInvoicesTillDate} onChange={this._handleProcessPendingInvoicesTillDateChange}/> 
+              </div>&nbsp;
+              
 		      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn purple hidden-print margin-bottom-5"> 
 		      	<i className="fa fa-forward"></i>&nbsp;{processingTypeButtonText}
 		      </a>&nbsp;
