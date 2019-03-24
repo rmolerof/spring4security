@@ -29,7 +29,7 @@ class PriceForm extends React.Component {
 	    	  return gasPrice;
 	      }
 	      
-	      return { ...gasPrice, newCost: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100)};
+	      return { ...gasPrice, newCost: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100)};
 	    });
 	    
 	    this.setState({ gasPrices: newGasPrices });
@@ -41,7 +41,7 @@ class PriceForm extends React.Component {
 	    	  return gasPrice;
 	      }
 	      
-	      return { ...gasPrice, newPrice: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100)};
+	      return { ...gasPrice, newPrice: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100)};
 	    });
 	    
 	    this.setState({ gasPrices: newGasPrices });

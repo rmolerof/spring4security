@@ -49,9 +49,9 @@ class StockForm extends React.Component {
 	    	  return tank;
 	      }
 	      
-	      var variationOfGals = (evt.target.value  == '' ? 0: (Math.floor(evt.target.value * 100) / 100)) - self.state.tanks[idx].gals; 
+	      var variationOfGals = (evt.target.value  == '' ? 0: ((evt.target.value * 100).toFixed() / 100)) - self.state.tanks[idx].gals; 
 	      
-	      return { ...tank, newGals: evt.target.value  == '' ? '': (Math.floor(evt.target.value * 100) / 100), variationOfGals: variationOfGals};
+	      return { ...tank, newGals: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100), variationOfGals: variationOfGals};
 	    });
 	    
 	    this.setState({ tanks: newTanks });
@@ -66,7 +66,7 @@ class StockForm extends React.Component {
 	    	  return tank;
 	      }
 	      
-	      var newGals = self.state.tanks[idx].gals + (evt.target.value  == '' ? 0: (Math.floor(evt.target.value * 100) / 100));
+	      var newGals = self.state.tanks[idx].gals + (evt.target.value  == '' ? 0: ((evt.target.value * 100).toFixed() / 100));
 	      
 	      return { ...tank, newGals: (Math.floor(newGals * 100) / 100), variationOfGals: evt.target.value};
 	    });
