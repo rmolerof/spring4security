@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import corp.services.ApplicationService;
 import corp.services.GlobalProperties;
+import corp.services.Utils;
 import corp.sunat.XmlSunat;
 
 public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
@@ -73,7 +74,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesLastNdays(Integer numberOfDaysAgo, boolean isVoidedInvoicesIncluded) {
-		Criteria criteria = Criteria.where("date").gte(XmlSunat.transformZoneToGMTDate(getDateAtMidnightNDaysAgo(numberOfDaysAgo), globalProperties.getTimeZoneID()));
+		Criteria criteria = Criteria.where("date").gte(XmlSunat.transformZoneToGMTDate(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo), globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
@@ -83,40 +84,14 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	}
 	
 	public Date getTodayDateAtMidnight() {
-		return getDateAtMidnightNDaysAgo(0);
-	}
-	
-	public Date getDateAtMidnightNDaysAgo(Integer numberOfDaysAgo) {
-		Calendar date = getCurrentCalendarAtMidnight();
-		date.add(Calendar.DAY_OF_MONTH, -numberOfDaysAgo);
-
-		return date.getTime();
-	}
-	
-	public Date addNDaysToDate(Date date, Integer nbrOfDays) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_MONTH, nbrOfDays);
-		
-		return calendar.getTime();
+		return Utils.getDateAtMidnightNDaysAgo(0);
 	}
 	
 	public Date getDateAtMidnightByDayOfYear(Integer dayOfTheYear) {
-		Calendar date = getCurrentCalendarAtMidnight();
+		Calendar date = Utils.getCurrentCalendarAtMidnight();
 		date.set(Calendar.DAY_OF_YEAR, dayOfTheYear);
 
 		return date.getTime();
-	}
-	
-	public Calendar getCurrentCalendarAtMidnight() {
-		Calendar date = new GregorianCalendar();
-		// reset hour, minutes, seconds and millis
-		date.set(Calendar.HOUR_OF_DAY, 0);
-		date.set(Calendar.MINUTE, 0);
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
-		
-		return date;
 	}
 	
 	public List<InvoiceDao> findLatestInvoicesByQuantity(Integer quantity) {
@@ -211,7 +186,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 
 	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort) {
 
-		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(XmlSunat.transformZoneToGMTDate(addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(XmlSunat.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
 		
 		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}

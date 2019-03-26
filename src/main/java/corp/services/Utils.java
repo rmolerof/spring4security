@@ -2,6 +2,10 @@ package corp.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -439,4 +443,46 @@ public class Utils {
 	public double roundTwo(double amt) {
 		return Math.round(amt * 100) / 100.0;
 	}
+	
+	public static Date getDateAtMidnightNDaysAgo(Integer numberOfDaysAgo) {
+		Calendar date = getCurrentCalendarAtMidnight();
+		date.add(Calendar.DAY_OF_MONTH, -numberOfDaysAgo);
+
+		return date.getTime();
+	}
+	
+	public static Calendar getCurrentCalendarAtMidnight() {
+		Calendar date = new GregorianCalendar();
+		// reset hour, minutes, seconds and millis
+		date.set(Calendar.HOUR_OF_DAY, 0);
+		date.set(Calendar.MINUTE, 0);
+		date.set(Calendar.SECOND, 0);
+		date.set(Calendar.MILLISECOND, 0);
+		
+		return date;
+	}
+	
+	public static boolean isNumeric(String str) {
+		try {
+			Double.parseDouble(str);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	public static Date addNDaysToDate(Date date, Integer nbrOfDays) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DAY_OF_MONTH, nbrOfDays);
+		
+		return calendar.getTime();
+	}
+	
+	public static String formatDate(Date date, String isoDatePattern) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(isoDatePattern);
+
+		return simpleDateFormat.format(date);
+	}
+	
 }

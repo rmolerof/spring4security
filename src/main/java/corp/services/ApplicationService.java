@@ -226,7 +226,7 @@ public class ApplicationService {
 	
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
 		
-		List<StationDao> stationDaos = stationRepository.findLatestMonth();
+		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg, 0);
 		
 		List<Station> stations = stationDaos.stream().map(stationDao -> {
 			Station station = new Station(stationDao);

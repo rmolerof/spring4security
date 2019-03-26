@@ -11,6 +11,14 @@ class TableDashboard extends React.Component {
       stockSummaryData: null,
       gasPricesSummaryData: null
     };
+    
+    this.CONSTANTS = {
+		TOTAL_BALANCES_LAST7DAYS: "7",
+		TOTAL_BALANCES_MONTH: "30",
+		TOTAL_BALANCES_3MONTHS: "90",
+		TOTAL_BALANCES_YEAR: "365"
+    }
+    
   }
   
   _toggleError = () => {
@@ -22,8 +30,10 @@ class TableDashboard extends React.Component {
   _fetchStationData(timeframe){
 			
 	  	var search = {};
+	  	var self = this;
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
+		self.setState({processingGif: true, stationSummaryData: null});
 		
 		jQuery.ajax({
 			type: "POST",
@@ -39,7 +49,7 @@ class TableDashboard extends React.Component {
 				var tableData = [];
 				
 				var count = 0;
-				for (var i = 0; i < stationSummaryData.length - 1; i++) {
+				for (var i = 0; i <= stationSummaryData.length - 1; i++) {
 					
 					var expenseOrCredit = {};
 					var visas = 0.0;
@@ -108,7 +118,8 @@ class TableDashboard extends React.Component {
 				}
 				
 				
-				this.setState({stationSummaryData: tableData});
+				self.setState({stationSummaryData: tableData});
+				self.setState({processingGif: false});
 			},
 			error: function(e){
 
@@ -121,6 +132,7 @@ class TableDashboard extends React.Component {
 	  	var search = {};
 		search["dateEnd"] = timeframe.dateEnd;
 		search["dateBeg"] = timeframe.dateBeg;
+		this.setState({stationCreditsOrExpensesData: null});
 		
 		jQuery.ajax({
 			type: "POST",
@@ -136,7 +148,7 @@ class TableDashboard extends React.Component {
 				var tableData = [];
 				
 				var count = 0;
-				for (var i = 0; i < stationSummaryData.length - 1; i++) {
+				for (var i = 0; i <= stationSummaryData.length - 1; i++) {
 					
 					var expenseOrCredit = {};
 					var type = "";
@@ -291,10 +303,15 @@ class TableDashboard extends React.Component {
   }
   
   componentWillMount(){
-	  this._fetchStationData({dateEnd: "latest", dateBeg: "-30"});
-	  this._fetchCreditsOrExpenses({dateEnd: "latest", dateBeg: "-30"});
+	  this._fetchStationData({dateEnd: "latest", dateBeg: "-7"});
+	  this._fetchCreditsOrExpenses({dateEnd: "latest", dateBeg: "-7"});
 	  this._fetchStockData({dateEnd: "latest", dateBeg: "-30"});
 	  this._fetchGasPricesData({dateEnd: "latest", dateBeg: "-30"});
+  }
+  
+  _loadInvoicesByCriteria = (loadInvoiceAmountCriteria) => (evt) => {
+	  this._fetchStationData({dateEnd: "latest", dateBeg: -this.CONSTANTS[loadInvoiceAmountCriteria]});
+	  this._fetchCreditsOrExpenses({dateEnd: "latest", dateBeg: -this.CONSTANTS[loadInvoiceAmountCriteria]});
   }
   
   onKeyPress(event) {
@@ -319,6 +336,22 @@ class TableDashboard extends React.Component {
 	      		<strong>Success!</strong> Tu forma has sido remitida. 
 	      	</div>
 	      }
+	      
+	      <div className="form-inline" style={{textAlign: 'right'}}>
+		      {this.state.processingGif &&
+	              <div className="inline-block"><img src="../assets/global/plugins/plupload/js/jquery.ui.plupload/img/loading.gif" className="img-responsive" alt="" /></div>}
+		      
+		      <div className="btn-group">
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_BALANCES_LAST7DAYS")}>Últimos 7 Días</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_BALANCES_MONTH")}>Total Mes</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_BALANCES_3MONTHS")}>Total Trimestre</button>
+	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_BALANCES_YEAR")}>Total Año</button>
+	          </div>&nbsp;
+		     
+		      <a href="/inventory-control-page" className="btn btn-default margin-bottom-5">
+		          <i className="fa fa-pencil"></i>&nbsp;Nuevo Cuadre
+			  </a>
+	      </div>
 	      	      
 	      {this.state && this.state.stationSummaryData &&
 	    	  <StationTbl data={this.state.stationSummaryData}></StationTbl>
