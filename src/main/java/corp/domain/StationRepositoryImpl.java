@@ -13,12 +13,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import corp.businessModel.Tank;
+import corp.services.GlobalProperties;
 import corp.services.Utils;
 
 public class StationRepositoryImpl implements StationRepositoryCustom {
 	
 	@Autowired
 	MongoTemplate mongoTemplate;
+	@Autowired
+	private GlobalProperties globalProperties;
 	
 	@Override
 	public List<StationDao> findLatest(String dateEnd, String dateBeg, int backDataCount) {
@@ -69,7 +72,7 @@ public class StationRepositoryImpl implements StationRepositoryCustom {
 
 	private Date getEarliestBalanceTimestampNDaysAgo(Integer nDaysAgo) {
 		Date earliestBalanceTimestampInShiftDates = null;
-		Date dateNDaysAgo = Utils.getDateAtMidnightNDaysAgo(nDaysAgo);
+		Date dateNDaysAgo = Utils.getDateAtMidnightNDaysAgo(nDaysAgo, globalProperties.getTimeZoneID());
 		String dateNDaysAgoFullFormat = Utils.formatDate(dateNDaysAgo, "dd/MM/yyyy");
 		String dateNDaysAgoShortFormat = Utils.formatDate(dateNDaysAgo, "d/M/yyyy");
 		

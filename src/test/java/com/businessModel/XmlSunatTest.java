@@ -142,8 +142,13 @@ public class XmlSunatTest {
 		String ruc = "20501568776";
 		String UsuarioSol = "LAJOYA40";
 		String PassSol = "Lajoya@4";
-		String tipoDocumento = "03";
-		String nro_comprobante = "B001-00000809";
+		String tipoDocumento = "";
+		String nro_comprobante = "F001-00001156";
+		if (nro_comprobante.charAt(0) == 'F') {
+			tipoDocumento = "01";
+		} else {
+			tipoDocumento = "03";
+		}
 		String RutaWS = "https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService";
 		String NombreCPE = "20501568776-" + tipoDocumento + "-" + nro_comprobante ;
 		String NombreCDR = "R-" + NombreCPE;

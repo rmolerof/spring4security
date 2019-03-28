@@ -1,9 +1,7 @@
 package corp.domain;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import corp.services.ApplicationService;
 import corp.services.GlobalProperties;
 import corp.services.Utils;
-import corp.sunat.XmlSunat;
 
 public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 
@@ -54,7 +51,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesToday(boolean isVoidedInvoicesIncluded) {
-		Criteria criteria = Criteria.where("date").gte(XmlSunat.transformZoneToGMTDate(getTodayDateAtMidnight(), globalProperties.getTimeZoneID()));
+		Criteria criteria = Criteria.where("date").gte(Utils.getTodayDateAtMidnight(globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
@@ -64,7 +61,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesCurrentYear(boolean isVoidedInvoicesIncluded) {
-		Criteria criteria = Criteria.where("date").gte(XmlSunat.transformZoneToGMTDate(getDateAtMidnightByDayOfYear(1), globalProperties.getTimeZoneID()));
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
@@ -74,24 +71,13 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	}
 	
 	public List<InvoiceDao> findTotalInvoicesLastNdays(Integer numberOfDaysAgo, boolean isVoidedInvoicesIncluded) {
-		Criteria criteria = Criteria.where("date").gte(XmlSunat.transformZoneToGMTDate(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo), globalProperties.getTimeZoneID()));
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo, globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
 		}
 		
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
-	}
-	
-	public Date getTodayDateAtMidnight() {
-		return Utils.getDateAtMidnightNDaysAgo(0);
-	}
-	
-	public Date getDateAtMidnightByDayOfYear(Integer dayOfTheYear) {
-		Calendar date = Utils.getCurrentCalendarAtMidnight();
-		date.set(Calendar.DAY_OF_YEAR, dayOfTheYear);
-
-		return date.getTime();
 	}
 	
 	public List<InvoiceDao> findLatestInvoicesByQuantity(Integer quantity) {
@@ -186,7 +172,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 
 	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort) {
 
-		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(XmlSunat.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
 		
 		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}

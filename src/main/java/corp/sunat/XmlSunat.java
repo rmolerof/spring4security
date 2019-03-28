@@ -7,11 +7,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import javax.xml.crypto.MarshalException;
@@ -68,8 +65,8 @@ public class XmlSunat {
 	    cpe.setNRO_OTR_COMPROBANTE("");
 	    cpe.setCOD_OTR_COMPROBANTE("");
 	    cpe.setNRO_COMPROBANTE(invoiceVo.getInvoiceNumber());// OBLIGATORIO  ????
-	    cpe.setFECHA_DOCUMENTO(Utils.formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));// OBLIGATORIO YYYY-MM-DD
-	    cpe.setFECHA_VTO(Utils.formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
+	    cpe.setFECHA_DOCUMENTO(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));// OBLIGATORIO YYYY-MM-DD
+	    cpe.setFECHA_VTO(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));//// OBLIGATORIO FECHA DE VENCIMIENTO IGUAL A FECHA DE DOCUMENTO PARA BOLETA Y FACTURA
 	    cpe.setCOD_TIPO_DOCUMENTO(invoiceVo.getInvoiceType());//01=factura, 03=boleta, 07=nota credito, 08=nota debito
 	    cpe.setCOD_MONEDA("PEN");
 	    
@@ -213,7 +210,7 @@ public class XmlSunat {
 		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
 		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
 		invoiceVo.setSunatErrorStr(sunatResponse);
-		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse + "| Invoice Date: " + Utils.formatDate(transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
+		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
 		logger.info("hash: " + invoiceVo.getInvoiceHash());
 		return sunatResponse;
 	}
@@ -335,13 +332,4 @@ public class XmlSunat {
 		return Math.round(amt * 100.0) / 100.0;
 	}
     
-    public static Date transformGMTDateToZone(Date date, String timeZoneID) {
-		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
-		return new Date(date.getTime() + tz.getOffset(date.getTime()));
-	}
-    
-    public static Date transformZoneToGMTDate(Date date, String timeZoneID) {
-		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
-		return new Date(date.getTime() - tz.getOffset(date.getTime()));
-	}
 }

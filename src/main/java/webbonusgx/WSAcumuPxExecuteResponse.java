@@ -89,4 +89,10 @@ public class WSAcumuPxExecuteResponse {
         this.flagretorno = value;
     }
 
+	@Override
+	public String toString() {
+		return "WSAcumuPxExecuteResponse [saldopuntos=" + saldopuntos + ", flagretorno=" + flagretorno + "]";
+	}
+
+    
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -247,7 +248,7 @@ public class Utils {
 				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
 				
 				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
-				invoiceDao.setDate(XmlSunat.transformGMTDateToZone(invoiceDao.getDate(), globalProperties.getTimeZoneID()));
+				invoiceDao.setDate(Utils.transformGMTDateToZone(invoiceDao.getDate(), globalProperties.getTimeZoneID()));
 				List<InvoiceDao> custList = Stream.of(invoiceDao).collect(Collectors.toList());
 				
 				CustomJRDataSource<InvoiceDao> dataSource = new CustomJRDataSource<InvoiceDao>().initBy(custList);
@@ -444,22 +445,35 @@ public class Utils {
 		return Math.round(amt * 100) / 100.0;
 	}
 	
-	public static Date getDateAtMidnightNDaysAgo(Integer numberOfDaysAgo) {
-		Calendar date = getCurrentCalendarAtMidnight();
+	public static Date getDateAtMidnightNDaysAgo(Integer numberOfDaysAgo, String timeZoneID) {
+		Calendar date = getCurrentCalendarAtMidnight(timeZoneID);
 		date.add(Calendar.DAY_OF_MONTH, -numberOfDaysAgo);
 
 		return date.getTime();
 	}
 	
-	public static Calendar getCurrentCalendarAtMidnight() {
-		Calendar date = new GregorianCalendar();
+	public static Calendar getCurrentCalendarAtMidnight(String timeZoneID) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		Date localDate = transformGMTDateToZone(new Date(System.currentTimeMillis()), timeZoneID);// + 4 * 3600 * 1000
+		calendar.setTime(localDate);
 		// reset hour, minutes, seconds and millis
-		date.set(Calendar.HOUR_OF_DAY, 0);
-		date.set(Calendar.MINUTE, 0);
-		date.set(Calendar.SECOND, 0);
-		date.set(Calendar.MILLISECOND, 0);
+		calendar.set(Calendar.HOUR_OF_DAY, -TimeZone.getTimeZone(timeZoneID).getOffset(localDate.getTime())/3600000);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 		
-		return date;
+		return calendar;
+	}
+	
+	public static Date getTodayDateAtMidnight(String timeZoneId) {
+		return getDateAtMidnightNDaysAgo(0, timeZoneId);
+	}
+	
+	public static Date getDateAtMidnightByDayOfYear(Integer dayOfTheYear, String timeZoneId) {
+		Calendar date = getCurrentCalendarAtMidnight(timeZoneId);
+		date.set(Calendar.DAY_OF_YEAR, dayOfTheYear);
+
+		return date.getTime();
 	}
 	
 	public static boolean isNumeric(String str) {
@@ -483,6 +497,16 @@ public class Utils {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(isoDatePattern);
 
 		return simpleDateFormat.format(date);
+	}
+	
+    public static Date transformGMTDateToZone(Date date, String timeZoneID) {
+		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
+		return new Date(date.getTime() + tz.getOffset(date.getTime()));
+	}
+    
+    public static Date transformZoneToGMTDate(Date date, String timeZoneID) {
+		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
+		return new Date(date.getTime() - tz.getOffset(date.getTime()));
 	}
 	
 }
