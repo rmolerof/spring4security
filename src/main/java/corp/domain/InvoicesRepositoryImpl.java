@@ -41,6 +41,25 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return new ArrayList<InvoiceDao>();
 	}
 	
+	public List<InvoiceDao> findInvoicesByAmountCriteriaAndVoidedIncludedFlagForBonus(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded) {
+		
+		if (isNumeric(loadInvoiceAmountCriteria)) {
+			return findLatestInvoicesByQuantity(Integer.valueOf(loadInvoiceAmountCriteria));
+		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_TODAY)) {
+			return findTotalInvoicesTodayForBonus(voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_LAST7DAYS)) {
+			return findTotalInvoicesLastNdaysForBonus(InvoicesRepository.WEEK, voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_PENDING_INVOICES)) {
+			return findLatestPendingInvoicesForBonus(voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_MONTH)) {
+			return findTotalInvoicesLastNdaysForBonus(InvoicesRepository.MONTH, voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_YEAR)) {
+			return findTotalInvoicesCurrentYearForBonus(voidedInvoicesIncluded);
+		}
+		
+		return new ArrayList<InvoiceDao>();
+	}
+	
 	public static boolean isNumeric(String str) {
 		try {
 			Double.parseDouble(str);
@@ -54,7 +73,17 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		Criteria criteria = Criteria.where("date").gte(Utils.getTodayDateAtMidnight(globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
-			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findTotalInvoicesTodayForBonus(boolean isVoidedInvoicesIncluded) {
+		Criteria criteria = Criteria.where("date").gte(Utils.getTodayDateAtMidnight(globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
 		}
 		
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
@@ -64,7 +93,17 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
-			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findTotalInvoicesCurrentYearForBonus(boolean isVoidedInvoicesIncluded) {
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
 		}
 		
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
@@ -74,7 +113,17 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo, globalProperties.getTimeZoneID()));
 		
 		if (!isVoidedInvoicesIncluded) {
-			criteria = criteria.and("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findTotalInvoicesLastNdaysForBonus(Integer numberOfDaysAgo, boolean isVoidedInvoicesIncluded) {
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
 		}
 		
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
@@ -93,11 +142,28 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	public List<InvoiceDao> findLatestPendingInvoices(boolean isVoidedInvoicesIncluded) {
 		
 		Criteria criteria = null;
-		Criteria notSentInvoicesCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_SENT_STATUS);
+		Criteria notSentInvoicesCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SENT_STATUS);
 		
 		if (!isVoidedInvoicesIncluded) {
-			Criteria notVoidedInvoicesCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS);
+			Criteria notVoidedInvoicesCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
 			criteria = new Criteria().andOperator(notSentInvoicesCriteria, notVoidedInvoicesCriteria);
+		} else {
+			criteria = notSentInvoicesCriteria;
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findLatestPendingInvoicesForBonus(boolean isVoidedInvoicesIncluded) {
+		
+		Criteria criteria = null;
+		Criteria notSentInvoicesCriteria = Criteria.where("bonusStatus").is(ApplicationService.PENDING_STATUS);
+		
+		if (isVoidedInvoicesIncluded) {
+			Criteria notVoidedInvoicesCriteria = Criteria.where("sunatStatus").is(ApplicationService.VOIDED_STATUS);
+			criteria = new Criteria().orOperator(notSentInvoicesCriteria, notVoidedInvoicesCriteria);
+		} else {
+			criteria = notSentInvoicesCriteria;
 		}
 		
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
@@ -119,12 +185,12 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		Criteria notaDeCreditoOfInvoiceTypeCriteria = null;
 		
 		if (invoiceType.equals(ApplicationService.BOLETA)) {
-			invoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_SENT_STATUS).and("invoiceType").is(ApplicationService.BOLETA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_SENT_STATUS).and("invoiceTypeModified").is(ApplicationService.BOLETA);
+			invoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceType").is(ApplicationService.BOLETA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceTypeModified").is(ApplicationService.BOLETA);
 			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		} else {
-			invoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_SENT_STATUS).and("invoiceType").is(ApplicationService.FACTURA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_SENT_STATUS).and("invoiceTypeModified").is(ApplicationService.FACTURA);
+			invoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceType").is(ApplicationService.FACTURA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceTypeModified").is(ApplicationService.FACTURA);
 			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		}
 		
@@ -143,12 +209,12 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		Criteria notaDeCreditoOfInvoiceTypeCriteria = null;
 		
 		if (invoiceType.equals(ApplicationService.BOLETA)) {
-			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceType").is(ApplicationService.BOLETA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.BOLETA);
+			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceType").is(ApplicationService.BOLETA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.BOLETA);
 			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		} else {
-			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceType").is(ApplicationService.FACTURA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.FACTURA);
+			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceType").is(ApplicationService.FACTURA);
+			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.FACTURA);
 			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
 		}
 		
@@ -162,7 +228,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 
 	public InvoiceDao findFirstByInvoiceNumberNotVoided(String invoiceNumber) {
 		
-		Query query = new Query(Criteria.where("sunatStatus").ne(ApplicationService.SUNAT_VOIDED_STATUS).and("invoiceNumber").is(invoiceNumber));
+		Query query = new Query(Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceNumber").is(invoiceNumber));
 		query.limit(1);
 		query.with(new Sort(Direction.DESC, "date"));
 		
@@ -172,7 +238,14 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 
 	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort) {
 
-		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SUNAT_PENDING_STATUS).and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.PENDING_STATUS).and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		
+		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
+	}
+
+	public List<InvoiceDao> findAllPendingInvoicesTillDateForBonus(Date processPendingInvoicesTillDate, Sort sort) {
+		
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("bonusStatus").is(ApplicationService.PENDING_STATUS).and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
 		
 		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}

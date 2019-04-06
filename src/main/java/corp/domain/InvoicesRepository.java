@@ -21,4 +21,6 @@ public interface InvoicesRepository extends MongoRepository<InvoiceDao, Long>, I
 	@Query("{sunatStatus: {$regex: ?0}}")
 	List<InvoiceDao> findAllPendingByRegex(String statusSunat, Sort sort);
 	
+	@Query("{bonusStatus: {$regex: ?0}}")
+	List<InvoiceDao> findAllPendingByRegexForBonus(String bonusSunat, Sort sort);
 }

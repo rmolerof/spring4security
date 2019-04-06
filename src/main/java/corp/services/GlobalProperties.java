@@ -18,7 +18,8 @@ public class GlobalProperties {
 	public String sunatSolUsername;
 	public String sunatSolPassword;
 	public String timeZoneID;
-	
+	public String comercio;
+	public String bonusURL;
 	
 	public String getEmailUsername() {
 		return emailUsername;
@@ -85,6 +86,18 @@ public class GlobalProperties {
 	}
 	public void setTimeZoneID(String timeZoneID) {
 		this.timeZoneID = timeZoneID;
+	}
+	public String getComercio() {
+		return comercio;
+	}
+	public void setComercio(String comercio) {
+		this.comercio = comercio;
+	}
+	public String getBonusURL() {
+		return bonusURL;
+	}
+	public void setBonusURL(String bonusURL) {
+		this.bonusURL = bonusURL;
 	}
 	
 }

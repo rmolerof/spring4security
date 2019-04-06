@@ -1,5 +1,7 @@
 package corp.services;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
+import javax.xml.ws.WebServiceException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -47,6 +50,12 @@ import corp.model.InvoiceVo;
 import corp.model.SubmitInvoiceGroupCriteria;
 import corp.model.User;
 import corp.sunat.XmlSunat;
+import webbonusgx.BonusVo;
+import webbonusgx.BonusPointsOperationResponse;
+import webbonusgx.WSAcumuPx;
+import webbonusgx.WSAcumuPxExecute;
+import webbonusgx.WSAcumuPxExecuteResponse;
+import webbonusgx.WSAcumuPxSoapPort;
 
 @Service
 public class ApplicationService {
@@ -60,12 +69,18 @@ public class ApplicationService {
 	public static final String FACTURA = "01";
 	public static final String BOLETA = "03";
 	public static final String NOTADECREDITO = "07";
-	public static final String SUNAT_PENDING_STATUS = "PENDIENTE";
-	public static final String SUNAT_SENT_STATUS = "ENVIADO";
-	public static final String SUNAT_VOIDED_STATUS = "ANULADO";
+	public static final String PENDING_STATUS = "PENDIENTE";
+	public static final String SENT_STATUS = "ENVIADO";
+	public static final String VOIDED_STATUS = "ANULADO";
+	public static final String FAILURE_STATUS = "FALLADO";
 	public static final String DNI = "1";
 	public static final String RUC = "6";
 	public static final String CLIENTES_VARIOS_DOC_NUMBER = "0";
+	public static final String SUCCESS_FLAG = "0";
+	public static final String FAILURE_FLAG = "1";
+	public static final String PRIMAX_CODE_D2 = "00000000000051";
+	public static final String PRIMAX_CODE_G90 = "00000000000021";
+	public static final String PRIMAX_CODE_G95 = "00000000000031";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -560,7 +575,7 @@ public class ApplicationService {
 		List<InvoiceDao> pendingInvoiceDaos = null;
 		
 		if (null == processPendingInvoicesTillDate) {
-			pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex(SUNAT_PENDING_STATUS, new Sort(Sort.Direction.ASC, "date"));
+			pendingInvoiceDaos = invoicesRepository.findAllPendingByRegex(PENDING_STATUS, new Sort(Sort.Direction.ASC, "date"));
 		} else {
 			pendingInvoiceDaos = invoicesRepository.findAllPendingInvoicesTillDate(processPendingInvoicesTillDate, new Sort(Sort.Direction.ASC, "date"));
 		}
@@ -571,7 +586,7 @@ public class ApplicationService {
 			
 			if (processingType.equalsIgnoreCase(SubmitInvoiceGroupCriteria.NORMAL)) {
 				if(validateInvoices(pendingInvoiceDaos, lastSunatProcessedBoleta, lastSunatProcessedFacturaOrNotaDeCredito)) {
-					return submitInvoices(pendingInvoiceDaos);
+					return processInvoicesBySunat(pendingInvoiceDaos);
 				} else {
 					invalidInvoiceVos = pendingInvoiceDaos.stream().map(invoiceDao -> {
 						InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
@@ -580,8 +595,26 @@ public class ApplicationService {
 					return invalidInvoiceVos;
 				}
 			} else {
-				return submitInvoices(pendingInvoiceDaos);
+				return processInvoicesBySunat(pendingInvoiceDaos);
 			}
+		} else {
+			return new ArrayList<InvoiceVo>();
+		}
+		
+	}
+	
+	public List<InvoiceVo> submitInvoicesToBonus(String processingType, Date processPendingInvoicesTillDate) {
+		
+		List<InvoiceDao> pendingInvoiceDaos = null;
+		
+		if (null == processPendingInvoicesTillDate) {
+			pendingInvoiceDaos = invoicesRepository.findAllPendingByRegexForBonus(PENDING_STATUS, new Sort(Sort.Direction.ASC, "date"));
+		} else {
+			pendingInvoiceDaos = invoicesRepository.findAllPendingInvoicesTillDateForBonus(processPendingInvoicesTillDate, new Sort(Sort.Direction.ASC, "date"));
+		}
+		
+		if (pendingInvoiceDaos.size() > 0) {
+			return processInvoicesByBonus(pendingInvoiceDaos);
 		} else {
 			return new ArrayList<InvoiceVo>();
 		}
@@ -635,7 +668,30 @@ public class ApplicationService {
 		return Integer.parseInt(invoiceNumberImmutable.substring(5, invoiceNumberImmutable.length())); 
 	}
 	
-	List<InvoiceVo> submitInvoices(List<InvoiceDao> invoiceDaos){
+	List<InvoiceVo> processInvoicesByBonus(List<InvoiceDao> invoiceDaos){
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			
+			BonusPointsOperationResponse bonusPointsOperationResponse = accumulateInvoiceForBonusPoints(invoiceVo);
+			
+			InvoiceDao invDao = new InvoiceDao(invoiceVo);
+
+			if (bonusPointsOperationResponse.getResponseFlag().equals("0")) {
+				invDao.setBonusStatus("ENVIADO");
+				invDao.setBonusAccumulatedPoints(bonusPointsOperationResponse.getAccumulatedPoints());
+				invoiceVo.setBonusStatus("ENVIADO");
+				invoiceVo.setBonusAccumulatedPoints(bonusPointsOperationResponse.getAccumulatedPoints());
+				invoicesRepository.save(invDao);
+				logger.info("Bonus points for invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
+			}
+			
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
+	}
+	
+	List<InvoiceVo> processInvoicesBySunat(List<InvoiceDao> invoiceDaos){
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 			
@@ -737,6 +793,12 @@ public class ApplicationService {
 				invoiceVo.setStatus("1");
 			}
 			
+			// Clean up Bonus Number = "000000000000" 
+			/*if (invoiceVo.getBonusNumber().trim().length() > 7 && invoiceVo.getBonusNumber().trim().substring(7).equals("000000000000")) {
+				invoiceVo.setBonusNumber("");
+				utils.saveBonusNumber(invoiceVo);
+			}
+			*/
 			// Save Bonus Number if present
 			if (null != invoiceVo.getBonusNumber() && !invoiceVo.getBonusNumber().trim().equals("")) {
 				utils.saveBonusNumber(invoiceVo);
@@ -767,6 +829,18 @@ public class ApplicationService {
 		return invoiceVos;
 	}
 	
+	public List<InvoiceVo> findInvoicesSummaryDataForBonus(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded) {
+
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findInvoicesByAmountCriteriaAndVoidedIncludedFlagForBonus(loadInvoiceAmountCriteria, voidedInvoicesIncluded);
+		
+		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
+			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			return invoiceVo;
+		}).collect(Collectors.toList());
+		
+		return invoiceVos;
+	}
+	
 	public List<InvoiceVo> findInvoice(String invoiceNbr) {
 
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
@@ -784,7 +858,7 @@ public class ApplicationService {
 	public String deleteInvoice(String invoiceNbr) {
 
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
-		invoiceDao.setSunatStatus(SUNAT_VOIDED_STATUS);
+		invoiceDao.setSunatStatus(VOIDED_STATUS);
 		invoiceDao.setInvoiceNumber(makeInvoiceNumberVoided(invoiceDao.getInvoiceNumber()));
 		
 		
@@ -822,11 +896,90 @@ public class ApplicationService {
 	}
 	
 	public boolean isInvoiceNotFound(InvoiceDao invoiceDao) {
-		return null == invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceDao.getInvoiceNumber(), ApplicationService.SUNAT_VOIDED_STATUS);
+		return null == invoicesRepository.findFirstByInvoiceNumberAndSunatStatus(invoiceDao.getInvoiceNumber(), ApplicationService.VOIDED_STATUS);
 	}
 	
 	public String makeInvoiceNumberVoided(String invoiceNumber) {
 		return (new StringBuilder(invoiceNumber).replace(1, 2, "A")).toString();
+	}
+	
+	public BonusPointsOperationResponse accumulateInvoiceForBonusPoints(InvoiceVo invoiceVo) {
+		
+		BonusVo bonusVo = new BonusVo();
+		bonusVo.setComercio(globalProperties.getComercio());
+		bonusVo.setTarjetac11(invoiceVo.getBonusNumber().substring(7, 18));
+		bonusVo.setFechaTransaccion(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), globalProperties.getTimeZoneID()), "ddMMyyyy"));
+		bonusVo.setHoraTransaccion(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), globalProperties.getTimeZoneID()), "hhmm"));
+		String invoiceNumber = invoiceVo.getInvoiceNumber();
+		bonusVo.setPosId("00" + invoiceNumber.substring(0, invoiceNumber.indexOf("-")));//globalProperties.getPosId()"00F001"
+		bonusVo.setPosSecuencial(invoiceNumber.substring(invoiceNumber.length()-6));//invoiceVo.getInvoiceNumber()"000062"
+		String totalSolesBonusFormat = String.format("%08.2f", invoiceVo.getTotal()).replace(".", "");// First 0 indicates sign
+		bonusVo.setLineasDetalle("000" + totalSolesBonusFormat + getPrimaxProductCodeAndQuantity(invoiceVo));
+		bonusVo.setTotalSolesTrn(totalSolesBonusFormat);
+		bonusVo.setFlagOperacion("0");
+		
+		BonusPointsOperationResponse bonusPointsOperationResponse = executeBonusPointsOperation(bonusVo);
+		String bonusPointsOperationMessage = "Accumulated Points: " + bonusPointsOperationResponse.getAccumulatedPoints() + ", Bonus Number: " + invoiceVo.getBonusNumber().substring(7) + ", Invoice Number: " + invoiceVo.getInvoiceNumber() + ", amount: S/ " + String.format("%#.2f", invoiceVo.getTotal());
+		
+		if (bonusPointsOperationResponse.getResponseFlag().equals(SUCCESS_FLAG)) {
+			logger.info("Bonus points were added. " + bonusPointsOperationMessage);
+		} else {
+			logger.info("Bonus points NOT added. " + bonusPointsOperationMessage);
+		}
+		
+		return bonusPointsOperationResponse;
+	}
+	
+	public String getPrimaxProductCodeAndQuantity(InvoiceVo invoiceVo) {
+		
+		String primaxProductCode = "";
+		String totalGalsBonusFormat = "";
+		
+		if (invoiceVo.getGalsD2() > 0D) {
+			primaxProductCode = PRIMAX_CODE_D2;
+			totalGalsBonusFormat = String.format("%09.3f", invoiceVo.getGalsD2()).replace(".", "");
+		} else if (invoiceVo.getGalsG90() > 0D) {
+			primaxProductCode = PRIMAX_CODE_G90;
+			totalGalsBonusFormat = String.format("%09.3f", invoiceVo.getGalsD2()).replace(".", "");
+		} else if (invoiceVo.getGalsG95() > 0D) {
+			primaxProductCode = PRIMAX_CODE_G95;
+			totalGalsBonusFormat = String.format("%09.3f", invoiceVo.getGalsD2()).replace(".", "");
+		}
+		
+		return primaxProductCode + totalGalsBonusFormat;
+	}
+	
+	public BonusPointsOperationResponse executeBonusPointsOperation(BonusVo bonusVo) {
+		WSAcumuPx wsAcumuPx = new WSAcumuPx(getBonusURL(globalProperties.getBonusURL()));
+		WSAcumuPxSoapPort wsAcumuPxSoapPort = wsAcumuPx.getWSAcumuPxSoapPort();
+		
+		WSAcumuPxExecute parameters = new WSAcumuPxExecute();
+		parameters.setComercio(bonusVo.getComercio());
+		parameters.setTarjetac11(bonusVo.getTarjetac11());
+		parameters.setFechatransaccion(bonusVo.getFechaTransaccion());
+		parameters.setHoratransaccion(bonusVo.getHoraTransaccion());
+		parameters.setPosId(bonusVo.getPosId());
+		parameters.setPosSecuencial(bonusVo.getPosSecuencial());
+		parameters.setLineasdetalle(bonusVo.getLineasDetalle());
+		parameters.setTotalsolestrn(bonusVo.getTotalSolesTrn());
+		parameters.setFlagoperacion(bonusVo.getFlagOperacion());
+		
+		WSAcumuPxExecuteResponse wsAcumuPxExecuteResponse = wsAcumuPxSoapPort.execute(parameters);
+		
+		return new BonusPointsOperationResponse(wsAcumuPxExecuteResponse.getSaldopuntos(), wsAcumuPxExecuteResponse.getFlagretorno());
+	}
+	
+	public URL getBonusURL(String urlString) {
+		URL url = null;
+        WebServiceException e = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException ex) {
+            e = new WebServiceException(ex);
+            logger.error(e);
+        }
+        
+        return url;
 	}
 	
 	public TanksVo getCurrentTanksVo() {

@@ -9,7 +9,11 @@ public interface InvoicesRepositoryCustom {
 
 	List<InvoiceDao> findInvoicesByAmountCriteriaAndVoidedIncludedFlag(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded);
 	
+	List<InvoiceDao> findInvoicesByAmountCriteriaAndVoidedIncludedFlagForBonus(String loadInvoiceAmountCriteria, boolean voidedInvoicesIncluded);
+	
 	List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort);
+	
+	List<InvoiceDao> findAllPendingInvoicesTillDateForBonus(Date processPendingInvoicesTillDate, Sort sort);
 	
 	InvoiceDao findLastSentInvoice(String invoiceType);
 	

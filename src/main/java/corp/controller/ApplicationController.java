@@ -303,9 +303,10 @@ public class ApplicationController {
 		
 	}
 	
-	@PostMapping("/api/submitInvoicesToSunat")
-	public ResponseEntity<?> submitInvoicesToSunat(@Valid @RequestBody SubmitInvoiceGroupCriteria submitInvoiceGroupCriteria, Errors errors){
+	@PostMapping("/api/submitInvoices")
+	public ResponseEntity<?> submitInvoices(@Valid @RequestBody SubmitInvoiceGroupCriteria submitInvoiceGroupCriteria, Errors errors){
 		AjaxGetInvoiceResponse result = new AjaxGetInvoiceResponse();
+		List<InvoiceVo> invoiceVos = null;
 		
 		if(errors.hasErrors()) {
 			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
@@ -314,10 +315,15 @@ public class ApplicationController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<InvoiceVo> invoiceVos = userService.submitInvoicesToSunat(submitInvoiceGroupCriteria.getProcessingType(), submitInvoiceGroupCriteria.getProcessPendingInvoicesTillDate());
+		if(submitInvoiceGroupCriteria.isBonusControlsEnabled()) {
+			invoiceVos = userService.submitInvoicesToBonus(submitInvoiceGroupCriteria.getProcessingType(), submitInvoiceGroupCriteria.getProcessPendingInvoicesTillDate());
+		} else {
+			invoiceVos = userService.submitInvoicesToSunat(submitInvoiceGroupCriteria.getProcessingType(), submitInvoiceGroupCriteria.getProcessPendingInvoicesTillDate());
+		}
+		
 		
 		if(invoiceVos.isEmpty()) {
-			result.setMsg("No hay comprobantes para enviar a SUNAT.");
+			result.setMsg("No hay comprobantes para enviar");
 		} else {
 			result.setMsg("Comprobante remitido: " + invoiceVos.get(0).getInvoiceNumber());
 		}
@@ -330,6 +336,7 @@ public class ApplicationController {
 	@PostMapping("/api/getInvoicesSummaryData")
 	public ResponseEntity<?> getInvoicesSummaryData(@Valid @RequestBody SearchDateCriteria search, Errors errors){
 		AjaxGetInvoicesResponse result = new AjaxGetInvoicesResponse();
+		List<InvoiceVo> users = null;
 		
 		if(errors.hasErrors()) {
 			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
@@ -338,7 +345,13 @@ public class ApplicationController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<InvoiceVo> users = userService.findInvoicesSummaryData(search.getLoadInvoiceAmountCriteria(), search.isVoidedInvoicesIncluded());
+		if (search.isBonusControlsEnabled()) {
+			users = userService.findInvoicesSummaryDataForBonus(search.getLoadInvoiceAmountCriteria(), search.isVoidedInvoicesIncluded());
+		} else {
+			users = userService.findInvoicesSummaryData(search.getLoadInvoiceAmountCriteria(), search.isVoidedInvoicesIncluded());
+		}
+		
+		
 		if(users.isEmpty()) {
 			result.setMsg("No hay datos para la fecha: " + search.getDateEnd());
 		} else {

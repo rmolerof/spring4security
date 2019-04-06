@@ -59,6 +59,8 @@ public class InvoiceVo {
 	private Double igvModified = 0D;
 	private Double totalModified = 0D;
 	private String bonusNumber = "";
+	private String bonusStatus = "";
+	private String bonusAccumulatedPoints = "";
 	private String sunatStatus = "";
 	private boolean sunatValidated = false;
 	
@@ -111,6 +113,8 @@ public class InvoiceVo {
 		this.totalModified = new Double(invoiceDao.getTotalModified());
 		this.bonusNumber = new String(invoiceDao.getBonusNumber());
 		this.sunatStatus = new String(invoiceDao.getSunatStatus());
+		this.bonusStatus = new String(invoiceDao.getBonusStatus());
+		this.bonusAccumulatedPoints = new String(invoiceDao.getBonusAccumulatedPoints());
 		this.sunatValidated = new Boolean(invoiceDao.isSunatValidated());
 		this.clientEmailAddress = new String(null != invoiceDao.getClientEmailAddress() ? invoiceDao.getClientEmailAddress(): "");
 	}
@@ -416,6 +420,22 @@ public class InvoiceVo {
 
 	public void setClientEmailAddress(String clientEmailAddress) {
 		this.clientEmailAddress = clientEmailAddress;
+	}
+
+	public String getBonusStatus() {
+		return bonusStatus;
+	}
+
+	public void setBonusStatus(String bonusStatus) {
+		this.bonusStatus = bonusStatus;
+	}
+
+	public String getBonusAccumulatedPoints() {
+		return bonusAccumulatedPoints;
+	}
+
+	public void setBonusAccumulatedPoints(String bonusAccumulatedPoints) {
+		this.bonusAccumulatedPoints = bonusAccumulatedPoints;
 	}
 
 }

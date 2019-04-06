@@ -93,6 +93,7 @@ class TableDashboard extends React.Component {
 	  bonusNumber: '',
 	  bonusNumberDisp: '',
 	  sunatStatus: 'PENDIENTE',
+	  bonusStatus: '',
 	  sunatValidated: false,
 	  showNewInvoiceButton: true
     };
@@ -110,8 +111,11 @@ class TableDashboard extends React.Component {
 	    BONUS_NUMBER_PREFIX: '7027661',
 	    EDIT_ENABLED_TIME_IN_MS: 600000,
 	    LARGE_AMOUNT: 500.00,
-	    SUNAT_PENDING_STATUS: 'PENDIENTE',
-	    SUNAT_SENT_STATUS: 'ENVIADO'
+	    PENDING_STATUS: 'PENDIENTE',
+	    SENT_STATUS: 'ENVIADO',
+	    VOIDED_STATUS: 'ANULADO',
+	    FAILURE_STATUS: 'FALLADO'
+	    
     }
   }
   
@@ -309,7 +313,8 @@ class TableDashboard extends React.Component {
   }
   
   _validateBonusNumberDisp(bonusNumberDisp){
-	  var re = /^([0-9]{6}|[0-9]{8,9})$/;
+	  //var re = /^((?=.*[1-9].*)[0-9]{6}|(?=.*[1-9].*)[0-9]{8,9})$/;
+	  var re = /^(?=.*[1-9].*)[0-9]{12}$/;
 	  
 	  if (bonusNumberDisp != '' && !re.test(bonusNumberDisp)) {
 		  return false
@@ -699,7 +704,7 @@ class TableDashboard extends React.Component {
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
 							self.setState({bonusNumber: data.result.bonusNumber});
-							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7).replace(/^0+/, '')});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7)});
 							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
 								self.setState({clientAddressDisabled: false});
 							} else {
@@ -767,8 +772,8 @@ class TableDashboard extends React.Component {
 							self.setState({clientNameDisabled: true});
 							self.setState({clientAddressDisabled: false});
 							self.setState({bonusNumber: data.result.bonusNumber});
+							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7)});
 							self.setState({clientAddress: data.result.direccion});
-							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7).replace(/^0+/, '')});
 						}
 						
 						// hide delay delay
@@ -856,8 +861,9 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
-					  bonusNumberDisp: data.result[0].bonusNumber.substring(7).replace(/^0+/, ''),
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(7),
 					  sunatStatus: data.result[0].sunatStatus,
+					  bonusStatus: data.result[0].bonusStatus,
 					  clientDocNumberDisabled: false,
 					  clientNameDisabled: false,
 					  clientAddressDisabled: false,
@@ -914,7 +920,7 @@ class TableDashboard extends React.Component {
 				  
 				  if (self._getQueryVariable('id')) {
 					  
-					  if (data.result[0].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS ){
+					  if (data.result[0].sunatStatus == self.CONSTANTS.PENDING_STATUS ){
 						  self.setState({submitDisabled: self._getSubmitInvoiceButtonStatus(data.result[0].user)});
 					  } else {
 						  self.setState({submitDisabled: true});
@@ -993,8 +999,9 @@ class TableDashboard extends React.Component {
 					  igvModified: data.result[0].totalIGV,
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
-					  bonusNumberDisp: data.result[0].bonusNumber.substring(7).replace(/^0+/, ''),
-					  sunatStatus: 'PENDIENTE',
+					  bonusNumberDisp: data.result[0].bonusNumber.substring(7),
+					  sunatStatus: this.CONSTANTS.PENDING_STATUS,
+					  bonusStatus: data.result[0].bonusNumber ? this.CONSTANTS.PENDING_STATUS: "",
 					  sunatValidated: false,
 					  clientEmailAddress: data.result[0].clientEmailAddress
 				  });
@@ -1190,7 +1197,8 @@ class TableDashboard extends React.Component {
 	      totalModified: '',
 	      bonusNumber: '',
 	      bonusNumberDisp: '',
-	      sunatStatus: 'PENDIENTE'
+	      sunatStatus: this.CONSTANTS.PENDING_STATUS,
+	      bonusStatus: ""
 	  });
   }
   
@@ -1246,6 +1254,7 @@ class TableDashboard extends React.Component {
 			bonusNumber,
 			bonusNumberDisp,
 			sunatStatus,
+			bonusStatus,
 			invoiceDateDisp} = this.state;
 		var self = this;
 	    var errors = {
@@ -1297,7 +1306,8 @@ class TableDashboard extends React.Component {
 	    	saveOrUpdate: saveOrUpdate,
 	    	bonusNumber: bonusNumber,
 	    	invoiceHash: invoiceHash,
-	    	sunatStatus: sunatStatus
+	    	sunatStatus: sunatStatus,
+	    	bonusStatus: bonusNumber ? self.CONSTANTS.PENDING_STATUS: ""
 	    };
 
 	    if (solesD2 || solesG90 || solesG95) {
@@ -1331,7 +1341,7 @@ class TableDashboard extends React.Component {
 	    	// Bonus validation
 	    	if (bonusNumber && bonusNumber >= 0) {
 	    		if (!self._validateBonusNumberDisp(bonusNumberDisp)) {
-	    			errors["bonusNumberDisp"] = "Número Bonus debe tener 6, 8, o 9 dígitos";
+	    			errors["bonusNumberDisp"] = "Número Bonus debe tener 12 dígitos con al menos una cifra diferente de cero";
 	    			formIsValid = false;
 	    		}
 		    }
@@ -1671,7 +1681,7 @@ class TableDashboard extends React.Component {
 			              </div>
 			              }
 		              	  <div className="row">
-				    	      <div className="col-md-2">
+				    	      <div className="col-md-1">
 					              <div className="form-group">
 					                  <label className="control-label">Fecha&nbsp; {this.state.user.roles.ROLE_ADMIN && <a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a>}</label>
 					                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
@@ -1701,7 +1711,7 @@ class TableDashboard extends React.Component {
 			    	          </div>
 			              
 			              
-			    	          <div className="col-md-2">
+			    	          <div className="col-md-3">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Dirección</label>
 			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>

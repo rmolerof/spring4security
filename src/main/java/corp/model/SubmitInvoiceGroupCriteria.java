@@ -9,6 +9,7 @@ public class SubmitInvoiceGroupCriteria {
 	@NotBlank(message = "Procesamiento debe ser NORMAL o FORZADO.")
 	String processingType;
 	Date processPendingInvoicesTillDate;
+	boolean bonusControlsEnabled;
 	
 	public static final String NORMAL = "NORMAL";
 	public static final String FORCED = "FORCED";
@@ -27,6 +28,14 @@ public class SubmitInvoiceGroupCriteria {
 
 	public void setProcessPendingInvoicesTillDate(Date processPendingInvoicesTillDate) {
 		this.processPendingInvoicesTillDate = processPendingInvoicesTillDate;
+	}
+
+	public boolean isBonusControlsEnabled() {
+		return bonusControlsEnabled;
+	}
+
+	public void setBonusControlsEnabled(boolean bonusControlsEnabled) {
+		this.bonusControlsEnabled = bonusControlsEnabled;
 	}
 	
 }

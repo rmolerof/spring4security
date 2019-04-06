@@ -21,6 +21,7 @@ class InvoiceTableSummary extends React.Component {
       processingTypeButtonToggle: true,
       processingType: 'NORMAL',
       voidedInvoicesIncluded: false,
+      bonusControlsEnabled: false,
       processPendingInvoicesTillDate: '',
       processPendingInvoicesTillDateStyle: {color: 'black'},
     };
@@ -29,8 +30,9 @@ class InvoiceTableSummary extends React.Component {
 	    FACTURA: '01',
 	    BOLETA: '03',
 	    NOTADECREDITO: '07',
-	    SUNAT_PENDING_STATUS: 'PENDIENTE',
-	    SUNAT_SENT_STATUS: 'ENVIADO',
+	    PENDING_STATUS: 'PENDIENTE',
+	    SENT_STATUS: 'ENVIADO',
+	    VOIDED_STATUS: 'ANULADO',
 	    NORMAL_PROCESSING_TYPE: 'NORMAL',
 	    FORCED_PROCESSING_TYPE: 'FORZADO',
 	    EDIT_ENABLED_TIME_IN_MS: 600000,
@@ -93,6 +95,7 @@ class InvoiceTableSummary extends React.Component {
 	  	var search = {};
 		search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
 		search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
+		search["bonusControlsEnabled"] = criteria.bonusControlsEnabled;
 		self.setState({invoicesSummaryData: null, processingGif: true, showError: false, showSuccess: false});
 		
 		jQuery.ajax({
@@ -128,7 +131,7 @@ class InvoiceTableSummary extends React.Component {
 					}
 					
 					var editInvoice = '';
-					if (invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
+					if (invoicesSummaryData[i].sunatStatus == self.CONSTANTS.PENDING_STATUS) {
 						if (self.state.user.roles.ROLE_ADMIN) {
 							editInvoice = "<a class='view' href='/invoice-page?id=" + invoicesSummaryData[i].invoiceNumber + "'>Editar</a>";
 						} else {
@@ -149,6 +152,36 @@ class InvoiceTableSummary extends React.Component {
 						electronicOrCashPmtMsg = self.CONSTANTS.CASH_PAYMENT_MSG;
 					} else if (invoicesSummaryData[i].electronicPmt > 0 && invoicesSummaryData[i].cashPmt > 0) {
 						electronicOrCashPmtMsg = self.CONSTANTS.ELECTRONIC_PAYMENT_MSG + "/" +self.CONSTANTS.CASH_PAYMENT_MSG; 
+					}
+					
+					var bonusStatus = ""
+					switch (invoicesSummaryData[i].bonusStatus){
+						case self.CONSTANTS.PENDING_STATUS:
+							bonusStatus = "<span class='label label-sm label-info'> " + self.CONSTANTS.PENDING_STATUS + " </span>"
+							break;
+						case self.CONSTANTS.SENT_STATUS:
+							bonusStatus = "<span class='label label-sm label-success'> " + self.CONSTANTS.SENT_STATUS + " </span>"
+							break;
+						case self.CONSTANTS.VOIDED_STATUS:
+							bonusStatus = "<span class='label label-sm label-warning'> " + self.CONSTANTS.VOIDED_STATUS + " </span>"
+							break;
+						default:
+							bonusStatus = "";
+					
+					}
+					
+					var sunatStatus = ""
+					switch (invoicesSummaryData[i].sunatStatus){
+						case self.CONSTANTS.PENDING_STATUS:
+							sunatStatus = "<span class='label label-sm label-info'> " + self.CONSTANTS.PENDING_STATUS + " </span>"
+							break;
+						case self.CONSTANTS.SENT_STATUS:
+							sunatStatus = "<span class='label label-sm label-success'> " + self.CONSTANTS.SENT_STATUS + " </span>"
+							break;
+						case self.CONSTANTS.VOIDED_STATUS:
+							sunatStatus = "<span class='label label-sm label-warning'> " + self.CONSTANTS.VOIDED_STATUS + " </span>"
+							break;
+					
 					}
 					
 					count++;
@@ -175,10 +208,12 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].total,
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
-						invoicesSummaryData[i].sunatStatus,
+						bonusStatus,
+						invoicesSummaryData[i].bonusAccumulatedPoints,
+						sunatStatus,
 						invoicesSummaryData[i].user.name,
 						editInvoice,
-						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
+						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
 						];
 					
 					tableData[i] = row;
@@ -199,6 +234,7 @@ class InvoiceTableSummary extends React.Component {
 	  	var search = {};
 	  	search["loadInvoiceAmountCriteria"] = criteria.loadInvoiceAmountCriteria;
 	  	search["voidedInvoicesIncluded"] = criteria.voidedInvoicesIncluded;
+	  	search["bonusControlsEnabled"] = criteria.bonusControlsEnabled;
 	  	self.setState({invoicesSummaryConcarData: null, processingGif: true, showError: false, showSuccess: false});
 	  	
 		jQuery.ajax({
@@ -309,8 +345,8 @@ class InvoiceTableSummary extends React.Component {
   
   componentWillMount(){
 	  this._getUser();
-	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
-	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS.TOTAL_INVOICES_TODAY, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
   }
   
   onKeyPress(event) {
@@ -333,35 +369,51 @@ class InvoiceTableSummary extends React.Component {
 		
 		var self = this;
 		const {processPendingInvoicesTillDate, 
-			processPendingInvoicesTillDateStyle} = self.state;
+			processPendingInvoicesTillDateStyle,
+			bonusControlsEnabled} = self.state;
 		var confirmMsg = "";
 		var formIsValid = true;
 		var sunatSubmitCriteria = {};
 		var errors = {};
 		
-		if (processPendingInvoicesTillDate) {
-			if (processPendingInvoicesTillDate.trim().length >= 0 && processPendingInvoicesTillDateStyle.color == 'black') {
-				confirmMsg = "¿Está seguro de procesar comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
-				sunatSubmitCriteria["processPendingInvoicesTillDate"] = this._convertStringToDate(processPendingInvoicesTillDate);
-		    } else {
-		    	errors["submit"] = "Falta o corregir fecha";
-				formIsValid = false;
-		    } 
+		if(!bonusControlsEnabled) {
+			if (processPendingInvoicesTillDate) {
+				if (processPendingInvoicesTillDate.trim().length >= 0 && processPendingInvoicesTillDateStyle.color == 'black') {
+					confirmMsg = "¿Está seguro de procesar comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
+					sunatSubmitCriteria["processPendingInvoicesTillDate"] = this._convertStringToDate(processPendingInvoicesTillDate);
+			    } else {
+			    	errors["submit"] = "Falta o corregir fecha";
+					formIsValid = false;
+			    } 
+			} else {
+				confirmMsg = "¿Está seguro de procesar TODOS los comprobantes pendientes hasta la presente fecha?";
+			}
 		} else {
-			confirmMsg = "¿Está seguro de procesar TODOS los comprobantes pendientes hasta la presente fecha?";
+			if (processPendingInvoicesTillDate) {
+				if (processPendingInvoicesTillDate.trim().length >= 0 && processPendingInvoicesTillDateStyle.color == 'black') {
+					confirmMsg = "¿Está seguro de procesar BONUS para comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
+					sunatSubmitCriteria["processPendingInvoicesTillDate"] = this._convertStringToDate(processPendingInvoicesTillDate);
+			    } else {
+			    	errors["submit"] = "Falta o corregir fecha";
+					formIsValid = false;
+			    } 
+			} else {
+				confirmMsg = "¿Está seguro de procesar BONUS para TODOS los comprobantes pendientes hasta la presente fecha?";
+			}
 		}
-		
-		self.setState({ showError: false, processingGif: true});
-		sunatSubmitCriteria["processingType"] = this.state.processingType;
 		
 		if (formIsValid) {
 			if (confirm(confirmMsg) == false) {
 	            return;
 	        }
+			
+			self.setState({ showError: false, processingGif: true});
+			sunatSubmitCriteria["processingType"] = this.state.processingType;
+			sunatSubmitCriteria["bonusControlsEnabled"] = this.state.bonusControlsEnabled;
 			jQuery.ajax({
 				type: "POST",
 				contentType: "application/json", 
-				url:"/api/submitInvoicesToSunat",
+				url:"/api/submitInvoices",
 				data: JSON.stringify(sunatSubmitCriteria),
 				datatype: 'json',
 				cache: false,
@@ -372,26 +424,43 @@ class InvoiceTableSummary extends React.Component {
 						var submittedInvoices = data.result;
 						//var errors = [];
 						var invoiceSequenceValidationErrorMsg = "Secuencia incompleta en: ";
-						var sunatFailedToSendMsg = "Comprobantes no enviados: ";
-						var sunatErrorCount = 0;
+						var failedToSendMsg = "Comprobantes no procesados: ";
+						var errorCount = 0;
 						
-						for (var i = 0; i < submittedInvoices.length; i++) {
-							if (!submittedInvoices[i].sunatValidated) {
-								invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
-								sunatErrorCount++;
+						if (!bonusControlsEnabled) {
+							for (var i = 0; i < submittedInvoices.length; i++) {
+								if (!submittedInvoices[i].sunatValidated) {
+									invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
+									errorCount++;
+								}
+								
+								if (submittedInvoices[i].sunatStatus == self.CONSTANTS.PENDING_STATUS) {
+									failedToSendMsg += submittedInvoices[i].invoiceNumber + " "
+									errorCount++;
+								}
 							}
 							
-							if (submittedInvoices[i].sunatStatus == self.CONSTANTS.SUNAT_PENDING_STATUS) {
-								sunatFailedToSendMsg += submittedInvoices[i].invoiceNumber + " "
-								sunatErrorCount++;
+							if (errorCount > 0) {
+								errors["validationMsg"] = invoiceSequenceValidationErrorMsg + failedToSendMsg;
+								this.setState({errors: errors, showError: true});
+							} else {
+								this.setState({showSuccess: true});
 							}
-						}
-						
-						if (sunatErrorCount > 0) {
-							errors["sunatValidationMsg"] = invoiceSequenceValidationErrorMsg + sunatFailedToSendMsg;
-							this.setState({errors: errors, showError: true});
 						} else {
-							this.setState({showSuccess: true});
+							for (var i = 0; i < submittedInvoices.length; i++) {
+								
+								if (submittedInvoices[i].bonusStatus == self.CONSTANTS.PENDING_STATUS) {
+									failedToSendMsg += submittedInvoices[i].invoiceNumber + " "
+									errorCount++;
+								}
+							}
+							
+							if (errorCount > 0) {
+								errors["validationMsg"] = failedToSendMsg;
+								this.setState({errors: errors, showError: true});
+							} else {
+								this.setState({showSuccess: true});
+							}
 						}
 						
 						self.setState({processingGif: false});
@@ -427,11 +496,19 @@ class InvoiceTableSummary extends React.Component {
   }
   
   _loadInvoicesByCriteria = (loadInvoiceAmountCriteria) => (evt) => {
-	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded}); 
-	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded});
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled}); 
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: this.CONSTANTS[loadInvoiceAmountCriteria], voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
   }
   
   handleVoidedInvoicesIncludedChange(event) {
+	  const target = event.target;
+	  const value = target.type === 'checkbox' ? target.checked : target.value;
+	  const name = target.name;
+
+	  this.setState({[name]: value});
+  }
+  
+  handleBonusControlsEnabledChange(event) {
 	  const target = event.target;
 	  const value = target.type === 'checkbox' ? target.checked : target.value;
 	  const name = target.name;
@@ -452,7 +529,7 @@ class InvoiceTableSummary extends React.Component {
       	  
 	      {this.state.showError && 
 		        <div className="alert alert-danger">
-	      <strong>¡Error!</strong>{this.state.errors.sunatValidationMsg && ` ${this.state.errors.sunatValidationMsg}`}{this.state.errors.submit && ` ${this.state.errors.submit}`}  
+	      <strong>¡Error!</strong>{this.state.errors.validationMsg && ` ${this.state.errors.validationMsg}`}{this.state.errors.submit && ` ${this.state.errors.submit}`}  
 		      	</div>
 	      }
 	      
@@ -476,7 +553,13 @@ class InvoiceTableSummary extends React.Component {
 		      
 		      <label className="mt-checkbox">
 	              <input name="voidedInvoicesIncluded" type="checkbox" checked={this.state.voidedInvoicesIncluded} onChange={this.handleVoidedInvoicesIncludedChange.bind(this)}/>
-	              Incluir Anulados
+	              Anulados
+	              <span></span>
+	          </label>
+	          
+	          <label className="mt-checkbox">
+	              <input name="bonusControlsEnabled" type="checkbox" checked={this.state.bonusControlsEnabled} onChange={this.handleBonusControlsEnabledChange.bind(this)}/>
+	              Bonus
 	              <span></span>
 	          </label>
 	          
@@ -579,7 +662,9 @@ class InvoicesTbl extends React.Component {
 		            { title: "Forma Pago" },
 		            { title: "Total" },
 		            { title: "Nro hash" },
-		            { title: "Bonus" },
+		            { title: "Nro Bonus" },
+		            { title: "Bonus Status" },
+		            { title: "Puntos Bonus" },
 		            { title: "Sunat Status" },
 		            { title: "Usuario" },
 		            { title: "Editar" },
