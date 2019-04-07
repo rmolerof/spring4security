@@ -909,7 +909,7 @@ public class ApplicationService {
 		bonusVo.setComercio(globalProperties.getComercio());
 		bonusVo.setTarjetac11(invoiceVo.getBonusNumber().substring(7, 18));
 		bonusVo.setFechaTransaccion(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), globalProperties.getTimeZoneID()), "ddMMyyyy"));
-		bonusVo.setHoraTransaccion(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), globalProperties.getTimeZoneID()), "hhmm"));
+		bonusVo.setHoraTransaccion(Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), globalProperties.getTimeZoneID()), "HHmm"));
 		String invoiceNumber = invoiceVo.getInvoiceNumber();
 		bonusVo.setPosId("00" + invoiceNumber.substring(0, invoiceNumber.indexOf("-")));//globalProperties.getPosId()"00F001"
 		bonusVo.setPosSecuencial(invoiceNumber.substring(invoiceNumber.length()-6));//invoiceVo.getInvoiceNumber()"000062"

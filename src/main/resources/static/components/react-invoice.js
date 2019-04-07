@@ -1703,7 +1703,7 @@ class TableDashboard extends React.Component {
 			    	                  <input name="clientDocNumber" type="text" pattern="[0-9]*" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientDocNumberDisabled} placeholder={this.state.docLabelObj.clientDocTypePH} onKeyPress={this.onKeyPress.bind(this)} value={this.state.clientDocNumber} onChange={this.clientDocNumberChange}/>
 			                	  </div>
 			    	          </div>
-			    	          <div className="col-md-2">
+			    	          <div className="col-md-3">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">{this.state.docLabelObj.clientName}</label>
 			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientNameDisabled} placeholder={this.state.docLabelObj.clientNamePH} onKeyPress={this.onKeyPress} value={this.state.clientName} onChange={this.clientNameChange}/>
@@ -1711,7 +1711,7 @@ class TableDashboard extends React.Component {
 			    	          </div>
 			              
 			              
-			    	          <div className="col-md-3">
+			    	          <div className="col-md-2">
 			    	              <div className="form-group">
 			    	                  <label className="control-label">Dirección</label>
 			    	                  <input type="text" className="form-control" style={{borderColor: '#26344b'}} disabled={this.state.clientAddressDisabled} placeholder="Dirección" onKeyPress={this.onKeyPress} value={this.state.clientAddress} onChange={this.clientAddressChange}/>
