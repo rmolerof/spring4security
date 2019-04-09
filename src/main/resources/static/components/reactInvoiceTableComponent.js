@@ -379,14 +379,14 @@ class InvoiceTableSummary extends React.Component {
 		if(!bonusControlsEnabled) {
 			if (processPendingInvoicesTillDate) {
 				if (processPendingInvoicesTillDate.trim().length >= 0 && processPendingInvoicesTillDateStyle.color == 'black') {
-					confirmMsg = "¿Está seguro de procesar comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
+					confirmMsg = "¿Está seguro de procesar SUNAT para comprobantes pendientes hasta fecha: " + processPendingInvoicesTillDate + "?";
 					sunatSubmitCriteria["processPendingInvoicesTillDate"] = this._convertStringToDate(processPendingInvoicesTillDate);
 			    } else {
 			    	errors["submit"] = "Falta o corregir fecha";
 					formIsValid = false;
 			    } 
 			} else {
-				confirmMsg = "¿Está seguro de procesar TODOS los comprobantes pendientes hasta la presente fecha?";
+				confirmMsg = "¿Está seguro de procesar SUNAT para TODOS los comprobantes pendientes hasta la presente fecha?";
 			}
 		} else {
 			if (processPendingInvoicesTillDate) {

@@ -12,6 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import corp.Application;
+import corp.model.SubmitInvoiceGroupCriteria;
+import corp.services.ApplicationService;
+import corp.services.GlobalProperties;
 import corp.services.Utils;
 
 @Component
@@ -25,11 +28,39 @@ public class ScheduledTasks {
 	private ResourceLoader resourceLoader;
 	@Autowired
 	private Utils utils;
+	@Autowired
+	private GlobalProperties globalProperties;
+	@Autowired
+	ApplicationService applicationService;
+	
+	// Wednesday Local Time (GMT-5 Lima Peru)
+	@Scheduled(cron = "0 30 8 * * WED") 
+	public void submitSunat() {
+		Date localDate = Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID());
+		
+		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(localDate));
+		
+		applicationService.submitInvoicesToSunat(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(3, globalProperties.getTimeZoneID()));
+				
+		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(localDate));
+	}
+	
+	// 8 am => 3am GMT-5 Lima Peru 
+	@Scheduled(cron = "0 0 8 * * *") 
+	public void submitBonus() {
+		Date localDate = Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID());
+		
+		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(localDate));
+		
+		applicationService.submitInvoicesToBonus(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(1, globalProperties.getTimeZoneID()));
+				
+		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(localDate));
+	}
 	
 	// 7 am => 2am GMT-5 Lima Peru 
 	@Scheduled(cron = "0 0 7 * * *") 
-	public void reportCurrentTime() {
-		logger.info("Cron job is starting at " + dateFormat.format(new Date()));
+	public void cleanUpJasperFilesAndSunatXmls() {
+		logger.info("Cron job: cleanUpJasperFilesAndSunatXmls is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 		
 		// clean up jasterreports folder
 		utils.deletePath(getBasePath() + "/jasperReports");
@@ -37,7 +68,7 @@ public class ScheduledTasks {
 		// clean up xmlsSunat folder
 		utils.deletePath(getBasePath() + "/xmlsSunat");
 		
-		logger.info("Cron job is ending at " + dateFormat.format(new Date()));
+		logger.info("Cron job: cleanUpJasperFilesAndSunatXmls is ending at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 	}
 	
 	public String getBasePath() {
