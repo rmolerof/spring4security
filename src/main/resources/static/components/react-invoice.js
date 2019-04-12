@@ -380,7 +380,12 @@ class TableDashboard extends React.Component {
   
   bonusNumberDispChange = (evt) => {
     this.setState({bonusNumberDisp: evt.target.value.trim()});
-    this.setState({bonusNumber: this._transformToFullBonusNumber(evt.target.value.trim())});
+    if(evt.target.value.trim()){
+    	this.setState({bonusNumber: this._transformToFullBonusNumber(evt.target.value.trim())});
+    } else {
+    	this.setState({bonusNumber: ""});
+    }
+    
   }
   
   _transformToFullBonusNumber(bonusNumberDisp) {
