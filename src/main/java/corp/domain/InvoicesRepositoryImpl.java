@@ -249,5 +249,16 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		
 		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}
+	
+	public List<InvoiceDao> findAllInvoicesWithBonusNumberFromDateTillDate(Date fromDate, Date tillDate, Sort sort) {
+		
+		Date fromDateLocal = Utils.transformZoneToGMTDate(Utils.addNDaysToDate(fromDate, 1), globalProperties.getTimeZoneID());
+		Date tillDateLocal = Utils.transformZoneToGMTDate(Utils.addNDaysToDate(tillDate, 1), globalProperties.getTimeZoneID());
+		
+		//Criteria pendingInvoicesCriteriaTillDate = Criteria.where("bonusStatus").is("").and("bonusNumber").ne("").and("date").gte(fromDateLocal).lt(tillDateLocal);
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("bonusNumber").ne("").and("date").gte(fromDateLocal).lt(tillDateLocal);
+		
+		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
+	}
 
 }

@@ -668,7 +668,7 @@ public class ApplicationService {
 		return Integer.parseInt(invoiceNumberImmutable.substring(5, invoiceNumberImmutable.length())); 
 	}
 	
-	List<InvoiceVo> processInvoicesByBonus(List<InvoiceDao> invoiceDaos){
+	public List<InvoiceVo> processInvoicesByBonus(List<InvoiceDao> invoiceDaos){
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 			
@@ -691,7 +691,7 @@ public class ApplicationService {
 		return invoiceVos;
 	}
 	
-	List<InvoiceVo> processInvoicesBySunat(List<InvoiceDao> invoiceDaos){
+	public List<InvoiceVo> processInvoicesBySunat(List<InvoiceDao> invoiceDaos){
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 			

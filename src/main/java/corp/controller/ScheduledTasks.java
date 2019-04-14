@@ -34,7 +34,7 @@ public class ScheduledTasks {
 	ApplicationService applicationService;
 	
 	// Wednesday Local Time (GMT-5 Lima Peru)
-	@Scheduled(cron = "0 30 8 * * WED") 
+	@Scheduled(cron = "0 30 8 * * WED,SAT") 
 	public void submitSunat() {
 		Date localDate = Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID());
 		
