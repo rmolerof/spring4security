@@ -23,6 +23,8 @@ import com.bean.Cpe_DetalleBean;
 
 import apiclienteenviosunat.ApiClienteEnvioSunat;
 import corp.model.InvoiceVo;
+import corp.model.SunatSubmitServiceResponse;
+import corp.services.GlobalProperties;
 import corp.services.Utils;
 import firmacpesunat.FirmaCPESunat;
 import generadorxmlcpe.CPESunat;
@@ -203,16 +205,41 @@ public class XmlSunat {
 	 * PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
-	public static String envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL, String sunatSolUsername, String sunatSolPassword) {
+	public static SunatSubmitServiceResponse envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL, String sunatSolUsername, String sunatSolPassword) {
 		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = basePath + "/xmlsSunat/";
-		String sunatResponse = ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL);
-		invoiceVo.setInvoiceHash(sunatResponse.substring(sunatResponse.lastIndexOf("|") + 1, sunatResponse.length()));
-		invoiceVo.setSunatErrorStr(sunatResponse);
-		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatResponse + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
-		logger.info("hash: " + invoiceVo.getInvoiceHash());
-		return sunatResponse;
+		SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL));
+		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatSubmitServiceResponse.toString() + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
+		return sunatSubmitServiceResponse;
+	}
+	
+	public static String consultInvoice(InvoiceVo invoiceVo, String cdrPath, GlobalProperties globalProperties) {
+		String ruc = globalProperties.getMyRuc();
+		String UsuarioSol = globalProperties.getSunatSolUsername();
+		String PassSol = globalProperties.getSunatSolPassword();
+		String tipoDocumento = invoiceVo.getInvoiceType();
+		String nro_comprobante = invoiceVo.getInvoiceNumber();
+		String RutaWS = globalProperties.getSunatConsultInvoiceURL();
+		String NombreCPE = globalProperties.getMyRuc() + "-" + tipoDocumento + "-" + nro_comprobante ;
+		String NombreCDR = "R-" + NombreCPE;
+		String RutaArchivo = getValidatedPath(cdrPath);
+		
+		String sunatInvoiceConsultResponse = ApiClienteEnvioSunat.ConexionCPEStatusCDR(ruc, UsuarioSol, PassSol, tipoDocumento, nro_comprobante, NombreCPE,  NombreCDR,  RutaArchivo, RutaWS);
+		logger.info("\n" + sunatInvoiceConsultResponse);
+		
+		return sunatInvoiceConsultResponse;
+	}
+	
+	public static String getValidatedPath(String path) {
+		boolean alreadyExists = new File(path).exists();
+	    
+	    // Create path if basePath doesn't exist
+	    if(!alreadyExists){
+			(new File(path)).getParentFile().mkdirs();
+		}
+	    
+	    return path;
 	}
 	
 	public static String rightPadZeros(String str, int num) {

@@ -7,19 +7,20 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("globalProperties")
 public class GlobalProperties {
 	
-	public String emailUsername;
-	public String emailPassword;
-	public String emailHost;
-	public String emailFrom;
-	public String myRuc;
-	public String sunatInvoicingServiceURL;
-	public String sunatSignatureFileName;
-	public String sunatSignaturePassword;
-	public String sunatSolUsername;
-	public String sunatSolPassword;
-	public String timeZoneID;
-	public String comercio;
-	public String bonusURL;
+	private String emailUsername;
+	private String emailPassword;
+	private String emailHost;
+	private String emailFrom;
+	private String myRuc;
+	private String sunatInvoicingServiceURL;
+	private String sunatConsultInvoiceURL;
+	private String sunatSignatureFileName;
+	private String sunatSignaturePassword;
+	private String sunatSolUsername;
+	private String sunatSolPassword;
+	private String timeZoneID;
+	private String comercio;
+	private String bonusURL;
 	
 	public String getEmailUsername() {
 		return emailUsername;
@@ -98,6 +99,12 @@ public class GlobalProperties {
 	}
 	public void setBonusURL(String bonusURL) {
 		this.bonusURL = bonusURL;
+	}
+	public String getSunatConsultInvoiceURL() {
+		return sunatConsultInvoiceURL;
+	}
+	public void setSunatConsultInvoiceURL(String sunatConsultInvoiceURL) {
+		this.sunatConsultInvoiceURL = sunatConsultInvoiceURL;
 	}
 	
 }

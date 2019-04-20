@@ -15,6 +15,11 @@ import javax.xml.crypto.MarshalException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -22,15 +27,28 @@ import com.bean.CpeBean;
 import com.bean.Cpe_DetalleBean;
 
 import apiclienteenviosunat.ApiClienteEnvioSunat;
+import corp.Application;
+import corp.domain.InvoicesRepository;
 import corp.model.InvoiceVo;
+import corp.services.ApplicationService;
+import corp.services.GlobalProperties;
 import corp.sunat.XmlSunat;
 import firmacpesunat.FirmaCPESunat;
 import generadorxmlcpe.CPESunat;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class)
 public class XmlSunatTest {
 	
 	public static CpeBean cpe = null;
     public static Cpe_DetalleBean cpe_Detalle = null;
+    
+    @Autowired
+	private InvoicesRepository invoicesRepository;
+	@Autowired
+	private GlobalProperties globalProperties;
+	@Autowired
+	ApplicationService userService;
     
     public static void main(String[] args) throws Exception {
     	
@@ -143,7 +161,7 @@ public class XmlSunatTest {
 		String UsuarioSol = "LAJOYA40";
 		String PassSol = "Lajoya@4";
 		String tipoDocumento = "";
-		String nro_comprobante = "F001-00001156";
+		String nro_comprobante = "B001-00003790";
 		if (nro_comprobante.charAt(0) == 'F') {
 			tipoDocumento = "01";
 		} else {
@@ -161,6 +179,15 @@ public class XmlSunatTest {
     	//String NombreCPE = "20501568776-03-B001-00000038";
     	//System.out.println("Hash CPE: " + valorXML(RutaArchivo + NombreCPE, "", "DigestValue"));
 		
+	}
+	
+	@Test
+	public void consultInvoiceTest() {
+		
+		InvoiceVo invoiceVo = new InvoiceVo(invoicesRepository.findFirstByInvoiceNumberAndSunatStatus("B001-00003790", ApplicationService.PENDING_STATUS));
+		String rutaArchivo = XmlSunat.getValidatedPath("C:\\Users\\mecam\\xmlsSunat\\CDR\\");
+		
+		XmlSunat.consultInvoice(invoiceVo, rutaArchivo, globalProperties);
 	}
 	
     public static String valorXML(String rutaArchivo, String Nspace, String TagName) throws SAXException, IOException, ParserConfigurationException {

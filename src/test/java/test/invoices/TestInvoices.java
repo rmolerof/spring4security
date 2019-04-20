@@ -50,7 +50,7 @@ public class TestInvoices {
 	}
 	
 	@Test
-	public void submitBonusTest() {
+	public void submitBonusFromDateTillDateTest() {
 
 		Date fromDate = Utils.getDateAtMidnightNDaysAgo(13, globalProperties.getTimeZoneID());
 		Date untilDate = Utils.getDateAtMidnightNDaysAgo(8, globalProperties.getTimeZoneID());

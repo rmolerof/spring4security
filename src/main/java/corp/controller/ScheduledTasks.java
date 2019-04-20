@@ -36,25 +36,23 @@ public class ScheduledTasks {
 	// Wednesday Local Time (GMT-5 Lima Peru)
 	@Scheduled(cron = "0 30 8 * * WED,SAT") 
 	public void submitSunat() {
-		Date localDate = Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID());
 		
-		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(localDate));
+		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 		
 		applicationService.submitInvoicesToSunat(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(3, globalProperties.getTimeZoneID()));
 				
-		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(localDate));
+		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 	}
 	
 	// 8 am => 3am GMT-5 Lima Peru 
 	@Scheduled(cron = "0 0 8 * * *") 
 	public void submitBonus() {
-		Date localDate = Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID());
 		
-		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(localDate));
+		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 		
-		applicationService.submitInvoicesToBonus(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(1, globalProperties.getTimeZoneID()));
+		applicationService.submitInvoicesToBonus(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(7, globalProperties.getTimeZoneID()));
 				
-		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(localDate));
+		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 	}
 	
 	// 7 am => 2am GMT-5 Lima Peru 

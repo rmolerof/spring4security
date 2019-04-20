@@ -48,10 +48,11 @@ import corp.domain.TanksRepository;
 import corp.model.DayDataCriteria;
 import corp.model.InvoiceVo;
 import corp.model.SubmitInvoiceGroupCriteria;
+import corp.model.SunatSubmitServiceResponse;
 import corp.model.User;
 import corp.sunat.XmlSunat;
-import webbonusgx.BonusVo;
 import webbonusgx.BonusPointsOperationResponse;
+import webbonusgx.BonusVo;
 import webbonusgx.WSAcumuPx;
 import webbonusgx.WSAcumuPxExecute;
 import webbonusgx.WSAcumuPxExecuteResponse;
@@ -66,6 +67,8 @@ public class ApplicationService {
 	private Station currentStation;
 	private TanksVo currentTanksVo;
 	private GasPricesVo currentGasPricesVo;
+	public static final char SUCCESS = '1';
+	public static final char FAIL = '0';
 	public static final String FACTURA = "01";
 	public static final String BOLETA = "03";
 	public static final String NOTADECREDITO = "07";
@@ -81,6 +84,7 @@ public class ApplicationService {
 	public static final String PRIMAX_CODE_D2 = "00000000000051";
 	public static final String PRIMAX_CODE_G90 = "00000000000021";
 	public static final String PRIMAX_CODE_G95 = "00000000000031";
+	public static final String SUNAT_ALREADY_RECEIVED_MSG = "El comprobante fue registrado previamente con otros datos";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -696,13 +700,15 @@ public class ApplicationService {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
 			
 			// Sunat
-			String basePath;
-			String deliveryResponse = "";
+			String basePath = "";
+			SunatSubmitServiceResponse deliveryResponse = null;
 			try {
 				basePath = resourceLoader.getResource("classpath:/static/").getFile().getPath();
 				XmlSunat.invokeSunat(invoiceVo, basePath);
 				XmlSunat.firma(invoiceVo, basePath, globalProperties.getSunatSignatureFileName(), globalProperties.getSunatSignaturePassword());
 				deliveryResponse = XmlSunat.envio(invoiceVo, basePath, globalProperties.getSunatInvoicingServiceURL(), globalProperties.getSunatSolUsername(), globalProperties.getSunatSolPassword());
+				invoiceVo.setInvoiceHash(deliveryResponse.getHashCdr());
+				invoiceVo.setSunatErrorStr(deliveryResponse.getResponseDetailMsg());
 				
 			} catch (Exception e) {
 				invoiceVo.setStatus("0");
@@ -711,11 +717,23 @@ public class ApplicationService {
 			
 			InvoiceDao invDao = new InvoiceDao(invoiceVo);
 
-			if (deliveryResponse.charAt(0) == '1') {
+			if (deliveryResponse.getResponseCode().charAt(0) == SUCCESS) {
 				invDao.setSunatStatus("ENVIADO");
 				invoiceVo.setSunatStatus("ENVIADO");
 				invoicesRepository.save(invDao);
 				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
+			} else if (deliveryResponse.getResponseCode().charAt(0) == FAIL && deliveryResponse.getResponseDetailMsg().contains(SUNAT_ALREADY_RECEIVED_MSG)) {
+				SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(XmlSunat.consultInvoice(invoiceVo, basePath + "/CDR", globalProperties));
+				if (sunatSubmitServiceResponse.getResponseCode().charAt(0) == SUCCESS) {
+					invDao.setSunatStatus("ENVIADO");
+					invDao.setInvoiceHash(sunatSubmitServiceResponse.getHashCdr());
+					invDao.setSunatErrorStr(sunatSubmitServiceResponse.getResponseDetailMsg());
+					invoiceVo.setSunatStatus("ENVIADO");
+					invoiceVo.setInvoiceHash(sunatSubmitServiceResponse.getHashCdr());
+					invoiceVo.setSunatErrorStr(sunatSubmitServiceResponse.getResponseDetailMsg());
+					invoicesRepository.save(invDao);
+					logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
+				}
 			}
 			
 			return invoiceVo;

@@ -429,9 +429,12 @@ class InvoiceTableSummary extends React.Component {
 						
 						if (!bonusControlsEnabled) {
 							for (var i = 0; i < submittedInvoices.length; i++) {
-								if (!submittedInvoices[i].sunatValidated) {
-									invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
-									errorCount++;
+								
+								if (self.processingType == self.CONSTANTS.NORMAL_PROCESSING_TYPE) {
+									if (!submittedInvoices[i].sunatValidated) {
+										invoiceSequenceValidationErrorMsg += submittedInvoices[i].invoiceNumber + " ";
+										errorCount++;
+									}
 								}
 								
 								if (submittedInvoices[i].sunatStatus == self.CONSTANTS.PENDING_STATUS) {
@@ -661,7 +664,7 @@ class InvoicesTbl extends React.Component {
 		            { title: "IGV" },
 		            { title: "Forma Pago" },
 		            { title: "Total" },
-		            { title: "Nro hash" },
+		            { title: "Hash CDR" },
 		            { title: "Nro Bonus" },
 		            { title: "Bonus Status" },
 		            { title: "Puntos Bonus" },
