@@ -723,7 +723,7 @@ public class ApplicationService {
 				invoicesRepository.save(invDao);
 				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
 			} else if (deliveryResponse.getResponseCode().charAt(0) == FAIL && deliveryResponse.getResponseDetailMsg().contains(SUNAT_ALREADY_RECEIVED_MSG)) {
-				SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(XmlSunat.consultInvoice(invoiceVo, basePath + "/CDR", globalProperties));
+				SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(XmlSunat.consultInvoice(invoiceVo, basePath + "/CDR/", globalProperties));
 				if (sunatSubmitServiceResponse.getResponseCode().charAt(0) == SUCCESS) {
 					invDao.setSunatStatus("ENVIADO");
 					invDao.setInvoiceHash(sunatSubmitServiceResponse.getHashCdr());
