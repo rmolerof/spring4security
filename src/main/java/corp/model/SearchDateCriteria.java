@@ -11,6 +11,7 @@ public class SearchDateCriteria {
 	String loadInvoiceAmountCriteria;
 	boolean voidedInvoicesIncluded;
 	boolean bonusControlsEnabled;
+	boolean isDiscountUser;
 	
 	public String getShift() {
 		return shift;
@@ -60,5 +61,12 @@ public class SearchDateCriteria {
 	public void setBonusControlsEnabled(boolean bonusControlsEnabled) {
 		this.bonusControlsEnabled = bonusControlsEnabled;
 	}
+	public boolean isDiscountUser() {
+		return isDiscountUser;
+	}
+	public void setDiscountUser(boolean isDiscountUser) {
+		this.isDiscountUser = isDiscountUser;
+	}
+	
 
 }

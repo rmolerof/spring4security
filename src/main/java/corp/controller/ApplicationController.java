@@ -173,7 +173,13 @@ public class ApplicationController {
 			return ResponseEntity.badRequest().body(result);
 		}
 		
-		List<GasPricesVo> gasPricesVo = userService.findPricesByDates(search.getDateEnd(), search.getDateBeg());
+		List<GasPricesVo> gasPricesVo = null;
+		if (search.isDiscountUser()) {
+			gasPricesVo = userService.findPricesByDates(search.getDateEnd(), search.getDateBeg());
+		} else {
+			gasPricesVo = userService.findLastPriceByName(ApplicationService.DISCOUNT_USERNAME);
+		}
+		
 		if(gasPricesVo.isEmpty()) {
 			result.setMsg("No hay precios de productos en base de datos");
 		} else {
@@ -222,7 +228,11 @@ public class ApplicationController {
 		}
 		
 		List<GasPricesVo> gasPricesVos = userService.submitGasPricesVo(gasPricesVoCriteria, gasPricesVoCriteria.getSaveOrUpdate());
-		userService.updateGasPricesToStation(gasPricesVoCriteria);
+		
+		if (!gasPricesVoCriteria.getPumpAttendantNames().trim().equals(ApplicationService.DISCOUNT_USERNAME)) {
+			userService.updateGasPricesToStation(gasPricesVoCriteria);
+		}
+		
 		if(gasPricesVos.isEmpty()) {
 			result.setMsg("No hay Stock para la fecha: " + gasPricesVoCriteria.getDate());
 		} else {

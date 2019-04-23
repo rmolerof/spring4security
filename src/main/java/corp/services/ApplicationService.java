@@ -85,6 +85,7 @@ public class ApplicationService {
 	public static final String PRIMAX_CODE_G90 = "00000000000021";
 	public static final String PRIMAX_CODE_G95 = "00000000000031";
 	public static final String SUNAT_ALREADY_RECEIVED_MSG = "El comprobante fue registrado previamente con otros datos";
+	public static final String DISCOUNT_USERNAME = "DESCUENTO"; 
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -492,6 +493,27 @@ public class ApplicationService {
 	
 	public List<GasPricesVo> findPricesByDates(String dateEnd, String dateBeg) {
 		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatest(dateEnd, dateBeg);
+		List<GasPricesVo> gasPricesVos = null;
+		
+		if (gasPricesDaos.size() == 0) {
+			List<GasPrice> defaultPrices = new LinkedList<GasPrice>();
+			defaultPrices.add(new GasPrice("d2", 0D, 0D));
+			defaultPrices.add(new GasPrice("g90", 0D, 0D));
+			defaultPrices.add(new GasPrice("g95", 0D, 0D));
+			GasPricesVo gasPricesVo = new GasPricesVo("", new Date(), defaultPrices);
+			gasPricesVos = Stream.of(gasPricesVo).collect(Collectors.toList());
+		} else {
+			gasPricesVos = gasPricesDaos.stream().map(gasPricesDao -> {
+				GasPricesVo gasPricesVo = new GasPricesVo(gasPricesDao);
+				return gasPricesVo;
+			}).collect(Collectors.toList());
+		}
+		
+		return gasPricesVos;
+	}
+	
+	public List<GasPricesVo> findLastPriceByName(String name){
+		List<GasPricesDao> gasPricesDaos = gasPricesRepository.findLatestByName(name);
 		List<GasPricesVo> gasPricesVos = null;
 		
 		if (gasPricesDaos.size() == 0) {
