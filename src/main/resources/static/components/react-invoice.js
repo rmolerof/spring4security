@@ -95,7 +95,8 @@ class TableDashboard extends React.Component {
 	  sunatStatus: 'PENDIENTE',
 	  bonusStatus: '',
 	  sunatValidated: false,
-	  showNewInvoiceButton: true
+	  showNewInvoiceButton: true,
+	  productPriceEditorEnabled: false
     };
     
     this.CONSTANTS = {
@@ -187,6 +188,23 @@ class TableDashboard extends React.Component {
 	    this.setState({ cashPmt: cashPmt});
 	    this.setState({ change: change});
   }
+  
+  priceD2Change = (evt) => {
+	  this.setState({ priceD2: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+  }
+  
+  priceG90Change = (evt) => {
+	  this.setState({ priceG90: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+  }
+  
+  priceG95Change = (evt) => {
+	  this.setState({ priceG95: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
+  }
+  
+  productPriceEditorEnabledToggle() {
+	  this.setState({productPriceEditorEnabled: !this.state.productPriceEditorEnabled});
+  }
+  
   solesG90Change = (evt) => {
 	  this.setState({ solesG90: evt.target.value  == '' ? '': ((evt.target.value * 100).toFixed() / 100) });
 	  this.setState({ galsG90: evt.target.value == '' ? '': ((evt.target.value / this.state.priceG90 * 100).toFixed() / 100) });
@@ -1753,21 +1771,60 @@ class TableDashboard extends React.Component {
 			                              <td className="hidden-xs"> 01-MAX-D BIODIESEL B.A (UV) </td>
 			                              <td className="hidden-sm-up"> D2 </td>
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric"  value={this.state.galsD2} onChange={this.galsD2Change}/> </td>
-			                              {this.state.gasPrices && <td>S/ {this.state.priceD2} </td>} 
+			                              {this.state.gasPrices && <td>
+				                              <table>
+								      			  <tbody>
+						      			  			<tr>
+									      			    <td>{!this.state.productPriceEditorEnabled && <div>S/ {this.state.priceD2}</div>}
+												      		{this.state.productPriceEditorEnabled && <div><input type="number" step="0.01" style={{width: '80px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Precio" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.priceD2} onChange={this.priceD2Change}/></div>}
+				  										</td>
+									      			    <td>{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
+											      			<a type="button" onClick={this.productPriceEditorEnabledToggle.bind(this)} >&nbsp;<i className="fa fa-edit"></i></a>}
+									      			    </td> 
+										      	    </tr>
+								      			  </tbody>
+							      			  </table>
+						      			  </td>}
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesD2} onChange={this.solesD2Change}/> </td>
 			                          </tr>
 			                          <tr>
 			                              <td className="hidden-xs"> 02-GASOHOL PRIMAX 90 </td>
 			                              <td className="hidden-sm-up"> G90 </td>
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG90} onChange={this.galsG90Change}/> </td>
-			                              {this.state.gasPrices && <td>S/ {this.state.priceG90} </td>}
+			                              {this.state.gasPrices && <td>
+				                              <table>
+								      			  <tbody>
+						      			  			<tr>
+									      			    <td>{!this.state.productPriceEditorEnabled && <div>S/ {this.state.priceG90}</div>}
+												      		{this.state.productPriceEditorEnabled && <div><input type="number" step="0.01" style={{width: '80px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Precio" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.priceG90} onChange={this.priceG90Change}/></div>}
+				  										</td>
+									      			    <td>{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
+											      			<a type="button" onClick={this.productPriceEditorEnabledToggle.bind(this)} >&nbsp;<i className="fa fa-edit"></i></a>}
+									      			    </td> 
+										      	    </tr>
+								      			  </tbody>
+							      			  </table>
+						      			  </td>}
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG90} onChange={this.solesG90Change}/> </td>
 			                          </tr>
 			                          <tr>
 			                              <td className="hidden-xs"> 03-GASOHOL PRIMAX 95 </td>
 			                              <td className="hidden-sm-up"> G95 </td>
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Galones" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.galsG95} onChange={this.galsG95Change}/> </td> 
-			                              {this.state.gasPrices && <td>S/ {this.state.priceG95} </td>}
+			                              {this.state.gasPrices && <td>
+				                              <table>
+								      			  <tbody>
+						      			  			<tr>
+									      			    <td>{!this.state.productPriceEditorEnabled && <div>S/ {this.state.priceG95}</div>}
+												      		{this.state.productPriceEditorEnabled && <div><input type="number" step="0.01" style={{width: '80px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Precio" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.priceG95} onChange={this.priceG95Change}/></div>}
+				  										</td>
+									      			    <td>{!this.state.invoiceNumberEditorButtonDisabled && this.state.user.roles.ROLE_ADMIN &&
+											      			<a type="button" onClick={this.productPriceEditorEnabledToggle.bind(this)} >&nbsp;<i className="fa fa-edit"></i></a>}
+									      			    </td> 
+										      	    </tr>
+								      			  </tbody>
+							      			  </table>
+						      			  </td>}
 			                              <td className="hidden-sm-up"> <input type="number" step="0.01" style={{width: '100px', textAlign: 'right', borderColor: 'black'}} pattern="[0-9]*" className="form-control" placeholder="Soles" onKeyPress={this.onKeyPress} inputMode="numeric" value={this.state.solesG95} onChange={this.solesG95Change}/> </td>
 			                          </tr>
 			                      </tbody>
