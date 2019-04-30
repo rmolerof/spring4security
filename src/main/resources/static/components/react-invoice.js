@@ -1460,6 +1460,12 @@ class TableDashboard extends React.Component {
 		
 		if (formIsValid) {
 			
+			// Gets instant date when validation is success and ready for submission
+			if (saveOrUpdate == 'save') {
+				invoiceVo.date = new Date();
+				self.setState({date: invoiceVo.date});
+			}
+			
 			self.setState({emailingGif: true});
 			
 			jQuery.ajax({
