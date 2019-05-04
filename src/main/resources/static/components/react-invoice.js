@@ -1996,7 +1996,8 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12 col-xs-12 text-center">
 	                  <div className="invoice-logo">
 	                  	  {/*<img src="../assets/pages/media/invoice/lajoya.png" className="img-responsive" style={{display: 'block', margin: 'auto'}} alt="" />*/}
-	                      <span className="uppercase" >{this.state.selectedOption} Electrónica</span><br/>
+	                      {(this.state.selectedOption == 'boleta') && <span className="uppercase" >{this.state.selectedOption} de Venta Electrónica</span>}
+	                      {(this.state.selectedOption != 'boleta') && <span className="uppercase" >{this.state.selectedOption} Electrónica</span>}<br/>
 	                      <span className="uppercase" >{this.state.invoiceNumber}</span>
 	                    	  
 	                  </div>
