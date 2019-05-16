@@ -37,11 +37,11 @@ public class ScheduledTasks {
 	@Scheduled(cron = "0 30 8 * * WED,SAT") 
 	public void submitSunat() {
 		
-		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
+		logger.info("Cron job: submitSunat is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 		
 		applicationService.submitInvoicesToSunat(SubmitInvoiceGroupCriteria.NORMAL, Utils.getDateAtMidnightNDaysAgo(3, globalProperties.getTimeZoneID()));
 				
-		logger.info("Cron job: submitBonus is ending at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
+		logger.info("Cron job: submitSunat is ending at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
 	}
 	
 	// 8 am => 3am GMT-5 Lima Peru 
