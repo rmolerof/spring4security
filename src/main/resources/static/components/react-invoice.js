@@ -110,7 +110,7 @@ class TableDashboard extends React.Component {
 	    BLANK_FACTURA_NUMBER: 'F001-XXXXXXXX',
 	    ZERO_FACTURA_NUMBER: 'F001-00000000',
 	    BONUS_NUMBER_PREFIX: '7027661',
-	    EDIT_ENABLED_TIME_IN_MS: 600000,
+	    EDIT_ENABLED_TIME_IN_MS: 900000,
 	    LARGE_AMOUNT: 500.00,
 	    PENDING_STATUS: 'PENDIENTE',
 	    SENT_STATUS: 'ENVIADO',
@@ -311,7 +311,7 @@ class TableDashboard extends React.Component {
   editInvoiceDate() {
 	  this.setState({invoiceDateEditorDisabled: !this.state.invoiceDateEditorDisabled});
 	  
-	  this.setState({invoiceDateDisp: moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A').toString()});
+	  this.setState({invoiceDateDisp: moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A').toString()});
   }
   
   _validateInvoiceNumber(invoiceNumber) {
@@ -352,12 +352,12 @@ class TableDashboard extends React.Component {
 	    }
 
 	    var time = datetimeSplit[1] + ' ' + datetimeSplit[2];
-	    re = /^((0[1-9])|(1[0-2])):([0-5][0-9])\s([AP]M)?$/;
+	    re = /^((0[1-9])|(1[0-2])):([0-5][0-9]):([0-5][0-9])\s([AP]M)?$/;
 	    if(time != '' && !re.test(time)) {
 	      return 'Invalid Date';
 	    }
 	    
-	    var validatedDate = moment.tz(date + " " + time, 'DD/MM/YYYY hh:mm A', 'America/Lima').toDate();
+	    var validatedDate = moment.tz(date + " " + time, 'DD/MM/YYYY hh:mm:ss A', 'America/Lima').toDate();
 	    
 	    return validatedDate;
   }
@@ -1686,7 +1686,7 @@ class TableDashboard extends React.Component {
 				    	      <div className="col-md-2">
 					              <div className="form-group">
 					                  <label className="control-label">Fecha Referencia</label>
-					                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>
+					                  <input type="text" id="lastName" className="form-control" placeholder="Fecha y Hora" value={`${moment(this.state.dateOfInvoiceModified).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A')}`}  readOnly/>
 					              </div>
 					          </div>
 			    	          <div className="col-md-2">
@@ -1713,9 +1713,9 @@ class TableDashboard extends React.Component {
 				    	      <div className="col-md-1">
 					              <div className="form-group">
 					                  <label className="control-label">Fecha&nbsp; {this.state.user.roles.ROLE_ADMIN && <a type="button" onClick={this.editInvoiceDate.bind(this)} > <i className="fa fa-edit"></i></a>}</label>
-					                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm A')}`}  readOnly/>}
+					                  {this.state.invoiceDateEditorDisabled && <input type="text" id="lastName" className="form-control" value={`${moment(this.state.date).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A')}`}  readOnly/>}
 					                  
-					            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
+					            	  {!this.state.invoiceDateEditorDisabled && <input type="text" className="form-control" style={{borderColor: '#26344b'}} placeholder="DD/MM/AAAA hh:mm:ss [A,P]M" onKeyPress={this.onKeyPress} value={this.state.invoiceDateDisp} onChange={this.invoiceDateDispChange}/>}
 					              </div>
 					          </div>
 			    	      	  <div className="col-md-2">
