@@ -479,7 +479,7 @@ public class Utils {
 	public static Date getDateBeginningOfMonth(Integer month_number, String timeZoneId) {
 		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
 		tempDate.set(Calendar.MONTH, month_number);
-		tempDate.set(Calendar.DAY_OF_MONTH, 0);
+		tempDate.set(Calendar.DAY_OF_MONTH, 1);
 		
 		return tempDate.getTime();
 	}
@@ -487,7 +487,7 @@ public class Utils {
 	public static Date getDateBeginningOfNextMonth(Integer month_number, String timeZoneId) {
 		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
 		tempDate.set(Calendar.MONTH, month_number + 1);
-		tempDate.set(Calendar.DAY_OF_MONTH, 0);
+		tempDate.set(Calendar.DAY_OF_MONTH, 1);
 		
 		return tempDate.getTime();
 	}
