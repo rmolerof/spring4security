@@ -47,78 +47,80 @@ class TableDashboard extends React.Component {
 				
 				var stationSummaryData = data.result;
 				var tableData = [];
-				
 				var count = 0;
-				for (var i = 0; i <= stationSummaryData.length - 1; i++) {
-					
-					var expenseOrCredit = {};
-					var visas = 0.0;
-					var credits = 0.0;
-					var deposits = 0.0;
-					var expensesOnly = 0.0;
-					var expensesAndCredits = 0.0;
-					var isEditDisabled = false;
-					for(var j = 0; j < stationSummaryData[i].expensesAndCredits.length; j++) {
-						expenseOrCredit = stationSummaryData[i].expensesAndCredits[j];
-						if (expenseOrCredit.item.toLowerCase().includes("visa")) {
-							visas += expenseOrCredit.amt;
+				
+				if (stationSummaryData) {
+					for (var i = 0; i <= stationSummaryData.length - 1; i++) {
+						
+						var expenseOrCredit = {};
+						var visas = 0.0;
+						var credits = 0.0;
+						var deposits = 0.0;
+						var expensesOnly = 0.0;
+						var expensesAndCredits = 0.0;
+						var isEditDisabled = false;
+						for(var j = 0; j < stationSummaryData[i].expensesAndCredits.length; j++) {
+							expenseOrCredit = stationSummaryData[i].expensesAndCredits[j];
+							if (expenseOrCredit.item.toLowerCase().includes("visa")) {
+								visas += expenseOrCredit.amt;
+							}
+							if (expenseOrCredit.item.toLowerCase().includes("deposito") || expenseOrCredit.item.toLowerCase().includes("depósito")) {
+								deposits += expenseOrCredit.amt;
+							}
+							if (expenseOrCredit.item.toLowerCase().includes("credito") || expenseOrCredit.item.toLowerCase().includes("crédito")) {
+								credits += expenseOrCredit.amt;
+							}
+							expensesAndCredits += expenseOrCredit.amt;
 						}
-						if (expenseOrCredit.item.toLowerCase().includes("deposito") || expenseOrCredit.item.toLowerCase().includes("depósito")) {
-							deposits += expenseOrCredit.amt;
+						expensesAndCredits = expensesAndCredits.toFixed(2);
+						expensesOnly = (expensesAndCredits - visas - deposits - credits).toFixed(2);
+						deposits = deposits.toFixed(2);
+						credits = credits.toFixed(2);
+						visas = visas.toFixed(2);
+						
+						if ((!stationSummaryData[i].totalDay.totalDayUnits.d2 || stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay == 0)
+								&& (!stationSummaryData[i].totalDay.totalDayUnits.g90 || stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay == 0) 
+										&& (!stationSummaryData[i].totalDay.totalDayUnits.g95 || stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay == 0)) {
+							isEditDisabled = true;
 						}
-						if (expenseOrCredit.item.toLowerCase().includes("credito") || expenseOrCredit.item.toLowerCase().includes("crédito")) {
-							credits += expenseOrCredit.amt;
-						}
-						expensesAndCredits += expenseOrCredit.amt;
+						
+						count++;
+						var row = [
+							count,
+							moment(stationSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
+							stationSummaryData[i].pumpAttendantNames,
+							stationSummaryData[i].shiftDate,
+							stationSummaryData[i].shift,
+							stationSummaryData[i].tanks["d2"].gals,
+							stationSummaryData[i].tanks["g90"].gals,
+							stationSummaryData[i].tanks["g95"].gals,
+							stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalSolesRevenueDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalSolesRevenueDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalSolesRevenueDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalProfitDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalProfitDay: '',
+							stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalProfitDay: '',
+							stationSummaryData[i].totalDay.totalSolesRevenueDay,
+							stationSummaryData[i].totalCash,
+							expensesAndCredits,
+							visas,
+							deposits,
+							credits,
+							expensesOnly,
+							(stationSummaryData[i].totalDay.totalSolesRevenueDay - stationSummaryData[i].totalCash - expensesAndCredits).toFixed(2),
+							stationSummaryData[i].totalDay.totalProfitDay,
+							isEditDisabled ? "": "<a class='view' href='/inventory-control-page?id=" + stationSummaryData[i].shiftDate + "-" + stationSummaryData[i].shift + "'>Editar</a>"
+							];
+						
+						tableData[i] = row;
 					}
-					expensesAndCredits = expensesAndCredits.toFixed(2);
-					expensesOnly = (expensesAndCredits - visas - deposits - credits).toFixed(2);
-					deposits = deposits.toFixed(2);
-					credits = credits.toFixed(2);
-					visas = visas.toFixed(2);
 					
-					if ((!stationSummaryData[i].totalDay.totalDayUnits.d2 || stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay == 0)
-							&& (!stationSummaryData[i].totalDay.totalDayUnits.g90 || stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay == 0) 
-									&& (!stationSummaryData[i].totalDay.totalDayUnits.g95 || stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay == 0)) {
-						isEditDisabled = true;
-					}
-					
-					count++;
-					var row = [
-						count,
-						moment(stationSummaryData[i].date).tz('America/Lima').format('DD/MM/YYYY hh:mm A'),
-						stationSummaryData[i].pumpAttendantNames,
-						stationSummaryData[i].shiftDate,
-						stationSummaryData[i].shift,
-						stationSummaryData[i].tanks["d2"].gals,
-						stationSummaryData[i].tanks["g90"].gals,
-						stationSummaryData[i].tanks["g95"].gals,
-						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalGalsSoldDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalGalsSoldDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalGalsSoldDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalSolesRevenueDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalSolesRevenueDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalSolesRevenueDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.d2 ? stationSummaryData[i].totalDay.totalDayUnits.d2.totalProfitDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g90 ? stationSummaryData[i].totalDay.totalDayUnits.g90.totalProfitDay: '',
-						stationSummaryData[i].totalDay.totalDayUnits.g95 ? stationSummaryData[i].totalDay.totalDayUnits.g95.totalProfitDay: '',
-						stationSummaryData[i].totalDay.totalSolesRevenueDay,
-						stationSummaryData[i].totalCash,
-						expensesAndCredits,
-						visas,
-						deposits,
-						credits,
-						expensesOnly,
-						(stationSummaryData[i].totalDay.totalSolesRevenueDay - stationSummaryData[i].totalCash - expensesAndCredits).toFixed(2),
-						stationSummaryData[i].totalDay.totalProfitDay,
-						isEditDisabled ? "": "<a class='view' href='/inventory-control-page?id=" + stationSummaryData[i].shiftDate + "-" + stationSummaryData[i].shift + "'>Editar</a>"
-						];
-					
-					tableData[i] = row;
+					self.setState({stationSummaryData: tableData});
 				}
 				
-				
-				self.setState({stationSummaryData: tableData});
 				self.setState({processingGif: false});
 			},
 			error: function(e){

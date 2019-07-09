@@ -63,6 +63,8 @@ public class InvoiceVo {
 	private String bonusAccumulatedPoints = "";
 	private String sunatStatus = "";
 	private boolean sunatValidated = false;
+	private Date sunatSubmittedDate = new Date(0L);
+	private Date bonusSubmittedDate = new Date(0L);
 	
 	public InvoiceVo() {
 		super();
@@ -117,6 +119,8 @@ public class InvoiceVo {
 		this.bonusAccumulatedPoints = new String(invoiceDao.getBonusAccumulatedPoints());
 		this.sunatValidated = new Boolean(invoiceDao.isSunatValidated());
 		this.clientEmailAddress = new String(null != invoiceDao.getClientEmailAddress() ? invoiceDao.getClientEmailAddress(): "");
+		this.sunatSubmittedDate = new Date(invoiceDao.getSunatSubmittedDate().getTime());
+		this.bonusSubmittedDate = new Date(invoiceDao.getBonusSubmittedDate().getTime());
 	}
 	
 	public static double roundTwo(double amt) {
@@ -436,6 +440,22 @@ public class InvoiceVo {
 
 	public void setBonusAccumulatedPoints(String bonusAccumulatedPoints) {
 		this.bonusAccumulatedPoints = bonusAccumulatedPoints;
+	}
+
+	public Date getSunatSubmittedDate() {
+		return sunatSubmittedDate;
+	}
+
+	public void setSunatSubmittedDate(Date sunatSubmittedDate) {
+		this.sunatSubmittedDate = sunatSubmittedDate;
+	}
+
+	public Date getBonusSubmittedDate() {
+		return bonusSubmittedDate;
+	}
+
+	public void setBonusSubmittedDate(Date bonusSubmittedDate) {
+		this.bonusSubmittedDate = bonusSubmittedDate;
 	}
 
 }

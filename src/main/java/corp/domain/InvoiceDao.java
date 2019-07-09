@@ -70,6 +70,9 @@ public class InvoiceDao {
 	private String bonusAccumulatedPoints = "";
 	private String sunatStatus = "";
 	private boolean sunatValidated = false;
+	private Date sunatSubmittedDate = new Date(0L);
+	private Date bonusSubmittedDate = new Date(0L);
+	
 
 	public InvoiceDao() {
 		super();
@@ -128,6 +131,8 @@ public class InvoiceDao {
 		this.bonusAccumulatedPoints = new String(invoiceVo.getBonusAccumulatedPoints());
 		this.sunatValidated = new Boolean(invoiceVo.isSunatValidated());
 		this.clientEmailAddress = new String(null != invoiceVo.getClientEmailAddress() ? invoiceVo.getClientEmailAddress(): "");
+		this.sunatSubmittedDate = new Date(invoiceVo.getSunatSubmittedDate().getTime());
+		this.bonusSubmittedDate = new Date(invoiceVo.getBonusSubmittedDate().getTime());
 	}
 
 	public ObjectId getId() {
@@ -488,6 +493,22 @@ public class InvoiceDao {
 
 	public void setBonusAccumulatedPoints(String bonusAccumulatedPoints) {
 		this.bonusAccumulatedPoints = bonusAccumulatedPoints;
+	}
+
+	public Date getSunatSubmittedDate() {
+		return sunatSubmittedDate;
+	}
+
+	public void setSunatSubmittedDate(Date sunatSubmittedDate) {
+		this.sunatSubmittedDate = sunatSubmittedDate;
+	}
+
+	public Date getBonusSubmittedDate() {
+		return bonusSubmittedDate;
+	}
+
+	public void setBonusSubmittedDate(Date bonusSubmittedDate) {
+		this.bonusSubmittedDate = bonusSubmittedDate;
 	}
 
 }

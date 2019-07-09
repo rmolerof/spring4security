@@ -24,6 +24,8 @@ class InvoiceTableSummary extends React.Component {
       bonusControlsEnabled: false,
       processPendingInvoicesTillDate: '',
       processPendingInvoicesTillDateStyle: {color: 'black'},
+      motiveCd: '',
+      motiveCdDescription: ''
     };
     
     this.CONSTANTS = {
@@ -208,8 +210,10 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].total,
 						invoicesSummaryData[i].invoiceHash,
 						invoicesSummaryData[i].bonusNumber,
+						invoicesSummaryData[i].bonusSubmittedDate > 0 ? moment(invoicesSummaryData[i].bonusSubmittedDate).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A'): "",
 						bonusStatus,
 						invoicesSummaryData[i].bonusAccumulatedPoints,
+						invoicesSummaryData[i].sunatSubmittedDate > 0 ? moment(invoicesSummaryData[i].sunatSubmittedDate).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A'): "",
 						sunatStatus,
 						invoicesSummaryData[i].user.name,
 						editInvoice,
@@ -519,6 +523,17 @@ class InvoiceTableSummary extends React.Component {
 	  this.setState({[name]: value});
   }
   
+  motiveCdHandleChange(event) {
+	  var month_code = event.target.value;
+	  this.setState({motiveCd: month_code});
+
+	  var index = event.nativeEvent.target.selectedIndex;
+	  this.setState({motiveCdDescription: event.nativeEvent.target[index].text.toUpperCase()});
+	  
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: month_code, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled}); 
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: month_code, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
+  }
+  
   render() {    
 	  
 	let processingTypeButtonText = this.CONSTANTS.NORMAL_PROCESSING_TYPE;
@@ -572,6 +587,24 @@ class InvoiceTableSummary extends React.Component {
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_PENDING_INVOICES")}>Total Pendientes</button>
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_MONTH")}>Total Mes</button>
 	              <button type="button" className="btn btn-default margin-bottom-5" onClick={this._loadInvoicesByCriteria("TOTAL_INVOICES_YEAR")}>Total Año</button>
+	          </div>&nbsp;
+	          
+	          <div className="form-group">
+	              <select className="ticket-assign form-control input-medium selectHeight" style={{marginBottom: '5px', borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
+	              	  <option value="">Busque por Mes</option>
+	              	  <option value="00-MONTH">Enero</option>
+	              	  <option value="01-MONTH">Febrero</option>
+	              	  <option value="02-MONTH">Marzo</option>
+	              	  <option value="03-MONTH">Abril</option>
+	              	  <option value="04-MONTH">Mayo</option>
+	              	  <option value="05-MONTH">Junio</option>
+	              	  <option value="06-MONTH">Julio</option>
+	              	  <option value="07-MONTH">Agosto</option>
+	              	  <option value="08-MONTH">Septiembre</option>
+	              	  <option value="09-MONTH">Octubre</option>
+	              	  <option value="10-MONTH">Noviembre</option>
+	              	  <option value="11-MONTH">Diciembre</option>
+	              </select>
 	          </div>&nbsp;
 		     
 	          <div className="form-group" style={{marginBottom: '5px'}}>
@@ -666,8 +699,10 @@ class InvoicesTbl extends React.Component {
 		            { title: "Total" },
 		            { title: "Hash CDR" },
 		            { title: "Nro Bonus" },
+		            { title: "Fecha Envío Bonus" },
 		            { title: "Bonus Status" },
 		            { title: "Puntos Bonus" },
+		            { title: "Fecha Envío Sunat" },
 		            { title: "Sunat Status" },
 		            { title: "Usuario" },
 		            { title: "Editar" },

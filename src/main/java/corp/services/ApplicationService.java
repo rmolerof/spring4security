@@ -246,11 +246,14 @@ public class ApplicationService {
 	public List<Station> findStationStatusByDates(String dateEnd, String dateBeg) {
 		
 		List<StationDao> stationDaos = stationRepository.findLatest(dateEnd, dateBeg, 0);
+		List<Station> stations = new ArrayList<Station>();
 		
-		List<Station> stations = stationDaos.stream().map(stationDao -> {
-			Station station = new Station(stationDao);
-			return station;
-		}).collect(Collectors.toList());
+		if (null != stationDaos) {
+			stations = stationDaos.stream().map(stationDao -> {
+				Station station = new Station(stationDao);
+				return station;
+			}).collect(Collectors.toList());
+		}
 		
 		return stations;
 	}
@@ -683,8 +686,10 @@ public class ApplicationService {
 			if (bonusPointsOperationResponse.getResponseFlag().equals("0")) {
 				invDao.setBonusStatus("ENVIADO");
 				invDao.setBonusAccumulatedPoints(bonusPointsOperationResponse.getAccumulatedPoints());
+				invDao.setBonusSubmittedDate(new Date());
 				invoiceVo.setBonusStatus("ENVIADO");
 				invoiceVo.setBonusAccumulatedPoints(bonusPointsOperationResponse.getAccumulatedPoints());
+				invoiceVo.setBonusSubmittedDate(invDao.getBonusSubmittedDate());
 				invoicesRepository.save(invDao);
 				logger.info("Bonus points for invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
 			}
@@ -719,7 +724,9 @@ public class ApplicationService {
 
 			if (deliveryResponse.getResponseCode().charAt(0) == SUCCESS) {
 				invDao.setSunatStatus("ENVIADO");
+				invDao.setSunatSubmittedDate(new Date());
 				invoiceVo.setSunatStatus("ENVIADO");
+				invoiceVo.setSunatSubmittedDate(invDao.getSunatSubmittedDate());
 				invoicesRepository.save(invDao);
 				logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
 			} else if (deliveryResponse.getResponseCode().charAt(0) == FAIL && deliveryResponse.getResponseDetailMsg().contains(SUNAT_ALREADY_RECEIVED_MSG)) {
@@ -728,9 +735,11 @@ public class ApplicationService {
 					invDao.setSunatStatus("ENVIADO");
 					invDao.setInvoiceHash(sunatSubmitServiceResponse.getHashCdr());
 					invDao.setSunatErrorStr(sunatSubmitServiceResponse.getResponseDetailMsg());
+					invDao.setSunatSubmittedDate(new Date());
 					invoiceVo.setSunatStatus("ENVIADO");
 					invoiceVo.setInvoiceHash(sunatSubmitServiceResponse.getHashCdr());
 					invoiceVo.setSunatErrorStr(sunatSubmitServiceResponse.getResponseDetailMsg());
+					invoiceVo.setSunatSubmittedDate(invDao.getSunatSubmittedDate());
 					invoicesRepository.save(invDao);
 					logger.info("Invoice " + invoiceVo.getInvoiceNumber() + " marked as ENVIADO.");
 				}
