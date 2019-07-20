@@ -49,11 +49,12 @@ public class TestInvoices {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void submitBonusFromDateTillDateTest() {
 
-		Date fromDate = Utils.getDateAtMidnightNDaysAgo(13, globalProperties.getTimeZoneID());
-		Date untilDate = Utils.getDateAtMidnightNDaysAgo(8, globalProperties.getTimeZoneID());
+		Date fromDate = Utils.getDateAtMidnightNDaysAgo(15, globalProperties.getTimeZoneID());
+		Date untilDate = Utils.getDateAtMidnightNDaysAgo(14, globalProperties.getTimeZoneID());
 		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesWithBonusNumberFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
 		
 		/*int count = 0;
@@ -66,5 +67,22 @@ public class TestInvoices {
 		}*/
 		
 		userService.processInvoicesByBonus(invoiceDaos);
+	}
+	
+	@Test
+	public void manipulateSunatFromDateTillDateTest() {
+
+		Date fromDate = Utils.getDateAtMidnightNDaysAgo(16, globalProperties.getTimeZoneID());
+		Date untilDate = Utils.getDateAtMidnightNDaysAgo(14, globalProperties.getTimeZoneID());
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesForSunatFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
+		
+		int sunatCount = 0;
+		for (InvoiceDao invoiceDao: invoiceDaos) {
+			
+			logger.info(++sunatCount + " Sunat Sent Manually: " + invoiceDao.getInvoiceNumber() + ", Status: " + invoiceDao.getSunatStatus());
+			invoiceDao.setSunatStatus("ANULADO");
+			invoicesRepository.save(invoiceDao);
+		}
+		
 	}
 }

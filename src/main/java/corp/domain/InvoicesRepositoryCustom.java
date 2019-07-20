@@ -17,6 +17,8 @@ public interface InvoicesRepositoryCustom {
 	
 	List<InvoiceDao> findAllInvoicesWithBonusNumberFromDateTillDate(Date fromDate, Date tillDate, Sort sort);
 	
+	List<InvoiceDao> findAllInvoicesForSunatFromDateTillDate(Date fromDate, Date tillDate, Sort sort);
+	
 	InvoiceDao findLastSentInvoice(String invoiceType);
 	
 	InvoiceDao findFirstByInvoiceNumberNotVoided(String invoiceNumber);
