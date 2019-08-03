@@ -115,7 +115,9 @@ class TableDashboard extends React.Component {
 	    PENDING_STATUS: 'PENDIENTE',
 	    SENT_STATUS: 'ENVIADO',
 	    VOIDED_STATUS: 'ANULADO',
-	    FAILURE_STATUS: 'FALLADO'
+	    FAILURE_STATUS: 'FALLADO',
+	    COMPANY_RUC: '20501568776',
+	    RELOAD_BONUS_FLAG: false
 	    
     }
   }
@@ -726,8 +728,15 @@ class TableDashboard extends React.Component {
 							self.setState({clientName: data.result.razonSocial});
 							self.setState({clientEmailAddress: data.result.correoElectronico});
 							self.setState({clientNameDisabled: true});
-							self.setState({bonusNumber: data.result.bonusNumber});
-							self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7)});
+							
+							if (self.CONSTANTS.RELOAD_BONUS_FLAG) {
+								self.setState({bonusNumber: data.result.bonusNumber});
+								self.setState({bonusNumberDisp: data.result.bonusNumber.substring(7)});
+							} else {
+								self.setState({bonusNumber: ""});
+								self.setState({bonusNumberDisp: ""});
+							}
+							
 							if (data.result.direccionS.trim() == "" || data.result.direccionS.trim() == "-") {
 								self.setState({clientAddressDisabled: false});
 							} else {
@@ -1385,6 +1394,9 @@ class TableDashboard extends React.Component {
 			    if (clientDocNumber && clientDocNumber >= 0) {
 		    		if (clientDocNumber.toString().length  != 11) {
 		    			errors["clientDocNumber"] = "RUC debe tener 11 digitos";
+		    			formIsValid = false;
+		    		} else if (clientDocNumber.toString() == self.CONSTANTS.COMPANY_RUC) {
+		    			errors["clientDocNumber"] = "RUC no puede ser de la Empresa Emisora";
 		    			formIsValid = false;
 		    		}
 			    } else {
