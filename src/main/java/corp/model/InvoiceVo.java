@@ -15,6 +15,8 @@ public class InvoiceVo {
 	private ObjectId id;
 	private User user;
 	private String invoiceNumber;
+	// merchant
+	private String myRuc;
 	// customer
 	private String clientDocNumber;
 	private String clientName;
@@ -456,6 +458,14 @@ public class InvoiceVo {
 
 	public void setBonusSubmittedDate(Date bonusSubmittedDate) {
 		this.bonusSubmittedDate = bonusSubmittedDate;
+	}
+
+	public String getMyRuc() {
+		return myRuc;
+	}
+
+	public void setMyRuc(String myRuc) {
+		this.myRuc = myRuc;
 	}
 
 }

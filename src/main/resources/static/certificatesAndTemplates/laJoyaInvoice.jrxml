@@ -59,7 +59,7 @@ LA JOYA DE SANTA ISABEL E.I.R.L.]]></text>
 Lima - Lima - Ate
 Teléfono: +51 356 0345
 www.grifoslajoya.com
-RUC: 20501568776
+RUC: 10210111056
 DNI	]]></text>
 				</staticText>
 			</frame>
@@ -72,7 +72,7 @@ DNI	]]></text>
 			<staticText>
 				<reportElement x="390" y="33" width="100" height="17" uuid="3e8ac9cc-56bf-4942-b83a-cf16c2fc3a22"/>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[RUC: 20501568776]]></text>
+				<text><![CDATA[RUC: 10210111056]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="390" y="46" width="100" height="30" uuid="a82d8c39-6504-4a52-ad2d-6cab777e332f"/>
@@ -404,7 +404,7 @@ DNI	]]></text>
 			<componentElement>
 				<reportElement x="62" y="426" width="150" height="100" uuid="22fdb3ee-1d6b-4bfb-aeaa-1aa5ab19396f"/>
 				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<jr:codeExpression><![CDATA["20501568776" + "|" + $F{invoiceType} + "|" + $F{invoiceNumber}.substring(0, 4) + "|" + $F{invoiceNumber}.substring(5, 13) + "|" + $F{totalIGV} + "|" + $F{total} + "|" + new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{date}) + "|" + $F{clientDocType} + "|" + $F{clientDocNumber}]]></jr:codeExpression>
+					<jr:codeExpression><![CDATA["10210111056" + "|" + $F{invoiceType} + "|" + $F{invoiceNumber}.substring(0, 4) + "|" + $F{invoiceNumber}.substring(5, 13) + "|" + $F{totalIGV} + "|" + $F{total} + "|" + new SimpleDateFormat("dd/MM/yyyy hh:mm a").format($F{date}) + "|" + $F{clientDocType} + "|" + $F{clientDocNumber}]]></jr:codeExpression>
 				</jr:QRCode>
 			</componentElement>
 			<line>

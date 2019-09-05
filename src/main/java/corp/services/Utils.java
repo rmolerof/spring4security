@@ -272,6 +272,8 @@ public class Utils {
 		
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+		invoiceVo.setMyRuc(globalProperties.getMyRuc());
+		
 		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 		
 		if (new File(xmlPath).isFile()) {

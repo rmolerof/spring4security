@@ -116,7 +116,7 @@ class TableDashboard extends React.Component {
 	    SENT_STATUS: 'ENVIADO',
 	    VOIDED_STATUS: 'ANULADO',
 	    FAILURE_STATUS: 'FALLADO',
-	    COMPANY_RUC: '20501568776',
+	    COMPANY_RUC: '10210111056',
 	    RELOAD_BONUS_FLAG: false
 	    
     }
@@ -1513,7 +1513,7 @@ class TableDashboard extends React.Component {
 					
 						var qrcode1 = new QRCode("qrcode1");
 						qrcode1.clear();
-						qrcode1.makeCode("20501568776|" + 
+						qrcode1.makeCode("10210111056|" + 
 								invoiceVoResp.invoiceType + "|" + 
 								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
 								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
@@ -1526,7 +1526,7 @@ class TableDashboard extends React.Component {
 						
 						var qrcode2 = new QRCode("qrcode2");
 						qrcode2.clear();
-						qrcode2.makeCode("20501568776|" + 
+						qrcode2.makeCode("10210111056|" + 
 								invoiceVoResp.invoiceType + "|" + 
 								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
 								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
@@ -1538,7 +1538,7 @@ class TableDashboard extends React.Component {
 								);
 						var qrcode3 = new QRCode("qrcode3");
 						qrcode3.clear();
-						qrcode3.makeCode("20501568776|" + 
+						qrcode3.makeCode("10210111056|" + 
 								invoiceVoResp.invoiceType + "|" + 
 								invoiceVoResp.invoiceNumber.substring(0, 4) + "|" + 
 								invoiceVoResp.invoiceNumber.substring(5, invoiceVoResp.invoiceNumber.length) + "|" +
@@ -2017,7 +2017,7 @@ class TableDashboard extends React.Component {
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="company-address text-center">
 	                      <span className="bold uppercase" style={{fontSize: 13}}>La Joya de Santa Isabel EIRL</span>
-	                      <br/> <span className="muted"> RUC: 20501568776  </span>
+	                      <br/> <span className="muted"> RUC: 10210111056  </span>
 	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
 	                      <br/> Lima - Lima - Ate 
 	                      <br/> Teléfono: +51 356 0345

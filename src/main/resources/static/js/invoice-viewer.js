@@ -114,7 +114,7 @@ function fire_ajax_submit() {
 	            
 	            var qrcode1 = new QRCode("qrcode1");
 				qrcode1.clear();
-				qrcode1.makeCode("20501568776|" + 
+				qrcode1.makeCode("10210111056|" + 
 						data.result[0].invoiceType + "|" + 
 						data.result[0].invoiceNumber.substring(0, 4) + "|" + 
 						data.result[0].invoiceNumber.substring(5, data.result[0].invoiceNumber.length) + "|" +

@@ -52,7 +52,7 @@ public class SendEmailServiceTest {
 		String from = globalProperties.getEmailFrom();
 		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - FACTURA: F001-0000001";
 		String body = "Buen Día. Adjuntado está su comprobante de pago de FACTURA: F001-0000001";
-		List<String> attachmentPaths = Arrays.asList(new String("C:/Users/mecam/xmlsSunat/20501568776-07-B001-00000022.XML"), new String("C:/Users/mecam/xmlsSunat/invoice.pdf"));
+		List<String> attachmentPaths = Arrays.asList(new String("C:/Users/mecam/xmlsSunat/10210111056-07-B001-00000022.XML"), new String("C:/Users/mecam/xmlsSunat/invoice.pdf"));
 		
 		utils.sendEmail(to, from, subject, body, attachmentPaths);
 		assertTrue(true);
@@ -130,7 +130,7 @@ public class SendEmailServiceTest {
 			multipart.addBodyPart(messageBodyPart);
 
 			// Part two is attachment
-			addAttachment(multipart, "C:/Users/mecam/xmlsSunat/20501568776-07-B001-00000022.XML");
+			addAttachment(multipart, "C:/Users/mecam/xmlsSunat/10210111056-07-B001-00000022.XML");
 			addAttachment(multipart, "C:/Users/mecam/xmlsSunat/invoice.pdf");
 
 			// Send the complete message parts

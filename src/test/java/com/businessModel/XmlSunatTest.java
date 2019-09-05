@@ -57,7 +57,7 @@ public class XmlSunatTest {
     	conexionCPEStatusCDRTest();
     	// To recover hash CPE
     	/*String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\";
-    	String NombreCPE = "20501568776-03-B001-00000038";
+    	String NombreCPE = "10210111056-03-B001-00000038";
     	System.out.println(valorXML(RutaArchivo + NombreCPE, "", "DigestValue"));*/
     }
 	
@@ -106,6 +106,7 @@ public class XmlSunatTest {
 		
 		// Nota de Crédito
 		InvoiceVo invoiceVo3 = new InvoiceVo();
+		invoiceVo3.setMyRuc("10210111056");
 		invoiceVo3.setInvoiceNumber("F020-80000001");
 		invoiceVo3.setDate(new Date());
 		invoiceVo3.setClientAddress("319 Oakmont Dr");
@@ -143,10 +144,10 @@ public class XmlSunatTest {
 	
 	public static void conexionCPEConsultaTicketTest() {
 		
-		String ruc = "20501568776";
+		String ruc = "10210111056";
 		String UsuarioSol = "LAJOYA40";
 		String PassSol = "Lajoya@4";
-		String rucCliente = "20501568776";
+		String rucCliente = "10210111056";
 		String tipoDocumento = "01";
 		String serie = "F001";
 		String numero = "108";
@@ -157,7 +158,7 @@ public class XmlSunatTest {
 	
 	public static void conexionCPEStatusCDRTest() throws SAXException, IOException, ParserConfigurationException {
 		
-		String ruc = "20501568776";
+		String ruc = "10210111056";
 		String UsuarioSol = "LAJOYA40";
 		String PassSol = "Lajoya@4";
 		String tipoDocumento = "";
@@ -168,7 +169,7 @@ public class XmlSunatTest {
 			tipoDocumento = "03";
 		}
 		String RutaWS = "https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService";
-		String NombreCPE = "20501568776-" + tipoDocumento + "-" + nro_comprobante ;
+		String NombreCPE = "10210111056-" + tipoDocumento + "-" + nro_comprobante ;
 		String NombreCDR = "R-" + NombreCPE;
 		String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\CDR\\";
 		
@@ -176,7 +177,7 @@ public class XmlSunatTest {
 		System.out.println("\n" + response);
 		
 		//String RutaArchivo = "C:\\Users\\mecam\\xmlsSunat\\";
-    	//String NombreCPE = "20501568776-03-B001-00000038";
+    	//String NombreCPE = "10210111056-03-B001-00000038";
     	//System.out.println("Hash CPE: " + valorXML(RutaArchivo + NombreCPE, "", "DigestValue"));
 		
 	}
@@ -214,7 +215,7 @@ public class XmlSunatTest {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = "C:\\sunat\\20501568776-01-F020-8000";
+		String rutaXML = "C:\\sunat\\10210111056-01-F020-8000";
 		String rutaFirma = "C:\\Users\\mecam\\.m2\\repository\\sunat\\FIRMABETA.pfx";
 		String passFirma = "123456";
 
@@ -224,11 +225,11 @@ public class XmlSunatTest {
 	}
 	
 	public static void envio() {
-        String ruc = "20501568776";
+        String ruc = "10210111056";
         String UsuSol = "MODDATOS";// pruebas de sunat
         String PassSol = "moddatos";// password de prueba de sunat
-        String NombreCPE = "20501568776-01-F020-8000"; // xml firmado
-        String NombreCDR = "R-20501568776-01-F020-8000"; // respuesta
+        String NombreCPE = "10210111056-01-F020-8000"; // xml firmado
+        String NombreCDR = "R-10210111056-01-F020-8000"; // respuesta
         String RutaArchivo = "C:\\sunat\\";
         String RutaWS = "https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService";
         //PRODUCCION=https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService

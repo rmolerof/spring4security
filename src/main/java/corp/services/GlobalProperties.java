@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("globalProperties")
 public class GlobalProperties {
 	
+	private String commercialName;
 	private String emailUsername;
 	private String emailPassword;
 	private String emailHost;
@@ -106,5 +107,10 @@ public class GlobalProperties {
 	public void setSunatConsultInvoiceURL(String sunatConsultInvoiceURL) {
 		this.sunatConsultInvoiceURL = sunatConsultInvoiceURL;
 	}
-	
+	public String getCommercialName() {
+		return commercialName;
+	}
+	public void setCommercialName(String commercialName) {
+		this.commercialName = commercialName;
+	}
 }

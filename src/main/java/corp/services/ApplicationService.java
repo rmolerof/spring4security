@@ -703,6 +703,7 @@ public class ApplicationService {
 	public List<InvoiceVo> processInvoicesBySunat(List<InvoiceDao> invoiceDaos){
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			invoiceVo.setMyRuc(globalProperties.getMyRuc());
 			
 			// Sunat
 			String basePath = "";
