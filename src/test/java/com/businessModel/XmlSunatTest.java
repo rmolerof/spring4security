@@ -161,7 +161,7 @@ public class XmlSunatTest {
 		String UsuarioSol = "LAJOYA40";
 		String PassSol = "Lajoya@4";
 		String tipoDocumento = "";
-		String nro_comprobante = "B001-00011088";
+		String nro_comprobante = "F001-00009600";
 		if (nro_comprobante.charAt(0) == 'F') {
 			tipoDocumento = "01";
 		} else {

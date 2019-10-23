@@ -294,5 +294,15 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		
 		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
 	}
+	
+	public List<InvoiceDao> resetAllInvoicesForSunatTillDate(Date tillDate, Sort sort) {
+		
+		Date tillDateLocal = Utils.transformZoneToGMTDate(Utils.addNDaysToDate(tillDate, 1), globalProperties.getTimeZoneID());
+		Date fromDateLocal = Utils.transformZoneToGMTDate(Utils.addNDaysToDate(Utils.getDateAtMidnightNDaysAgo(30, globalProperties.getTimeZoneID()), 1), globalProperties.getTimeZoneID());
+		
+		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("date").gte(fromDateLocal).lt(tillDateLocal).and("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceHash").is("");
+		
+		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
+	}
 
 }

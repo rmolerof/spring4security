@@ -70,6 +70,7 @@ public class TestInvoices {
 	}
 	
 	@Test
+	@Ignore
 	public void manipulateSunatFromDateTillDateTest() {
 
 		Date fromDate = Utils.getDateAtMidnightNDaysAgo(16, globalProperties.getTimeZoneID());
@@ -81,6 +82,22 @@ public class TestInvoices {
 			
 			logger.info(++sunatCount + " Sunat Sent Manually: " + invoiceDao.getInvoiceNumber() + ", Status: " + invoiceDao.getSunatStatus());
 			invoiceDao.setSunatStatus("ANULADO");
+			invoicesRepository.save(invoiceDao);
+		}
+		
+	}
+	
+	@Test
+	public void resetSunatFromDateTillDateTest() {
+
+		Date untilDate = Utils.getDateAtMidnightNDaysAgo(2, globalProperties.getTimeZoneID());
+		List<InvoiceDao> invoiceDaos = invoicesRepository.resetAllInvoicesForSunatTillDate(untilDate, new Sort(Sort.Direction.ASC, "date"));
+		
+		int sunatCount = 0;
+		for (InvoiceDao invoiceDao: invoiceDaos) {
+			
+			logger.info(++sunatCount + " Sunat Sent Manually: " + invoiceDao.getInvoiceNumber() + ", Status: " + invoiceDao.getSunatStatus());
+			invoiceDao.setSunatStatus("PENDIENTE");
 			invoicesRepository.save(invoiceDao);
 		}
 		
