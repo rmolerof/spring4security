@@ -1,5 +1,7 @@
 package test.invoices;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +53,25 @@ public class TestInvoices {
 	
 	@Ignore
 	@Test
+	public void cleanupBonusByBonusNumberList() throws ParseException {
+		
+		String untilDateStr = "30/10/2019";
+		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse(untilDateStr);  
+		
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllPendingInvoicesTillDateForBonus(untilDate, new Sort(Sort.Direction.ASC, "date"));
+		
+		int count = 0;
+		for (InvoiceDao invoiceDao: invoiceDaos) {
+			
+			logger.info(++count + " updated: " + invoiceDao.getInvoiceNumber() + ", "  + invoiceDao.getBonusNumber() + ", " + invoiceDao.getBonusStatus());
+			//invoiceDao.setBonusNumber("");
+			invoiceDao.setBonusStatus("ENVIADO");
+			invoicesRepository.save(invoiceDao);
+		}
+	}
+	
+	@Ignore
+	@Test
 	public void submitBonusFromDateTillDateTest() {
 
 		Date fromDate = Utils.getDateAtMidnightNDaysAgo(15, globalProperties.getTimeZoneID());
@@ -88,6 +109,7 @@ public class TestInvoices {
 	}
 	
 	@Test
+	@Ignore
 	public void resetSunatFromDateTillDateTest() {
 
 		Date untilDate = Utils.getDateAtMidnightNDaysAgo(2, globalProperties.getTimeZoneID());

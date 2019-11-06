@@ -45,7 +45,7 @@ public class ScheduledTasks {
 	}
 	
 	// 8 am => 3am GMT-5 Lima Peru 
-	@Scheduled(cron = "0 0 8 * * SAT") 
+	@Scheduled(cron = "0 0 8 * * WED,SAT") 
 	public void submitBonus() {
 		
 		logger.info("Cron job: submitBonus is starting at " + dateFormat.format(Utils.transformGMTDateToZone(new Date(), globalProperties.getTimeZoneID())));
