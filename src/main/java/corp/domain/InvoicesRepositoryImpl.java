@@ -263,8 +263,10 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	public List<InvoiceDao> findAllPendingInvoicesTillDate(Date processPendingInvoicesTillDate, Sort sort) {
 
 		Criteria pendingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.PENDING_STATUS).and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		Criteria crdMissingInvoicesCriteriaTillDate = Criteria.where("sunatStatus").is(ApplicationService.SENT_STATUS).and("invoiceHash").is("").and("date").lt(Utils.transformZoneToGMTDate(Utils.addNDaysToDate(processPendingInvoicesTillDate, 1), globalProperties.getTimeZoneID()));
+		Criteria pendingAndCrdMissingInvoices = new Criteria().orOperator(pendingInvoicesCriteriaTillDate, crdMissingInvoicesCriteriaTillDate);
 		
-		return findInvoicesByCriteria(pendingInvoicesCriteriaTillDate, sort);
+		return findInvoicesByCriteria(pendingAndCrdMissingInvoices, sort);
 	}
 
 	public List<InvoiceDao> findAllPendingInvoicesTillDateForBonus(Date processPendingInvoicesTillDate, Sort sort) {
