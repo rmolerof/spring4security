@@ -92,17 +92,20 @@ public class TestInvoices {
 	
 	@Test
 	@Ignore
-	public void manipulateSunatFromDateTillDateTest() {
-
-		Date fromDate = Utils.getDateAtMidnightNDaysAgo(16, globalProperties.getTimeZoneID());
-		Date untilDate = Utils.getDateAtMidnightNDaysAgo(14, globalProperties.getTimeZoneID());
+	public void manipulateSunatFromDateTillDateTest() throws ParseException {
+		 
+		//Date fromDate = Utils.getDateAtMidnightNDaysAgo(16, globalProperties.getTimeZoneID());
+		//Date untilDate = Utils.getDateAtMidnightNDaysAgo(14, globalProperties.getTimeZoneID());
+		
+		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("25/12/2019"); 
+		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("28/12/2019"); 
 		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesForSunatFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
 		
 		int sunatCount = 0;
 		for (InvoiceDao invoiceDao: invoiceDaos) {
 			
-			logger.info(++sunatCount + " Sunat Sent Manually: " + invoiceDao.getInvoiceNumber() + ", Status: " + invoiceDao.getSunatStatus());
-			invoiceDao.setSunatStatus("ANULADO");
+			logger.info(++sunatCount + " Sunat Set Manually, date: " + invoiceDao.getDate() + ", number: " + invoiceDao.getInvoiceNumber() + ", status: " + invoiceDao.getSunatStatus());
+			invoiceDao.setSunatStatus("ENVIADO");
 			invoicesRepository.save(invoiceDao);
 		}
 		
