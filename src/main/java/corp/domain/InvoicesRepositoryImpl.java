@@ -38,6 +38,8 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			return findTotalInvoicesCurrentYear(voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("MONTH")) {
 			return findTotalInvoicesByMonth(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.contains("YEARAGO")) {
+			return findTotalInvoicesByYear(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
 		}
 		
 		return new ArrayList<InvoiceDao>();
@@ -59,6 +61,8 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 			return findTotalInvoicesCurrentYearForBonus(voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("MONTH")) {
 			return findTotalInvoicesByMonthForBonus(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
+		} else if (loadInvoiceAmountCriteria.contains("YEARAGO")) {
+			return findTotalInvoicesByYearForBonus(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
 		}
 		
 		return new ArrayList<InvoiceDao>();
@@ -103,8 +107,35 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
+	public List<InvoiceDao> findTotalInvoicesByYear (Integer numberOfYearsAgo, boolean isVoidedInvoicesIncluded) {
+		
+		Criteria criteria = Criteria.where("date")
+				.gte(Utils.getDateAtMidnightByDayOfYearByYearsAgo(1, globalProperties.getTimeZoneID(), numberOfYearsAgo))
+				.lt(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID()));
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
 	public List<InvoiceDao> findTotalInvoicesCurrentYearForBonus(boolean isVoidedInvoicesIncluded) {
 		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findTotalInvoicesByYearForBonus (Integer numberOfYearsAgo, boolean isVoidedInvoicesIncluded) {
+		
+		Criteria criteria = Criteria.where("date")
+				.gte(Utils.getDateAtMidnightByDayOfYearByYearsAgo(1, globalProperties.getTimeZoneID(), numberOfYearsAgo))
+				.lt(Utils.getDateAtMidnightByDayOfYear(1, globalProperties.getTimeZoneID()))
+				.and("bonusNumber").ne("");
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);

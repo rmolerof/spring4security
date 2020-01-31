@@ -70,6 +70,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 				.withUser("hsandra").password("hsandra1234").roles("USER")
 				.and()
-				.withUser("jzuasnabar").password("jzuasnabar9182").roles("ADMIN");
+				.withUser("jzuasnabar").password("jzuasnabar9182").roles("ADMIN")
+				.and()
+				.withUser("jespinoza").password("jespinoza678").roles("USER")
+				.and()
+				.withUser("jromero").password("jromero912").roles("USER")
+				.and()
+				.withUser("jaguila").password("jaguila346").roles("USER")
+				.and()
+				.withUser("calvarado").password("calvarado789").roles("USER");
 	}
 }

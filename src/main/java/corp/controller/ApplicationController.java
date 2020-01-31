@@ -36,9 +36,9 @@ import corp.model.SubmitInvoiceGroupCriteria;
 import corp.model.User;
 import corp.rucdnisearch.DNIVo;
 import corp.rucdnisearch.RUCVo;
+import corp.services.ApplicationService;
 import corp.services.GlobalProperties;
 import corp.services.RucDniService;
-import corp.services.ApplicationService;
 import corp.services.Utils;
 
 @RestController
@@ -298,6 +298,45 @@ public class ApplicationController {
 			result.setMsg("Comprobante remitido: " + invoiceVos.get(0).getInvoiceNumber());
 		}
 		result.setResult(invoiceVos);
+		
+		return ResponseEntity.ok(result);
+		
+	}
+	
+	@PostMapping("/api/submitInvoiceToLegalAgent")
+	public ResponseEntity<?> submitInvoiceToLegalAgent(@Valid @RequestBody SubmitInvoiceGroupCriteria submitInvoiceGroupCriteria, Errors errors){
+		AjaxGetInvoiceResponse result = new AjaxGetInvoiceResponse();
+		InvoiceVo invoiceVo = null;
+		String sunatOrBonus = submitInvoiceGroupCriteria.isBonusControlsEnabled()? ApplicationService.BONUS: ApplicationService.SUNAT ;
+		
+		if(errors.hasErrors()) {
+			result.setMsg(errors.getAllErrors().stream().map(x->x.getDefaultMessage())
+					.collect(Collectors.joining(",")));
+		
+			return ResponseEntity.badRequest().body(result);
+		}
+		
+		if(submitInvoiceGroupCriteria.isBonusControlsEnabled()) {
+			invoiceVo = userService.submitInvoiceToBonus(submitInvoiceGroupCriteria.getInvoiceNumber());
+			if(null == invoiceVo) {
+				result.setMsg("No hay comprobantes para enviar");
+			} else if (invoiceVo.getBonusStatus().equalsIgnoreCase(ApplicationService.PENDING_STATUS)) {
+				result.setMsg("No se envió comprobante a " + sunatOrBonus + ". " + invoiceVo.getSunatErrorStr());
+			} else {
+				result.setMsg("Comprobante " + invoiceVo.getInvoiceNumber() + " remitido a " + sunatOrBonus);
+			}
+		} else {
+			invoiceVo = userService.submitInvoiceToSunat(submitInvoiceGroupCriteria.getInvoiceNumber());
+			if(null == invoiceVo) {
+				result.setMsg("No hay comprobantes para enviar");
+			} else if (invoiceVo.getSunatStatus().equalsIgnoreCase(ApplicationService.PENDING_STATUS)) {
+				result.setMsg("No se envió comprobante a " + sunatOrBonus + ". " + invoiceVo.getSunatErrorStr());
+			} else {
+				result.setMsg("Comprobante " + invoiceVo.getInvoiceNumber() + " remitido a " + sunatOrBonus);
+			}
+		}
+		
+		result.setResult(new ArrayList<InvoiceVo>(Arrays.asList(new InvoiceVo[] {invoiceVo})));
 		
 		return ResponseEntity.ok(result);
 		

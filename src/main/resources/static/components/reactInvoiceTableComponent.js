@@ -186,6 +186,18 @@ class InvoiceTableSummary extends React.Component {
 					
 					}
 					
+					var resendButtonVerbiage = "";
+					if (self.state.user.roles.ROLE_ADMIN) {
+						if (invoicesSummaryData[i].sunatStatus == self.CONSTANTS.PENDING_STATUS) {
+							resendButtonVerbiage = "<a class='resend' href=''>Enviar</a>";
+						} else {
+							resendButtonVerbiage = "<a class='resend' href=''>Reenviar</a>";
+						}
+					} else {
+						resendButtonVerbiage = "<a></a>";
+					}
+					
+					
 					count++;
 					var row = [
 						count,
@@ -218,6 +230,7 @@ class InvoiceTableSummary extends React.Component {
 						invoicesSummaryData[i].user.name,
 						editInvoice,
 						invoicesSummaryData[i].sunatStatus == self.CONSTANTS.PENDING_STATUS && self.state.user.roles.ROLE_ADMIN ? '<a class="delete" href="">Anular</a>': "<a ></a>",
+						resendButtonVerbiage		
 						];
 					
 					tableData[i] = row;
@@ -604,6 +617,7 @@ class InvoiceTableSummary extends React.Component {
 	              	  <option value="09-MONTH">Octubre</option>
 	              	  <option value="10-MONTH">Noviembre</option>
 	              	  <option value="11-MONTH">Diciembre</option>
+	              	  <option value="01-YEARAGO">Año Pasado</option>
 	              </select>
 	          </div>&nbsp;
 		     
@@ -626,7 +640,7 @@ class InvoiceTableSummary extends React.Component {
 	      </div>}
 	      
 	      {this.state && this.state.invoicesSummaryData &&
-	    	  <InvoicesTbl data={this.state.invoicesSummaryData}></InvoicesTbl>
+	    	  <InvoicesTbl data={this.state.invoicesSummaryData} bonusControlsEnabledFromParent={this.state.bonusControlsEnabled}></InvoicesTbl>
 		  }
 	      
 	      {this.state && this.state.invoicesSummaryConcarData &&
@@ -706,7 +720,8 @@ class InvoicesTbl extends React.Component {
 		            { title: "Sunat Status" },
 		            { title: "Usuario" },
 		            { title: "Editar" },
-		            { title: "Anular" }
+		            { title: "Anular" },
+		            { title: "(Re)Enviar" }
 			]
 		});
 		
@@ -833,6 +848,83 @@ class InvoicesTbl extends React.Component {
     			}, error: function(e){
     				console.log("ERROR: ", e);
     				self.setState({loadingGif: false});
+    			}	
+    		});  
+        });
+        
+        table.on('click', '.resend', function (e) {
+            e.preventDefault();
+            
+            var nRow = $(this).parents('tr')[0];
+            var invoiceNumber = nRow.cells[4].innerText;
+            var sunatStatus = nRow.cells[26].innerText;
+            var bonusStatus = nRow.cells[23].innerText;
+            var bonusNumber = nRow.cells[21].innerText;
+            var resendActionVerbiage = "";
+            var bonusOrSunatVerbiage = self.props.bonusControlsEnabledFromParent ? "BONUS": "SUNAT";
+            
+            if (self.props.bonusControlsEnabledFromParent) {
+            	if (bonusStatus == "PENDIENTE" && bonusNumber.trim()) {
+            		if (confirm("¿Está seguro de ENVIAR comprobante " + invoiceNumber + " para " + bonusOrSunatVerbiage + "?") == false) {
+                        return;
+                    }
+            	} else {
+            		alert("ERROR: Comprobante no está pendiente o no cuenta con número BONUS");
+            		return;
+            	}
+            } else {
+            	 resendActionVerbiage = sunatStatus == 'PENDIENTE'? "ENVIAR":"REENVIAR";
+            	 
+            	 if (confirm("¿Está seguro de " + resendActionVerbiage + " comprobante " + invoiceNumber + " para " + bonusOrSunatVerbiage + "?") == false) {
+                     return;
+                 }
+            }
+            
+            //oTable.fnDeleteRow(nRow);
+            //alert("Deleted! Do not forget to do some ajax to sync with backend :)");
+            
+    	    
+    	    var sunatSubmitCriteria = {};
+    	    sunatSubmitCriteria["invoiceNumber"] = invoiceNumber;
+			sunatSubmitCriteria["bonusControlsEnabled"] = self.props.bonusControlsEnabledFromParent;
+			sunatSubmitCriteria["processingType"] = 'NORMAL';
+			self.setState({loadingGif: true});
+    	    
+    		$.ajax({
+    			type: "POST",
+    			contentType: "application/json", 
+    			url:"/api/submitInvoiceToLegalAgent",
+    			data: JSON.stringify(sunatSubmitCriteria),
+    			datatype: 'json',
+    			cache: false,
+    			timeout: 600000,
+    			success: function(response) {
+    				
+    			   if (response.result[0].sunatStatus == "ENVIADO" && !sunatSubmitCriteria["bonusControlsEnabled"]) {
+    				   self.setState({loadingGif: false});
+	    			   nRow.cells[20].innerText = response.result[0].invoiceHash;
+	    			   nRow.cells[25].innerText = response.result[0].date > 0 ? moment(response.result[0].date).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A'): "";
+	    			   nRow.cells[26].innerHTML="<span class='label label-sm label-success'> ENVIADO </span>"
+	    			   nRow.cells[28].innerHTML="<a ></a>";
+	    			   nRow.cells[29].innerHTML="<a ></a>";
+	    				   
+	    			   alert("EXITO: " + response.msg);
+    			   } else if (response.result[0].bonusStatus == "ENVIADO" && sunatSubmitCriteria["bonusControlsEnabled"]) {
+    				   self.setState({loadingGif: false});
+	    			   nRow.cells[22].innerText = response.result[0].date > 0 ? moment(response.result[0].date).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A'): "";
+	    			   nRow.cells[23].innerHTML="<span class='label label-sm label-success'> ENVIADO </span>"
+	    			   nRow.cells[24].innerText = response.result[0].bonusAccumulatedPoints;
+	    			   nRow.cells[28].innerHTML="<a ></a>";
+	    			   nRow.cells[29].innerHTML="<a ></a>";
+	    			   
+	    			   alert("EXITO: " + response.msg);
+    			   } else {
+    				   alert("ERROR: " + response.msg);
+    			   }  		
+    			}, error: function(e){
+    				console.log("ERROR: ", e);
+    				self.setState({loadingGif: false});
+    				alert("ERROR: " + e.responseJSON.msg);
     			}	
     		});  
         });

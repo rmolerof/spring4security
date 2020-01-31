@@ -476,6 +476,14 @@ public class Utils {
 		return date.getTime();
 	}
 	
+	public static Date getDateAtMidnightByDayOfYearByYearsAgo(Integer dayOfTheYear, String timeZoneId, Integer numberOfYearsAgo) {
+		Calendar date = getCurrentCalendarAtMidnight(timeZoneId);
+		date.set(Calendar.DAY_OF_YEAR, dayOfTheYear);
+		date.add(Calendar.YEAR, -1 * numberOfYearsAgo);
+		
+		return date.getTime();
+	}
+	
 	public static Date getDateBeginningOfMonth(Integer month_number, String timeZoneId) {
 		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
 		tempDate.set(Calendar.MONTH, month_number);

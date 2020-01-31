@@ -85,6 +85,8 @@ public class ApplicationService {
 	public static final String PRIMAX_CODE_G90 = "00000000000021";
 	public static final String PRIMAX_CODE_G95 = "00000000000031";
 	public static final String SUNAT_ALREADY_RECEIVED_MSG = "El comprobante fue registrado previamente con otros datos";
+	public static final String SUNAT = "SUNAT";
+	public static final String BONUS = "BONUS";
 	
 	@Autowired
     private StationRepository stationRepository;
@@ -625,7 +627,32 @@ public class ApplicationService {
 		} else {
 			return new ArrayList<InvoiceVo>();
 		}
+	}
+	
+	public InvoiceVo submitInvoiceToSunat(String invoiceNumber) {
 		
+		InvoiceDao invoiceDao = null;
+		
+		invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNumber);
+		
+		if (null != invoiceDao) {
+			return processInvoicesBySunat(new ArrayList<InvoiceDao>(Arrays.asList(new InvoiceDao[] {invoiceDao}))).get(0);
+		} else {
+			return new InvoiceVo();
+		}
+	}
+	
+	public InvoiceVo submitInvoiceToBonus(String invoiceNumber) {
+		
+		InvoiceDao invoiceDao = null;
+		
+		invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNumber);
+		
+		if (null != invoiceDao) {
+			return processInvoicesByBonus(new ArrayList<InvoiceDao>(Arrays.asList(new InvoiceDao[] {invoiceDao}))).get(0);
+		} else {
+			return new InvoiceVo();
+		}
 	}
 	
 	public boolean validateInvoices(List<InvoiceDao> invoiceDaos, InvoiceDao lastSunatProcessedBoleta, InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito) {
