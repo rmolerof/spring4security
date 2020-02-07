@@ -33,7 +33,6 @@ public class XmlSunat {
 	
 	private static Logger logger = LogManager.getLogger(XmlSunat.class);
 	
-	public static final String myRUC = "20501568776";
 	public static final String timeZoneID = "America/Lima";
 	private static final String[] UNIDADES = { "", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", "siete ", "ocho ", "nueve " };
 	private static final String[] DECENAS  = { "diez ", "once ", "doce ", "trece ", "catorce ", "quince ", "dieciseis ",
@@ -88,18 +87,18 @@ public class XmlSunat {
 	    cpe.setPROVINCIA_CLIENTE("");//NUEVO UBL2.1   
 	    cpe.setDISTRITO_CLIENTE("");//NUEVO UBL2.1 
 	    //===============================
-	    cpe.setCIUDAD_CLIENTE("LIMA");
-	    cpe.setCOD_PAIS_CLIENTE("PE");
-	    cpe.setNRO_DOCUMENTO_EMPRESA(myRUC); // MI RUC
+	    cpe.setCIUDAD_CLIENTE(invoiceVo.getCompanyProvince());// create variable if different from company city
+	    cpe.setCOD_PAIS_CLIENTE(invoiceVo.getCompanyCountryCode());
+	    cpe.setNRO_DOCUMENTO_EMPRESA(invoiceVo.getMyRuc()); // MI RUC
 	    cpe.setTIPO_DOCUMENTO_EMPRESA("6");// RUC
-	    cpe.setNOMBRE_COMERCIAL_EMPRESA("LA JOYA DE SANTA ISABEL E.I.R.L.");// PONER RAZON SOCIAL SI NO ESTA DISPONIBLE EN SUNAT 
-	    cpe.setCODIGO_UBIGEO_EMPRESA("150103"); // ate  (anterior 070104)
-	    cpe.setDIRECCION_EMPRESA("AV. MIGUEL GRAU MZA. B LOTE. 1-2 (COSTADO DE REVISION TECNICA-GRIFO PRIMAX)");
-	    cpe.setDEPARTAMENTO_EMPRESA("LIMA");
-	    cpe.setPROVINCIA_EMPRESA("LIMA");
-	    cpe.setDISTRITO_EMPRESA("ATE");
-	    cpe.setCODIGO_PAIS_EMPRESA("PE");
-	    cpe.setRAZON_SOCIAL_EMPRESA("LA JOYA DE SANTA ISABEL E.I.R.L.");
+	    cpe.setNOMBRE_COMERCIAL_EMPRESA(invoiceVo.getCompanyName());// PONER RAZON SOCIAL SI NO ESTA DISPONIBLE EN SUNAT 
+	    cpe.setCODIGO_UBIGEO_EMPRESA(invoiceVo.getCompanyUbigeo()); // ate  (anterior 070104)
+	    cpe.setDIRECCION_EMPRESA(invoiceVo.getCompanyAddress());
+	    cpe.setDEPARTAMENTO_EMPRESA(invoiceVo.getCompanyState());
+	    cpe.setPROVINCIA_EMPRESA(invoiceVo.getCompanyProvince());
+	    cpe.setDISTRITO_EMPRESA(invoiceVo.getCompanyDistrict());
+	    cpe.setCODIGO_PAIS_EMPRESA(invoiceVo.getCompanyCountryCode());
+	    cpe.setRAZON_SOCIAL_EMPRESA(invoiceVo.getCompanyName());
 	    
 	    /*Cpe.setUSUARIO_SOL_EMPRESA("MODDATOS"); // OBTENER DE GERENTE
 	    Cpe.setPASS_SOL_EMPRESA("moddatos");//OBETENER DE GERENT
@@ -164,7 +163,7 @@ public class XmlSunat {
 		    lstCpe_Detalle.add(cpe_Detalle);
 	    }
 	    
-	    String rutaXMLCPE = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+	    String rutaXMLCPE = basePath + "/xmlsSunat/" + invoiceVo.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 	    boolean alreadyExists = new File(rutaXMLCPE).exists();
 	    
 	    // Create path if basePath doesn't exist
@@ -186,7 +185,7 @@ public class XmlSunat {
 
 		int flg_firma = 0;// (1=factura,boleta,nc,nd)<====>(0=retencion, percepcion)
 
-		String rutaXML = basePath + "/xmlsSunat/" + myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String rutaXML = basePath + "/xmlsSunat/" + invoiceVo.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String rutaFirma = basePath + "/certificatesAndTemplates/" + sunatSignatureFileName;
 		
 		boolean alreadyExists = new File(rutaFirma).exists();
@@ -206,10 +205,10 @@ public class XmlSunat {
 	 * BETA=https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService
 	 */
 	public static SunatSubmitServiceResponse envio(InvoiceVo invoiceVo, String basePath, String sunatInvoicingServiceURL, String sunatSolUsername, String sunatSolPassword) {
-		String NombreCPE = myRUC + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
+		String NombreCPE = invoiceVo.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber();
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = basePath + "/xmlsSunat/";
-		SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(ApiClienteEnvioSunat.ConexionCPE(myRUC, sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL));
+		SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(ApiClienteEnvioSunat.ConexionCPE(invoiceVo.getMyRuc(), sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL));
 		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatSubmitServiceResponse.toString() + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
 		return sunatSubmitServiceResponse;
 	}

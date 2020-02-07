@@ -23,6 +23,15 @@ public class InvoiceDao {
 	private String username;
 	@Indexed(unique = true)
 	private String invoiceNumber;
+	// merchant
+	private String myRuc;
+	private String companyName;
+	private String companyAddress;
+	private String companyState;
+	private String companyProvince;
+	private String companyDistrict;
+	private String companyCountryCode;
+	private String companyUbigeo;
 	// customer
 	private String clientDocNumber;
 	private String clientName;
@@ -509,6 +518,70 @@ public class InvoiceDao {
 
 	public void setBonusSubmittedDate(Date bonusSubmittedDate) {
 		this.bonusSubmittedDate = bonusSubmittedDate;
+	}
+
+	public String getMyRuc() {
+		return myRuc;
+	}
+
+	public void setMyRuc(String myRuc) {
+		this.myRuc = myRuc;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getCompanyAddress() {
+		return companyAddress;
+	}
+
+	public void setCompanyAddress(String companyAddress) {
+		this.companyAddress = companyAddress;
+	}
+
+	public String getCompanyState() {
+		return companyState;
+	}
+
+	public void setCompanyState(String companyState) {
+		this.companyState = companyState;
+	}
+
+	public String getCompanyProvince() {
+		return companyProvince;
+	}
+
+	public void setCompanyProvince(String companyProvince) {
+		this.companyProvince = companyProvince;
+	}
+
+	public String getCompanyDistrict() {
+		return companyDistrict;
+	}
+
+	public void setCompanyDistrict(String companyDistrict) {
+		this.companyDistrict = companyDistrict;
+	}
+
+	public String getCompanyCountryCode() {
+		return companyCountryCode;
+	}
+
+	public void setCompanyCountryCode(String companyCountryCode) {
+		this.companyCountryCode = companyCountryCode;
+	}
+
+	public String getCompanyUbigeo() {
+		return companyUbigeo;
+	}
+
+	public void setCompanyUbigeo(String companyUbigeo) {
+		this.companyUbigeo = companyUbigeo;
 	}
 
 }

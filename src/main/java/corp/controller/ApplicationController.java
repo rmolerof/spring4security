@@ -516,7 +516,7 @@ public class ApplicationController {
 		
 		String to = search.getClientEmailAddress().toLowerCase();
 		String from = globalProperties.getEmailFrom();
-		String subject = "GRIFO LA JOYA DE SANTA ISABEL E.I.R.L - " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
+		String subject = "GRIFO " + globalProperties.getCompanyName() + " - " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
 		String body = "Estimado Cliente. Buen día. Adjuntado está su comprobante: " + search.getSelectedOption().toUpperCase() + ": " + search.getInvoiceNumber();
 		List<String> attachmentPaths = Arrays.asList(new String(xmlPath), new String(pdfPath));
 		

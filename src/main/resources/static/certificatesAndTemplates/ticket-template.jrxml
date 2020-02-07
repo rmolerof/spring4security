@@ -38,6 +38,15 @@
 	<field name="truckPlateNumber" class="java.lang.String"/>
 	<field name="bonusNumber" class="java.lang.String"/>
 	<field name="username" class="java.lang.String"/>
+	<field name="myRuc" class="java.lang.String"/>
+	<field name="companyName" class="java.lang.String"/>
+	<field name="companyAddress" class="java.lang.String"/>
+	<field name="companyState" class="java.lang.String"/>
+	<field name="companyProvince" class="java.lang.String"/>
+	<field name="companyDistrict" class="java.lang.String"/>
+	<field name="companyCountryCode" class="java.lang.String"/>
+	<field name="companyUbigeo" class="java.lang.String"/>
+	
 	<title>
 		<band height="108">
 			<frame>

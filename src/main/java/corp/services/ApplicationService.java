@@ -158,7 +158,7 @@ public class ApplicationService {
 			stationDao = new StationDao();
 			
 			stationDao.setStationId(101L);
-			stationDao.setName("La Joya");
+			stationDao.setName(globalProperties.getShortCompanyName());
 			stationDao.setShift("2");
 			stationDao.setPumpAttendantNames("");
 			stationDao.setDate(new Date());
@@ -730,6 +730,7 @@ public class ApplicationService {
 	public List<InvoiceVo> processInvoicesBySunat(List<InvoiceDao> invoiceDaos){
 		List<InvoiceVo> invoiceVos = invoiceDaos.stream().map(invoiceDao -> {
 			InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+			Utils.populateCompanyDetailsVo(invoiceVo, globalProperties);
 			
 			// Sunat
 			String basePath = "";

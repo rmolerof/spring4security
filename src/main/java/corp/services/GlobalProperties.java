@@ -7,6 +7,14 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("globalProperties")
 public class GlobalProperties {
 	
+	private String companyName;
+	private String shortCompanyName;
+	private String companyAddress;
+	private String companyState;
+	private String companyProvince;
+	private String companyDistrict;
+	private String companyCountryCode;
+	private String companyUbigeo;
 	private String emailUsername;
 	private String emailPassword;
 	private String emailHost;
@@ -106,5 +114,52 @@ public class GlobalProperties {
 	public void setSunatConsultInvoiceURL(String sunatConsultInvoiceURL) {
 		this.sunatConsultInvoiceURL = sunatConsultInvoiceURL;
 	}
-	
+	public String getCompanyName() {
+		return companyName;
+	}
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	public String getShortCompanyName() {
+		return shortCompanyName;
+	}
+	public void setShortCompanyName(String shortCompanyName) {
+		this.shortCompanyName = shortCompanyName;
+	}
+	public String getCompanyUbigeo() {
+		return companyUbigeo;
+	}
+	public void setCompanyUbigeo(String companyUbigeo) {
+		this.companyUbigeo = companyUbigeo;
+	}
+	public String getCompanyAddress() {
+		return companyAddress;
+	}
+	public void setCompanyAddress(String companyAddress) {
+		this.companyAddress = companyAddress;
+	}
+	public String getCompanyState() {
+		return companyState;
+	}
+	public void setCompanyState(String companyState) {
+		this.companyState = companyState;
+	}
+	public String getCompanyProvince() {
+		return companyProvince;
+	}
+	public void setCompanyProvince(String companyProvince) {
+		this.companyProvince = companyProvince;
+	}
+	public String getCompanyDistrict() {
+		return companyDistrict;
+	}
+	public void setCompanyDistrict(String companyDistrict) {
+		this.companyDistrict = companyDistrict;
+	}
+	public String getCompanyCountryCode() {
+		return companyCountryCode;
+	}
+	public void setCompanyCountryCode(String companyCountryCode) {
+		this.companyCountryCode = companyCountryCode;
+	}
 }

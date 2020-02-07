@@ -245,9 +245,10 @@ public class Utils {
 			}
 		
 			try {
-				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/laJoyaInvoice.jrxml");
+				jasperReport = JasperCompileManager.compileReport(getBasePath() + "/certificatesAndTemplates/ticket-template.jrxml");
 				
 				InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
+				populateCompanyDetailsDao(invoiceDao, globalProperties);
 				invoiceDao.setDate(Utils.transformGMTDateToZone(invoiceDao.getDate(), globalProperties.getTimeZoneID()));
 				List<InvoiceDao> custList = Stream.of(invoiceDao).collect(Collectors.toList());
 				
@@ -272,6 +273,8 @@ public class Utils {
 		
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
+		invoiceVo.setMyRuc(globalProperties.getMyRuc());
+		
 		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
 		
 		if (new File(xmlPath).isFile()) {
@@ -531,6 +534,26 @@ public class Utils {
     public static Date transformZoneToGMTDate(Date date, String timeZoneID) {
 		TimeZone tz = TimeZone.getTimeZone(timeZoneID);
 		return new Date(date.getTime() - tz.getOffset(date.getTime()));
+	}
+    
+    public static void populateCompanyDetailsVo(InvoiceVo invoiceVo, GlobalProperties globalProperties) {
+		invoiceVo.setMyRuc(globalProperties.getMyRuc());
+		invoiceVo.setCompanyAddress(globalProperties.getCompanyAddress());
+		invoiceVo.setCompanyState(globalProperties.getCompanyState());
+		invoiceVo.setCompanyProvince(globalProperties.getCompanyProvince());
+		invoiceVo.setCompanyDistrict(globalProperties.getCompanyProvince());
+		invoiceVo.setCompanyCountryCode(globalProperties.getCompanyCountryCode());
+		invoiceVo.setCompanyUbigeo(globalProperties.getCompanyUbigeo());
+	}
+    
+    public static void populateCompanyDetailsDao(InvoiceDao invoiceDao, GlobalProperties globalProperties) {
+    	invoiceDao.setMyRuc(globalProperties.getMyRuc());
+    	invoiceDao.setCompanyAddress(globalProperties.getCompanyAddress());
+    	invoiceDao.setCompanyState(globalProperties.getCompanyState());
+    	invoiceDao.setCompanyProvince(globalProperties.getCompanyProvince());
+    	invoiceDao.setCompanyDistrict(globalProperties.getCompanyProvince());
+    	invoiceDao.setCompanyCountryCode(globalProperties.getCompanyCountryCode());
+    	invoiceDao.setCompanyUbigeo(globalProperties.getCompanyUbigeo());
 	}
 	
 }
