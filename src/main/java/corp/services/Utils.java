@@ -272,7 +272,7 @@ public class Utils {
 		
 		InvoiceDao invoiceDao = invoicesRepository.findFirstByInvoiceNumberNotVoided(invoiceNbr);
 		InvoiceVo invoiceVo = new InvoiceVo(invoiceDao);
-		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".XML";
+		String xmlPath = getBasePath() + "/xmlsSunat/" + globalProperties.getMyRuc() + "-" + invoiceVo.getInvoiceType() + "-" + invoiceVo.getInvoiceNumber() + ".xml";
 		
 		if (new File(xmlPath).isFile()) {
 			logger.info("File found in local memory: " + xmlPath);

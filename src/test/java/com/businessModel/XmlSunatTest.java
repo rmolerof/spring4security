@@ -23,18 +23,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.bean.CpeBean;
-import com.bean.Cpe_DetalleBean;
-
-import apiclienteenviosunat.ApiClienteEnvioSunat;
 import corp.Application;
 import corp.domain.InvoicesRepository;
 import corp.model.InvoiceVo;
 import corp.services.ApplicationService;
 import corp.services.GlobalProperties;
 import corp.sunat.XmlSunat;
-import firmacpesunat.FirmaCPESunat;
-import generadorxmlcpe.CPESunat;
+import corp.sunat.electronica.ApiClienteEnvioSunat;
+import corp.sunat.electronica.CPESunat;
+import corp.sunat.electronica.FirmaCPESunat;
+import corp.sunat.electronica.beans.CpeBean;
+import corp.sunat.electronica.beans.Cpe_DetalleBean;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -195,7 +194,7 @@ public class XmlSunatTest {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
-            Document doc = dbf.newDocumentBuilder().parse(new FileInputStream(rutaArchivo + ".XML"), "ISO-8859-1");//origen
+            Document doc = dbf.newDocumentBuilder().parse(new FileInputStream(rutaArchivo + ".xml"), "ISO-8859-1");//origen
             doc.getDocumentElement().normalize();
             if (Nspace.length() > 0) {
                 rta = doc.getDocumentElement().getElementsByTagNameNS("*", TagName).item(0).getTextContent();//cbc:ResponseCode
@@ -314,6 +313,6 @@ public class XmlSunatTest {
 	    cpe_Detalle.setPRECIO_SIN_IMPUESTO(625.00);
 	    lstCpe_Detalle.add(cpe_Detalle);
 	    
-	    int rta = CPESunat.GenerarXMLCPE("C:\\sunat\\BETA\\20100066603-03-B020-8000.XML", cpe, lstCpe_Detalle);
+	    int rta = CPESunat.GenerarXMLCPE("C:\\sunat\\BETA\\20100066603-03-B020-8000.xml", cpe, lstCpe_Detalle);
 	}	   
 }
