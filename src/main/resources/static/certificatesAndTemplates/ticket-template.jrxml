@@ -41,36 +41,96 @@
 	<field name="myRuc" class="java.lang.String"/>
 	<field name="companyName" class="java.lang.String"/>
 	<field name="companyAddress" class="java.lang.String"/>
+	<field name="companyAddress2" class="java.lang.String"/>
 	<field name="companyState" class="java.lang.String"/>
 	<field name="companyProvince" class="java.lang.String"/>
 	<field name="companyDistrict" class="java.lang.String"/>
 	<field name="companyCountryCode" class="java.lang.String"/>
 	<field name="companyUbigeo" class="java.lang.String"/>
-	
+	<field name="companyPhoneNumber" class="java.lang.String"/>
+	<field name="companyUrl" class="java.lang.String"/>
 	<title>
 		<band height="108">
 			<frame>
 				<reportElement mode="Opaque" x="0" y="-14" width="305" height="106" backcolor="#006699" uuid="61b26b08-1e16-4ac0-9f4e-54cdb9fcb3d5"/>
 				<staticText>
-					<reportElement x="20" y="10" width="272" height="43" forecolor="#FFFFFF" uuid="9bca019e-5344-41a2-b1e1-233b3b2a3ed0"/>
+					<reportElement x="10" y="10" width="272" height="43" forecolor="#FFFFFF" uuid="9bca019e-5344-41a2-b1e1-233b3b2a3ed0"/>
 					<textElement textAlignment="Center">
 						<font size="14" isBold="true"/>
 					</textElement>
-					<text><![CDATA[GRIFO
-LA JOYA DE SANTA ISABEL E.I.R.L.]]></text>
+					<text><![CDATA[GRIFO]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="54" y="50" width="196" height="58" forecolor="#FFFFFF" uuid="f20c60f6-d6cc-48c1-be84-abb796c67763"/>
-					<textElement textAlignment="Center">
+					<reportElement positionType="Float" x="95" y="50" width="196" height="58" forecolor="#FFFFFF" uuid="f20c60f6-d6cc-48c1-be84-abb796c67763"/>
+					<textElement textAlignment="Left">
 						<font size="8" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Av. Miguel Grau Mza B Lote 1-2
-Lima - Lima - Ate
-Teléfono: +51 356 0345
-www.grifoslajoya.com
-RUC: 20501568776
-DNI	]]></text>
+					<text><![CDATA[
+
+Teléfono:
+
+RUC: 	]]></text>
 				</staticText>
+				<textField>
+					<reportElement x="33" y="29" width="272" height="43" forecolor="#FFFFFF" uuid="b1fcd61e-85c8-4e32-a44f-c539254bf3c3">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement>
+						<font size="14" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{companyName}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="34" y="51" width="232" height="13" forecolor="#FFFFFF" uuid="6b5fe925-f84e-48ba-8efd-93697f15a161">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font size="8" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{companyAddress}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="109" y="61" width="107" height="13" forecolor="#FFFFFF" uuid="dad0b9f2-2580-413a-bda5-4f700c17045a">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font size="8" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{companyAddress2}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="130" y="70" width="111" height="13" forecolor="#FFFFFF" uuid="a7801eeb-c917-44b2-949c-9143a74e04ff">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font size="8" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{companyPhoneNumber}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="118" y="90" width="111" height="13" forecolor="#FFFFFF" uuid="c63eb29c-059c-4c9a-9320-814147f44271">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font size="8" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{myRuc}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="95" y="80" width="111" height="13" forecolor="#FFFFFF" uuid="fc46ab6c-2609-4546-8e59-0dab9ab9bc70">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font size="8" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{companyUrl}]]></textFieldExpression>
+				</textField>
 			</frame>
 			<rectangle>
 				<reportElement x="350" y="0" width="175" height="76" uuid="737fa893-6399-406b-b260-1c8d71d47c7a"/>
@@ -79,9 +139,9 @@ DNI	]]></text>
 				<reportElement x="350" y="21" width="175" height="1" uuid="9760dcbd-6fd2-4752-9828-eefc864f7336"/>
 			</line>
 			<staticText>
-				<reportElement x="390" y="33" width="100" height="17" uuid="3e8ac9cc-56bf-4942-b83a-cf16c2fc3a22"/>
+				<reportElement x="356" y="33" width="100" height="17" uuid="3e8ac9cc-56bf-4942-b83a-cf16c2fc3a22"/>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[RUC: 20501568776]]></text>
+				<text><![CDATA[RUC:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="390" y="46" width="100" height="30" uuid="a82d8c39-6504-4a52-ad2d-6cab777e332f"/>
@@ -110,6 +170,13 @@ DNI	]]></text>
 				</textElement>
 				<text><![CDATA[ ELECTRÓNICA]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="423" y="33" width="100" height="18" uuid="0dfd2623-b009-48dd-aee1-9ff70237b560"/>
+				<textElement textAlignment="Left">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{myRuc}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<columnHeader>
@@ -319,7 +386,7 @@ DNI	]]></text>
 				<textFieldExpression><![CDATA[String.format("%.2f", $F{electronicPmt})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="267" y="215" width="100" height="18" uuid="4d996301-7d05-4f29-b1c2-fa2f9624fbe2"/>
+				<reportElement x="267" y="211" width="100" height="18" uuid="4d996301-7d05-4f29-b1c2-fa2f9624fbe2"/>
 				<text><![CDATA[Efectivo:]]></text>
 			</staticText>
 			<textField>
@@ -470,7 +537,7 @@ DNI	]]></text>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
-				<text><![CDATA[Consulte su comprobante en: www.grifoslajoya.com]]></text>
+				<text><![CDATA[Consulte su comprobante en: ]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="431" y="125" width="19" height="18" uuid="5857977b-5bc5-4ed3-8d05-fd51f0897356"/>
@@ -526,6 +593,16 @@ DNI	]]></text>
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86e51ee4-1494-4a93-9800-5db048e22480"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{username}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="132" y="524" width="111" height="13" forecolor="#0F0D0D" uuid="c938eada-4112-46ba-aa4a-38030ff74af7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cae26df4-6684-4e37-89d8-777deb7d3d84"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="10" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{companyUrl}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -538,22 +538,31 @@ public class Utils {
     
     public static void populateCompanyDetailsVo(InvoiceVo invoiceVo, GlobalProperties globalProperties) {
 		invoiceVo.setMyRuc(globalProperties.getMyRuc());
+		invoiceVo.setCompanyName(globalProperties.getCompanyName());
 		invoiceVo.setCompanyAddress(globalProperties.getCompanyAddress());
 		invoiceVo.setCompanyState(globalProperties.getCompanyState());
 		invoiceVo.setCompanyProvince(globalProperties.getCompanyProvince());
-		invoiceVo.setCompanyDistrict(globalProperties.getCompanyProvince());
+		invoiceVo.setCompanyDistrict(globalProperties.getCompanyDistrict());
 		invoiceVo.setCompanyCountryCode(globalProperties.getCompanyCountryCode());
 		invoiceVo.setCompanyUbigeo(globalProperties.getCompanyUbigeo());
+		invoiceVo.setCompanyAddress2(globalProperties.getCompanyAddress2());
+		invoiceVo.setCompanyPhoneNumber(globalProperties.getCompanyPhoneNumber());
+		invoiceVo.setCompanyUrl(globalProperties.getCompanyUrl());
+		
 	}
     
     public static void populateCompanyDetailsDao(InvoiceDao invoiceDao, GlobalProperties globalProperties) {
     	invoiceDao.setMyRuc(globalProperties.getMyRuc());
+    	invoiceDao.setCompanyName(globalProperties.getCompanyName());
     	invoiceDao.setCompanyAddress(globalProperties.getCompanyAddress());
     	invoiceDao.setCompanyState(globalProperties.getCompanyState());
     	invoiceDao.setCompanyProvince(globalProperties.getCompanyProvince());
-    	invoiceDao.setCompanyDistrict(globalProperties.getCompanyProvince());
+    	invoiceDao.setCompanyDistrict(globalProperties.getCompanyDistrict());
     	invoiceDao.setCompanyCountryCode(globalProperties.getCompanyCountryCode());
     	invoiceDao.setCompanyUbigeo(globalProperties.getCompanyUbigeo());
+    	invoiceDao.setCompanyAddress2(globalProperties.getCompanyAddress2());
+    	invoiceDao.setCompanyPhoneNumber(globalProperties.getCompanyPhoneNumber());
+    	invoiceDao.setCompanyUrl(globalProperties.getCompanyUrl());
 	}
 	
 }

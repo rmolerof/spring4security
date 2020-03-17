@@ -121,10 +121,10 @@
                     <form class="search-form" style="height: 68px;">
                         <div class="input-group">
                             <div class="col-xs-12">
-	                            <address style="width: 300px; font-size: 14px;">
-	                                <strong> <small> La Joya de Santa Isabel EIRL - RUC: 20501568776</small></strong>
-	                                <br/> <small>  Av. Miguel Grau Mza B Lote 1-2, Ate - Lima - Lima </small>
-	                                <br/> <small> +51 356 0345 </small>
+	                            <address style="width: 320px; font-size: 14px;">
+	                                <strong th:inline="text"> <small> [[${@globalProperties.getCompanyName() + " - RUC: " + @globalProperties.getMyRuc()}]]</small></strong>
+	                                <br/> <small th:inline="text"> [[${@globalProperties.getCompanyAddress() + " " + @globalProperties.getCompanyAddress2()}]] </small>
+	                                <br/> <small th:inline="text"> [[${@globalProperties.getCompanyPhoneNumber()}]] </small>
 	                            </address>
                             </div>
                          </div>
@@ -1262,7 +1262,7 @@
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-	        <div class="page-footer-inner"> 2018 &copy; construido por los Desarroladores de La Joya
+	        <div class="page-footer-inner"> 2018 &copy; construido por Rudy Molero - rmolerof@gmail.com
             </div>
             <div class="scroll-to-top">
                 <i class="icon-arrow-up"></i>

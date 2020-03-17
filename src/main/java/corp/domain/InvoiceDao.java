@@ -32,6 +32,10 @@ public class InvoiceDao {
 	private String companyDistrict;
 	private String companyCountryCode;
 	private String companyUbigeo;
+	private String companyAddress2;
+	private String companyPhoneNumber;
+	private String companyUrl;
+
 	// customer
 	private String clientDocNumber;
 	private String clientName;
@@ -582,6 +586,30 @@ public class InvoiceDao {
 
 	public void setCompanyUbigeo(String companyUbigeo) {
 		this.companyUbigeo = companyUbigeo;
+	}
+
+	public String getCompanyAddress2() {
+		return companyAddress2;
+	}
+
+	public void setCompanyAddress2(String companyAddress2) {
+		this.companyAddress2 = companyAddress2;
+	}
+
+	public String getCompanyPhoneNumber() {
+		return companyPhoneNumber;
+	}
+
+	public void setCompanyPhoneNumber(String companyPhoneNumber) {
+		this.companyPhoneNumber = companyPhoneNumber;
+	}
+
+	public String getCompanyUrl() {
+		return companyUrl;
+	}
+
+	public void setCompanyUrl(String companyUrl) {
+		this.companyUrl = companyUrl;
 	}
 
 }

@@ -16,6 +16,33 @@ class TableDashboard extends React.Component {
     		  ROLE_ADMIN: false
     	  }
       },
+      globalProperties:{
+    	  companyName: '',
+    	  shortCompanyName: '',
+    	  companyAddress: '',
+    	  companyState: '',
+    	  companyProvince: '',
+    	  companyDistrict: '',
+    	  companyCountryCode: '',
+    	  companyUbigeo: '',
+    	  companyAddress2: '',
+    	  companyPhoneNumber: '',
+    	  companyUrl: '',
+    	  emailUsername: '',
+    	  emailPassword: '',
+    	  emailHost: '',
+    	  emailFrom: '',
+    	  myRuc: '',
+    	  sunatInvoicingServiceURL: '',
+    	  sunatConsultInvoiceURL: '',
+    	  sunatSignatureFileName: '',
+    	  sunatSignaturePassword: '',
+    	  sunatSolUsername: '',
+    	  sunatSolPassword: '',
+    	  timeZoneID: '',
+    	  comercio: '',
+    	  bonusURL: ''
+      },
 	  showError: false,
 	  showSuccess: false,
 	  showEmailModal: false, 
@@ -577,6 +604,25 @@ class TableDashboard extends React.Component {
 		});
   }
   
+  _getGlobalProperties() {
+
+	  var self = this;
+	  jQuery.ajax({
+			type: "GET",
+			contentType: "application/json", 
+			url:"/api/getGlobalProperties",
+			datatype: 'json',
+			cache: false,
+			timeout: 600000,
+			success: (response) => {						
+				self.setState({globalProperties: response});
+			},
+			error: function(e){
+
+			}	
+		});
+  }
+  
   _getSubmitInvoiceButtonStatus(user) {
 	  var isSubmitInvoiceButtonDisabled = true;
 	  if (user.roles.ROLE_ADMIN) {
@@ -592,6 +638,8 @@ class TableDashboard extends React.Component {
   }
   
   componentWillMount(){
+	  // Retrieve Global Properties from back-end
+	  this._getGlobalProperties();
 	  
 	  var invoiceNumber = this._getQueryVariable('id');
 	  if (invoiceNumber) {
@@ -1032,8 +1080,8 @@ class TableDashboard extends React.Component {
 					  totalModified: data.result[0].total,
 					  bonusNumber: data.result[0].bonusNumber,
 					  bonusNumberDisp: data.result[0].bonusNumber.substring(7),
-					  sunatStatus: this.CONSTANTS.PENDING_STATUS,
-					  bonusStatus: data.result[0].bonusNumber ? this.CONSTANTS.PENDING_STATUS: "",
+					  sunatStatus: self.CONSTANTS.PENDING_STATUS,
+					  bonusStatus: data.result[0].bonusNumber ? self.CONSTANTS.PENDING_STATUS: "",
 					  sunatValidated: false,
 					  clientEmailAddress: data.result[0].clientEmailAddress
 				  });
@@ -2016,12 +2064,12 @@ class TableDashboard extends React.Component {
 	              </div>
 	              <div className="col-md-12 col-xs-12">
 	                  <div className="company-address text-center">
-	                      <span className="bold uppercase" style={{fontSize: 13}}>La Joya de Santa Isabel EIRL</span>
-	                      <br/> <span className="muted"> RUC: 20501568776  </span>
-	                      <br/> Av. Miguel Grau Mza B Lote 1-2 
-	                      <br/> Lima - Lima - Ate 
-	                      <br/> Teléfono: +51 356 0345
-	                      <br/> www.grifoslajoya.com 
+	                      <span className="bold uppercase" style={{fontSize: 13}}>{this.state.globalProperties.companyName}</span>
+	                      <br/> <span className="muted"> RUC: {this.state.globalProperties.myRuc}  </span>
+	                      <br/> {this.state.globalProperties.companyAddress} 
+	                      <br/> {this.state.globalProperties.companyAddress2} 
+	                      <br/> Teléfono: {this.state.globalProperties.companyPhoneNumber}
+	                      <br/> {this.state.globalProperties.companyUrl} 
                       </div>
 	              </div>
 	          </div>
@@ -2193,7 +2241,7 @@ class TableDashboard extends React.Component {
 	                  </address>
 	                  <address>
 	                      <strong>Consulte su documento en:</strong>
-	                      <a> www.grifoslajoya.com </a>
+	                      <a> {this.state.globalProperties.companyUrl} </a>
 	                      <strong>AUTORIZADO MEDIANTE RESOLUCIÓN DE INTENDENCIA - N° 034-005-0005294/SUNAT</strong>
 	                  </address>
 	          </div>

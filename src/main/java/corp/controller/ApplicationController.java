@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import corp.businessModel.GasPricesVo;
@@ -77,6 +80,12 @@ public class ApplicationController {
 		
 		return ResponseEntity.ok(result);
 		
+	}
+	
+	@RequestMapping(value = "/api/getGlobalProperties", method = RequestMethod.GET)
+    @ResponseBody
+	public ResponseEntity<?> getGlobalProperties(){
+		return ResponseEntity.ok(globalProperties);
 	}
 	
 	@PostMapping("/api/getStationStatusByDates")

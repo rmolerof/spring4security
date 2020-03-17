@@ -29,7 +29,7 @@
 						                  Status: <strong class="uppercase"><span id="errorAlert"></span></strong></div> 
 						              <div class="col-xs-12 text-center">
 						                  <p> <strong class="uppercase "><span id="invoiceType"></span> ELECTRÓNICA</strong> <br/>
-						                      <span class="muted"> RUC: 20501568776  </span><br/>
+						                      <span class="muted" th:inline="text">[[${"RUC: " + @globalProperties.getMyRuc()}]]</span><br/>
 						                      <span class="muted bold" id="invoiceNbr"></span>
 						                  </p>
 						              </div>
@@ -37,10 +37,10 @@
 			                     <div class="row">
 						              <div class="col-md-12">
 						                  <ul class="list-unstyled">
-						                      <li><strong>  La Joya de Santa Isabel EIRL </strong></li>
-						                      <li> Av. Miguel Grau Mza B Lote 1-2 </li>
-						                      <li> Lima - Lima - Ate </li>
-						                      <li> +51 356 0345 </li>
+						                      <li><strong th:inline="text">[[${@globalProperties.getCompanyName()}]]</strong></li>
+						                      <li th:inline="text">[[${@globalProperties.getCompanyAddress()}]]</li>
+						                      <li th:inline="text">[[${@globalProperties.getCompanyAddress2()}]]</li>
+						                      <li th:inline="text">[[${@globalProperties.getCompanyPhoneNumber()}]]</li>
 						                  </ul>
 						              </div>
 					              </div>
@@ -132,7 +132,7 @@
 							                  </address>
 							                  <address>
 							                      <strong>Potenciado por:</strong>
-							                      <a> www.grifoslajoya.com </a>
+							                      <a th:inline="text">[[${@globalProperties.getCompanyUrl()}]]</a>
 							                  </address>
 			                             </div>
 			                         </div>

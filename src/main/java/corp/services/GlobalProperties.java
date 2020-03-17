@@ -15,6 +15,9 @@ public class GlobalProperties {
 	private String companyDistrict;
 	private String companyCountryCode;
 	private String companyUbigeo;
+	private String companyAddress2;
+	private String companyPhoneNumber;
+	private String companyUrl;
 	private String emailUsername;
 	private String emailPassword;
 	private String emailHost;
@@ -162,4 +165,23 @@ public class GlobalProperties {
 	public void setCompanyCountryCode(String companyCountryCode) {
 		this.companyCountryCode = companyCountryCode;
 	}
+	public String getCompanyAddress2() {
+		return companyAddress2;
+	}
+	public void setCompanyAddress2(String companyAddress2) {
+		this.companyAddress2 = companyAddress2;
+	}
+	public String getCompanyPhoneNumber() {
+		return companyPhoneNumber;
+	}
+	public void setCompanyPhoneNumber(String companyPhoneNumber) {
+		this.companyPhoneNumber = companyPhoneNumber;
+	}
+	public String getCompanyUrl() {
+		return companyUrl;
+	}
+	public void setCompanyUrl(String companyUrl) {
+		this.companyUrl = companyUrl;
+	}
+	
 }
