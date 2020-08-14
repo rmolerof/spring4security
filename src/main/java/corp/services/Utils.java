@@ -166,6 +166,8 @@ public class Utils {
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.smtp.host", host);
 		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.ssl.enable", false);
+		props.put("mail.smtp.starttls.enable", false);
 
 		// Get the Session object.
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
