@@ -1443,10 +1443,11 @@ class TableDashboard extends React.Component {
 		    		if (clientDocNumber.toString().length  != 11) {
 		    			errors["clientDocNumber"] = "RUC debe tener 11 digitos";
 		    			formIsValid = false;
-		    		} else if (clientDocNumber.toString() == self.CONSTANTS.COMPANY_RUC) {
+		    		} 
+		    		/*else if (clientDocNumber.toString() == self.CONSTANTS.COMPANY_RUC) {
 		    			errors["clientDocNumber"] = "RUC no puede ser de la Empresa Emisora";
 		    			formIsValid = false;
-		    		}
+		    		}*/	
 			    } else {
 			    	errors["clientDocNumber"] = "Falta RUC o DNI";
 					formIsValid = false;
