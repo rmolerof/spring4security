@@ -5,11 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
@@ -26,7 +26,7 @@ import corp.services.Utils;
 @SpringBootTest(classes = Application.class)
 public class TestInvoices {
 	
-	private static Logger logger = LogManager.getLogger(TestInvoices.class);
+	private static Logger logger = LoggerFactory.getLogger(TestInvoices.class);
 	
 	@Autowired
 	private InvoicesRepository invoicesRepository;
@@ -104,9 +104,11 @@ public class TestInvoices {
 		int sunatCount = 0;
 		for (InvoiceDao invoiceDao: invoiceDaos) {
 			
-			logger.info(++sunatCount + " Sunat Set Manually, date: " + invoiceDao.getDate() + ", number: " + invoiceDao.getInvoiceNumber() + ", status: " + invoiceDao.getSunatStatus());
-			invoiceDao.setSunatStatus("ENVIADO");
-			invoicesRepository.save(invoiceDao);
+			if (invoiceDao.getSunatStatus().equals("PENDIENTE")) {
+				logger.info(++sunatCount + " Sunat Set Manually, date: " + invoiceDao.getDate() + ", number: " + invoiceDao.getInvoiceNumber() + ", status: " + invoiceDao.getSunatStatus());
+				invoiceDao.setSunatStatus("ENVIADO");
+				invoicesRepository.save(invoiceDao);
+			}
 		}
 		
 	}

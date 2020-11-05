@@ -1,10 +1,10 @@
 package corp.model;
 
-import org.hibernate.validator.constraints.NotBlank;
+//import org.hibernate.validator.constraints.NotBlank;
 
 public class SearchInvoiceCriteria {
 
-	@NotBlank(message = "Número de recibo no puede ser vacío")
+//	@NotBlank(message = "Número de recibo no puede ser vacío")
 	String invoiceNumber;
 	String selectedOption;
 	String clientEmailAddress;

@@ -30,9 +30,9 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ import net.sf.jasperreports.engine.JasperReport;
 @Service
 public class Utils {
 	
-	private static Logger logger = LogManager.getLogger(Utils.class);
+	private static Logger logger = LoggerFactory.getLogger(Utils.class);
 	
 	private String basePath;
 	

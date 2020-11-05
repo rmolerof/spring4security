@@ -2,11 +2,11 @@ package corp.model;
 
 import java.util.Date;
 
-import org.hibernate.validator.constraints.NotBlank;
+//import org.hibernate.validator.constraints.NotBlank;
 
 public class SubmitInvoiceGroupCriteria {
 	
-	@NotBlank(message = "Procesamiento debe ser NORMAL o FORZADO.")
+//	@NotBlank(message = "Procesamiento debe ser NORMAL o FORZADO.")
 	String processingType;
 	Date processPendingInvoicesTillDate;
 	String invoiceNumber;

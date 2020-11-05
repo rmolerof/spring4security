@@ -17,9 +17,9 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.xml.ws.WebServiceException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
@@ -61,7 +61,7 @@ import webbonusgx.WSAcumuPxSoapPort;
 @Service
 public class ApplicationService {
 
-	private static Logger logger = LogManager.getLogger(ApplicationService.class);
+	private static Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 	
 	private List<User> users;
 	private Station currentStation;
@@ -1031,7 +1031,7 @@ public class ApplicationService {
             url = new URL(urlString);
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
-            logger.error(e);
+            logger.error("Error: ", e);
         }
         
         return url;

@@ -1,11 +1,11 @@
 package test.webbonusgx;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,7 +26,7 @@ import webbonusgx.WSAcumuPxSoapPort;
 @SpringBootTest(classes = Application.class)
 public class WebbonusgxClientTest {
 	
-	private static Logger logger = LogManager.getLogger(WebbonusgxClientTest.class);
+	private static Logger logger = LoggerFactory.getLogger(WebbonusgxClientTest.class);
 	
 	@Autowired
 	private GlobalProperties globalProperties;

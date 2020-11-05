@@ -1,10 +1,10 @@
 package corp.model;
 
-import org.hibernate.validator.constraints.NotBlank;
+//import org.hibernate.validator.constraints.NotBlank;
 
 public class SearchDocIdCriteria {
 
-	@NotBlank(message = "Número de doc no puede ser vacío")
+//	@NotBlank(message = "Número de doc no puede ser vacío")
 	String docId;
 
 	public String getDocId() {

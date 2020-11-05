@@ -1,10 +1,10 @@
 package corp.model;
 
-import org.hibernate.validator.constraints.NotBlank;
+//import org.hibernate.validator.constraints.NotBlank;
 
 public class SearchCriteria {
 
-	@NotBlank(message = "username can't be empty")
+//	@NotBlank(message = "username can't be empty")
 	String username;
 	
 	public String getUsername() {

@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 import javax.xml.crypto.MarshalException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.bean.CpeBean;
@@ -31,7 +31,7 @@ import generadorxmlcpe.CPESunat;
 
 public class XmlSunat {
 	
-	private static Logger logger = LogManager.getLogger(XmlSunat.class);
+	private static Logger logger = LoggerFactory.getLogger(XmlSunat.class);
 	
 	public static final String timeZoneID = "America/Lima";
 	private static final String[] UNIDADES = { "", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", "siete ", "ocho ", "nueve " };
