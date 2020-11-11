@@ -103,10 +103,11 @@ public class TestInvoices {
 		
 		int sunatCount = 0;
 		for (InvoiceDao invoiceDao: invoiceDaos) {
-			
-			logger.info(++sunatCount + " Sunat Set Manually, date: " + invoiceDao.getDate() + ", number: " + invoiceDao.getInvoiceNumber() + ", status: " + invoiceDao.getSunatStatus());
-			invoiceDao.setSunatStatus("ENVIADO");
-			invoicesRepository.save(invoiceDao);
+			if (invoiceDao.getSunatStatus().equals("PENDIENTE")) {
+				logger.info(++sunatCount + " Sunat Set Manually, date: " + invoiceDao.getDate() + ", number: " + invoiceDao.getInvoiceNumber() + ", status: " + invoiceDao.getSunatStatus());
+				invoiceDao.setSunatStatus("ENVIADO");
+				invoicesRepository.save(invoiceDao);
+			}
 		}
 		
 	}
