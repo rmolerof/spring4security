@@ -25,7 +25,9 @@ class InvoiceTableSummary extends React.Component {
       processPendingInvoicesTillDate: '',
       processPendingInvoicesTillDateStyle: {color: 'black'},
       motiveCd: '',
-      motiveCdDescription: ''
+      motiveCdDescription: '',
+      yearCd: '00-YEAR',
+      yearCdDescription: ''
     };
     
     this.CONSTANTS = {
@@ -543,8 +545,16 @@ class InvoiceTableSummary extends React.Component {
 	  var index = event.nativeEvent.target.selectedIndex;
 	  this.setState({motiveCdDescription: event.nativeEvent.target[index].text.toUpperCase()});
 	  
-	  this._fetchInvoiceData({loadInvoiceAmountCriteria: month_code, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled}); 
-	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: month_code, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
+	  this._fetchInvoiceData({loadInvoiceAmountCriteria: month_code + "-" + this.state.yearCd, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled}); 
+	  this._fetchInvoiceConcarData({loadInvoiceAmountCriteria: month_code + "-" + this.state.yearCd, voidedInvoicesIncluded: this.state.voidedInvoicesIncluded, bonusControlsEnabled: this.state.bonusControlsEnabled});
+  }
+  
+  yearCdHandleChange(event) {
+	  var year_code = event.target.value;
+	  this.setState({yearCd: year_code});
+
+	  var index = event.nativeEvent.target.selectedIndex;
+	  this.setState({yearCdDescription: event.nativeEvent.target[index].text.toUpperCase()});	  
   }
   
   render() {    
@@ -604,7 +614,7 @@ class InvoiceTableSummary extends React.Component {
 	          
 	          <div className="form-group">
 	              <select className="ticket-assign form-control input-medium selectHeight" style={{marginBottom: '5px', borderColor: '#26344b'}} value={this.state.motiveCd} onChange={this.motiveCdHandleChange.bind(this)}>
-	              	  <option value="">Busque por Mes</option>
+	              	  <option value="">Més</option>
 	              	  <option value="00-MONTH">Enero</option>
 	              	  <option value="01-MONTH">Febrero</option>
 	              	  <option value="02-MONTH">Marzo</option>
@@ -620,6 +630,24 @@ class InvoiceTableSummary extends React.Component {
 	              	  <option value="01-YEARAGO">Año Pasado</option>
 	              </select>
 	          </div>&nbsp;
+	          
+	          <div className="form-group">
+              <select className="ticket-assign form-control input-medium selectHeight" style={{marginBottom: '5px', borderColor: '#26344b'}} value={this.state.yearCd} onChange={this.yearCdHandleChange.bind(this)}>
+              	  <option value="">Año</option>
+              	  <option value="00-YEAR">Actual</option>
+              	  <option value="01-YEAR">Pasado</option>
+              	  <option value="02-YEAR">Antepasado</option>
+              	  <option value="03-YEAR">Trasantepasado</option>
+              	  <option value="04-YEAR">Actual-4</option>
+              	  <option value="05-YEAR">Actual-5</option>
+              	  <option value="06-YEAR">Actual-6</option>
+              	  <option value="07-YEAR">Actual-7</option>
+              	  <option value="08-YEAR">Actual-8</option>
+              	  <option value="09-YEAR">Actual-9</option>
+              	  <option value="10-YEAR">Actual-10</option>
+              	  <option value="11-YEAR">Actual-11</option>
+              </select>
+          </div>&nbsp;
 		     
 	          <div className="form-group" style={{marginBottom: '5px'}}>
 	              <label className="sr-only">Procesar Hasta Fecha</label>

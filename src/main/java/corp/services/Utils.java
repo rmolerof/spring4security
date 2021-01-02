@@ -497,10 +497,28 @@ public class Utils {
 		return tempDate.getTime();
 	}
 	
+	public static Date getDateBeginningOfMonthByYear(Integer month_number, Integer numberOfYearsAgo, String timeZoneId) {
+		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
+		tempDate.set(Calendar.MONTH, month_number);
+		tempDate.set(Calendar.DAY_OF_MONTH, 1);
+		tempDate.add(Calendar.YEAR, -1 * numberOfYearsAgo);
+		
+		return tempDate.getTime();
+	}
+	
 	public static Date getDateBeginningOfNextMonth(Integer month_number, String timeZoneId) {
 		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
 		tempDate.set(Calendar.MONTH, month_number + 1);
 		tempDate.set(Calendar.DAY_OF_MONTH, 1);
+		
+		return tempDate.getTime();
+	}
+	
+	public static Date getDateBeginningOfNextMonthByYear(Integer month_number,  Integer numberOfYearsAgo,  String timeZoneId) {
+		Calendar tempDate = getCurrentCalendarAtMidnight(timeZoneId);
+		tempDate.set(Calendar.MONTH, month_number + 1);
+		tempDate.set(Calendar.DAY_OF_MONTH, 1);
+		tempDate.add(Calendar.YEAR, -1 * numberOfYearsAgo);
 		
 		return tempDate.getTime();
 	}

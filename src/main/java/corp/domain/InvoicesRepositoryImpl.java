@@ -37,7 +37,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_YEAR)) {
 			return findTotalInvoicesCurrentYear(voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("MONTH")) {
-			return findTotalInvoicesByMonth(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
+			return findTotalInvoicesByMonthAndByYear(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), Integer.parseInt(loadInvoiceAmountCriteria.substring(9, 11)),  voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("YEARAGO")) {
 			return findTotalInvoicesByYear(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
 		}
@@ -60,7 +60,7 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		} else if (loadInvoiceAmountCriteria.equals(InvoicesRepository.TOTAL_INVOICES_YEAR)) {
 			return findTotalInvoicesCurrentYearForBonus(voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("MONTH")) {
-			return findTotalInvoicesByMonthForBonus(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
+			return findTotalInvoicesByMonthForBonusByYear(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)),  Integer.parseInt(loadInvoiceAmountCriteria.substring(9, 11)), voidedInvoicesIncluded);
 		} else if (loadInvoiceAmountCriteria.contains("YEARAGO")) {
 			return findTotalInvoicesByYearForBonus(Integer.parseInt(loadInvoiceAmountCriteria.substring(0, 2)), voidedInvoicesIncluded);
 		}
@@ -164,6 +164,16 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
 	}
 	
+	public List<InvoiceDao> findTotalInvoicesByMonthAndByYear(Integer monthNumber, Integer numberOfYearsAgo, boolean isVoidedInvoicesIncluded) {
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateBeginningOfMonthByYear(monthNumber, numberOfYearsAgo, globalProperties.getTimeZoneID())).lt(Utils.getDateBeginningOfNextMonthByYear(monthNumber, numberOfYearsAgo, globalProperties.getTimeZoneID()));
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
 	public List<InvoiceDao> findTotalInvoicesLastNdaysForBonus(Integer numberOfDaysAgo, boolean isVoidedInvoicesIncluded) {
 		Criteria criteria = Criteria.where("date").gte(Utils.getDateAtMidnightNDaysAgo(numberOfDaysAgo, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
 		
@@ -176,6 +186,16 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 	
 	public List<InvoiceDao> findTotalInvoicesByMonthForBonus(Integer monthNumber, boolean isVoidedInvoicesIncluded) {
 		Criteria criteria = Criteria.where("date").gte(Utils.getDateBeginningOfMonth(monthNumber, globalProperties.getTimeZoneID())).lt(Utils.getDateBeginningOfNextMonth(monthNumber, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
+		
+		if (!isVoidedInvoicesIncluded) {
+			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
+		}
+		
+		return findInvoicesByCriteria(criteria, new Sort(Direction.DESC, "date"));
+	}
+	
+	public List<InvoiceDao> findTotalInvoicesByMonthForBonusByYear(Integer monthNumber, Integer numberOfYearsAgo,  boolean isVoidedInvoicesIncluded) {
+		Criteria criteria = Criteria.where("date").gte(Utils.getDateBeginningOfMonthByYear(monthNumber, numberOfYearsAgo, globalProperties.getTimeZoneID())).lt(Utils.getDateBeginningOfNextMonthByYear(monthNumber, numberOfYearsAgo, globalProperties.getTimeZoneID())).and("bonusNumber").ne("");
 		
 		if (!isVoidedInvoicesIncluded) {
 			criteria = criteria.and("sunatStatus").ne(ApplicationService.VOIDED_STATUS);
