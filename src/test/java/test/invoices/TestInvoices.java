@@ -90,6 +90,20 @@ public class TestInvoices {
 		userService.processInvoicesByBonus(invoiceDaos);
 	}
 	
+	@Ignore
+	@Test
+	public void recoverHashCodeFromDateTillDateTest() throws ParseException {
+
+		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("29/12/2020"); 
+		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("31/12/2020");
+		
+		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesForSunatFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
+		invoiceDaos.removeIf(invoiceDao -> !invoiceDao.getInvoiceHash().trim().equals(""));
+		
+		userService.processInvoicesBySunat(invoiceDaos);
+		
+	}
+	
 	@Test
 	@Ignore
 	public void manipulateSunatFromDateTillDateTest() throws ParseException {
@@ -97,8 +111,8 @@ public class TestInvoices {
 		//Date fromDate = Utils.getDateAtMidnightNDaysAgo(16, globalProperties.getTimeZoneID());
 		//Date untilDate = Utils.getDateAtMidnightNDaysAgo(14, globalProperties.getTimeZoneID());
 		
-		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("25/12/2019"); 
-		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("28/12/2019"); 
+		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("30/12/2020"); 
+		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("31/12/20"); 
 		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesForSunatFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
 		
 		int sunatCount = 0;
