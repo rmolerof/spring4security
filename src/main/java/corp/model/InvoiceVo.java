@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.bson.types.ObjectId;
 
 import corp.domain.InvoiceDao;
+import corp.services.ApplicationService;
 
 public class InvoiceVo {
 	
@@ -78,6 +79,9 @@ public class InvoiceVo {
 	private boolean sunatValidated = false;
 	private Date sunatSubmittedDate = new Date(0L);
 	private Date bonusSubmittedDate = new Date(0L);
+	private String processPendingInvoiceTillDate = "";
+	private String processingType = ApplicationService.CASH;
+	private String invoicePaymentStatus = "";
 	
 	public InvoiceVo() {
 		super();
@@ -134,6 +138,33 @@ public class InvoiceVo {
 		this.clientEmailAddress = new String(null != invoiceDao.getClientEmailAddress() ? invoiceDao.getClientEmailAddress(): "");
 		this.sunatSubmittedDate = new Date(invoiceDao.getSunatSubmittedDate().getTime());
 		this.bonusSubmittedDate = new Date(invoiceDao.getBonusSubmittedDate().getTime());
+		this.processPendingInvoiceTillDate = new String(invoiceDao.getProcessPendingInvoiceTillDate());
+		this.processingType = new String(invoiceDao.getProcessingType());
+		this.invoicePaymentStatus = new String(invoiceDao.getInvoicePaymentStatus());
+	}
+	
+	public String getProcessPendingInvoiceTillDate() {
+		return processPendingInvoiceTillDate;
+	}
+
+	public void setProcessPendingInvoiceTillDate(String processPendingInvoiceTillDate) {
+		this.processPendingInvoiceTillDate = processPendingInvoiceTillDate;
+	}
+
+	public String getProcessingType() {
+		return processingType;
+	}
+
+	public void setProcessingType(String processingType) {
+		this.processingType = processingType;
+	}
+
+	public String getInvoicePaymentStatus() {
+		return invoicePaymentStatus;
+	}
+
+	public void setInvoicePaymentStatus(String invoicePaymentStatus) {
+		this.invoicePaymentStatus = invoicePaymentStatus;
 	}
 	
 	public static double roundTwo(double amt) {

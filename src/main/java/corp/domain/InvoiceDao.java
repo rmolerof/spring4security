@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import corp.model.InvoiceVo;
 import corp.model.User;
+import corp.services.ApplicationService;
 
 @Document(collection = "invoices")
 public class InvoiceDao {
@@ -85,7 +86,9 @@ public class InvoiceDao {
 	private boolean sunatValidated = false;
 	private Date sunatSubmittedDate = new Date(0L);
 	private Date bonusSubmittedDate = new Date(0L);
-	
+	private String processPendingInvoiceTillDate = "";
+	private String processingType = ApplicationService.CASH;
+	private String invoicePaymentStatus = "";
 
 	public InvoiceDao() {
 		super();
@@ -146,6 +149,33 @@ public class InvoiceDao {
 		this.clientEmailAddress = new String(null != invoiceVo.getClientEmailAddress() ? invoiceVo.getClientEmailAddress(): "");
 		this.sunatSubmittedDate = new Date(invoiceVo.getSunatSubmittedDate().getTime());
 		this.bonusSubmittedDate = new Date(invoiceVo.getBonusSubmittedDate().getTime());
+		this.processPendingInvoiceTillDate = new String(invoiceVo.getProcessPendingInvoiceTillDate());
+		this.processingType = new String(invoiceVo.getProcessingType());
+		this.invoicePaymentStatus = new String(invoiceVo.getInvoicePaymentStatus());
+	}
+	
+	public String getProcessPendingInvoiceTillDate() {
+		return processPendingInvoiceTillDate;
+	}
+
+	public void setProcessPendingInvoiceTillDate(String processPendingInvoiceTillDate) {
+		this.processPendingInvoiceTillDate = processPendingInvoiceTillDate;
+	}
+
+	public String getProcessingType() {
+		return processingType;
+	}
+
+	public void setProcessingType(String processingType) {
+		this.processingType = processingType;
+	}
+
+	public String getInvoicePaymentStatus() {
+		return invoicePaymentStatus;
+	}
+
+	public void setInvoicePaymentStatus(String invoicePaymentStatus) {
+		this.invoicePaymentStatus = invoicePaymentStatus;
 	}
 
 	public ObjectId getId() {

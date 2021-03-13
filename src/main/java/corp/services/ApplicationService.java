@@ -87,6 +87,8 @@ public class ApplicationService {
 	public static final String SUNAT_ALREADY_RECEIVED_MSG = "El comprobante fue registrado previamente con otros datos";
 	public static final String SUNAT = "SUNAT";
 	public static final String BONUS = "BONUS";
+	public static final String CASH = "CONTADO";
+	public static final String CREDIT = "CREDITO";
 	
 	@Autowired
     private StationRepository stationRepository;

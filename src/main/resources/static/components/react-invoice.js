@@ -123,7 +123,11 @@ class TableDashboard extends React.Component {
 	  bonusStatus: '',
 	  sunatValidated: false,
 	  showNewInvoiceButton: true,
-	  productPriceEditorEnabled: false
+	  productPriceEditorEnabled: false,
+	  processPendingInvoiceTillDateStyle: {color: 'black'},
+	  processPendingInvoiceTillDate: '',
+	  processingTypeButtonToggle: true,
+	  processingType: 'CONTADO'
     };
     
     this.CONSTANTS = {
@@ -144,8 +148,9 @@ class TableDashboard extends React.Component {
 	    VOIDED_STATUS: 'ANULADO',
 	    FAILURE_STATUS: 'FALLADO',
 	    COMPANY_RUC: '20501568776',
-	    RELOAD_BONUS_FLAG: false
-	    
+	    RELOAD_BONUS_FLAG: false,
+	    CASH_PROCESSING_TYPE: 'CONTADO',
+	    CREDIT_PROCESSING_TYPE: 'CREDITO'    
     }
   }
   
@@ -389,6 +394,26 @@ class TableDashboard extends React.Component {
 	    var validatedDate = moment.tz(date + " " + time, 'DD/MM/YYYY hh:mm:ss A', 'America/Lima').toDate();
 	    
 	    return validatedDate;
+  }
+  
+  _handleProcessPendingInvoiceTillDateChange = evt => {
+	  this.setState({processPendingInvoiceTillDate: evt.target.value.trim()});
+	  
+	  if (this._validateDate(evt.target.value.trim())) {
+		  this.setState({processPendingInvoiceTillDateStyle: {color: 'black'}});
+	  } else {
+		  this.setState({processPendingInvoiceTillDateStyle: {color: 'red'}});
+	  }
+  }
+  
+  _processingTypeButtonHandleClick(){
+		this.setState({processingTypeButtonToggle: !this.state.processingTypeButtonToggle});
+		
+		if (this.state.processingTypeButtonToggle) {
+			this.setState({processingType: this.CONSTANTS.CREDIT_PROCESSING_TYPE});
+		} else {
+			this.setState({processingType: this.CONSTANTS.CASH_PROCESSING_TYPE});
+		}
   }
   
   _validateDate(date)
@@ -1643,6 +1668,13 @@ class TableDashboard extends React.Component {
 			invoicePrefix = 'B001-';
 	  }
 	  
+	  let editCreditDate = true;
+	  let processingTypeButtonText = this.CONSTANTS.CASH_PROCESSING_TYPE;
+	  if (!this.state.processingTypeButtonToggle) {
+			processingTypeButtonText = this.CONSTANTS.CREDIT_PROCESSING_TYPE;
+			editCreditDate = false;
+	  }
+	  
 	  return (
 			  
       <form onSubmit={this.handleSubmit}>
@@ -2002,6 +2034,20 @@ class TableDashboard extends React.Component {
 							                      </td>
 							                      <td className="text-right sbold">{this.state.change}</td>
 							                  </tr>
+							                  <tr>
+								                  <td className="text-left sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>
+								                      <a type="submit" onClick={this._processingTypeButtonHandleClick.bind(this)} className="btn btn-sm purple hidden-print margin-bottom-5"> 
+									    		      	<i className="fa fa-forward"></i>&nbsp;{processingTypeButtonText}
+									    		      </a>
+							                      </td>	
+							                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}></td>
+							                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", width: '50px'}}>
+								                      <div className="form-group" style={{marginBottom: '5px'}}>
+									    	              <label className="sr-only">Procesar Hasta Fecha</label>
+									    	              <input type="text" className="form-control" placeholder="Procesar Hasta Fecha" style={this.state.processPendingInvoiceTillDateStyle} value={this.state.processPendingInvoiceTillDate} onChange={this._handleProcessPendingInvoiceTillDateChange} readOnly={editCreditDate}/> 
+									                  </div>
+							                      </td>
+							                  </tr>
 							              </tbody>
 							          </table>	
 				          		  </div>
@@ -2195,7 +2241,8 @@ class TableDashboard extends React.Component {
 		                      	  <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
 		                      	  	<strong><u>Forma de Pago:</u></strong>
 			                      </td>
-			                      
+			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}></td>
+			                      <td className="text-right sbold" style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px", paddingRight: "12px"}}>{parseFloat(this.state.cashGiven || '0').toFixed(2) > 0.0 ? "CONTADO": (parseFloat(this.state.electronicPmt || '0').toFixed(2) > 0.0 ? "TARJETA": "")}</td>
 			                  </tr>
 			                  <tr>
 			                      <td style={{fontFamily:"sans-serif", fontSize: 11, padding: "2px"}}>
