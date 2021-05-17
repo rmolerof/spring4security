@@ -94,8 +94,8 @@ public class TestInvoices {
 	@Test
 	public void recoverHashCodeFromDateTillDateTest() throws ParseException {
 
-		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("21/03/2021"); 
-		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("22/03/2021");
+		Date fromDate = new SimpleDateFormat("dd/MM/yyyy").parse("11/05/2021"); 
+		Date untilDate = new SimpleDateFormat("dd/MM/yyyy").parse("13/05/2021");
 		
 		List<InvoiceDao> invoiceDaos = invoicesRepository.findAllInvoicesForSunatFromDateTillDate(fromDate, untilDate, new Sort(Sort.Direction.ASC, "date"));
 		invoiceDaos.removeIf(invoiceDao -> !invoiceDao.getInvoiceHash().trim().equals(""));

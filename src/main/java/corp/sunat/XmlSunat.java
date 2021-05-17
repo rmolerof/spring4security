@@ -231,11 +231,12 @@ public class XmlSunat {
 	}
 	
 	public static String getValidatedPath(String path) {
-		boolean alreadyExists = new File(path).exists();
+		
+		File file = new File(path);	
+		boolean alreadyExists = file.exists();
 	    
-	    // Create path if basePath doesn't exist
 	    if(!alreadyExists){
-			(new File(path)).getParentFile().mkdirs();
+	    	file.mkdirs();
 		}
 	    
 	    return path;
