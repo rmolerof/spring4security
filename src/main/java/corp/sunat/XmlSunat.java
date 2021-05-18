@@ -213,7 +213,7 @@ public class XmlSunat {
 		return sunatSubmitServiceResponse;
 	}
 	
-	public static String consultInvoice(InvoiceVo invoiceVo, String cdrPath, GlobalProperties globalProperties) {
+	public static String consultInvoice(InvoiceVo invoiceVo, String basePath, GlobalProperties globalProperties) {
 		String ruc = globalProperties.getMyRuc();
 		String UsuarioSol = globalProperties.getSunatSolUsername();
 		String PassSol = globalProperties.getSunatSolPassword();
@@ -222,7 +222,7 @@ public class XmlSunat {
 		String RutaWS = globalProperties.getSunatConsultInvoiceURL();
 		String NombreCPE = globalProperties.getMyRuc() + "-" + tipoDocumento + "-" + nro_comprobante ;
 		String NombreCDR = "R-" + NombreCPE;
-		String RutaArchivo = getValidatedPath(cdrPath);
+		String RutaArchivo = getValidatedPath(basePath + "/CDR/");
 		
 		String sunatInvoiceConsultResponse = ApiClienteEnvioSunat.ConexionCPEStatusCDR(ruc, UsuarioSol, PassSol, tipoDocumento, nro_comprobante, NombreCPE,  NombreCDR,  RutaArchivo, RutaWS);
 		logger.info("\n" + sunatInvoiceConsultResponse);
