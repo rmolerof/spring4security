@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 import com.bean.CpeBean;
 import com.bean.Cpe_DetalleBean;
 
-import apiclienteenviosunat.ApiClienteEnvioSunat;
+import corp.sunat.ApiClienteEnvioSunat;
 import corp.model.InvoiceVo;
 import corp.model.SunatSubmitServiceResponse;
 import corp.services.GlobalProperties;
@@ -209,7 +209,7 @@ public class XmlSunat {
 		String NombreCDR = "R-" + NombreCPE; // respuesta
 		String RutaArchivo = basePath + "/xmlsSunat/";
 		SunatSubmitServiceResponse sunatSubmitServiceResponse = new SunatSubmitServiceResponse(ApiClienteEnvioSunat.ConexionCPE(invoiceVo.getMyRuc(), sunatSolUsername, sunatSolPassword, NombreCPE, NombreCDR, RutaArchivo, sunatInvoicingServiceURL));
-		logger.info("\nSUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatSubmitServiceResponse.toString() + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
+		logger.info("SUNAT response for invoice: " + invoiceVo.getInvoiceNumber() + ": " + sunatSubmitServiceResponse.toString() + "| Invoice Date: " + Utils.formatDate(Utils.transformGMTDateToZone(invoiceVo.getDate(), timeZoneID), "yyyy-MM-dd"));
 		return sunatSubmitServiceResponse;
 	}
 	
@@ -222,10 +222,10 @@ public class XmlSunat {
 		String RutaWS = globalProperties.getSunatConsultInvoiceURL();
 		String NombreCPE = globalProperties.getMyRuc() + "-" + tipoDocumento + "-" + nro_comprobante ;
 		String NombreCDR = "R-" + NombreCPE;
-		String RutaArchivo = getValidatedPath(basePath + "/CDR/");
+		String RutaArchivo = basePath + "/xmlsSunat/";
 		
 		String sunatInvoiceConsultResponse = ApiClienteEnvioSunat.ConexionCPEStatusCDR(ruc, UsuarioSol, PassSol, tipoDocumento, nro_comprobante, NombreCPE,  NombreCDR,  RutaArchivo, RutaWS);
-		logger.info("\n" + sunatInvoiceConsultResponse);
+		logger.info("Sunat Consult Response for " +  invoiceVo.getInvoiceNumber() + "->" + sunatInvoiceConsultResponse);
 		
 		return sunatInvoiceConsultResponse;
 	}
