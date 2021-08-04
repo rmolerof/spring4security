@@ -72,6 +72,7 @@ public class ApplicationService {
 	public static final String FACTURA = "01";
 	public static final String BOLETA = "03";
 	public static final String NOTADECREDITO = "07";
+	public static final String NOTADECREDITO_PREFIX = "FC01"; 
 	public static final String PENDING_STATUS = "PENDIENTE";
 	public static final String SENT_STATUS = "ENVIADO";
 	public static final String VOIDED_STATUS = "ANULADO";
@@ -782,11 +783,14 @@ public class ApplicationService {
 	public Long getNextInvoiceSequence(String invoiceType) {
 		
 		if (invoiceType.equals(BOLETA)) {
-			InvoiceDao lastSunatProcessedBoletaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(BOLETA);
-			return invoiceNumberToLong(lastSunatProcessedBoletaOrNotaDeCredito.getInvoiceNumber()) + 1;
+			InvoiceDao lastSunatProcessedBoleta = invoicesRepository.findLastNotVoidedInvoice(BOLETA);
+			return invoiceNumberToLong(lastSunatProcessedBoleta.getInvoiceNumber()) + 1;
 		} else if (invoiceType.equals(FACTURA)){
-			InvoiceDao lastSunatProcessedFacturaOrNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(FACTURA);
-			return invoiceNumberToLong(lastSunatProcessedFacturaOrNotaDeCredito.getInvoiceNumber()) + 1;
+			InvoiceDao lastSunatProcessedFactura = invoicesRepository.findLastNotVoidedInvoice(FACTURA);
+			return invoiceNumberToLong(lastSunatProcessedFactura.getInvoiceNumber()) + 1;
+		} else if (invoiceType.equals(NOTADECREDITO)){
+			InvoiceDao lastSunatProcessedNotaDeCredito = invoicesRepository.findLastNotVoidedInvoice(NOTADECREDITO);
+			return invoiceNumberToLong(lastSunatProcessedNotaDeCredito.getInvoiceNumber()) + 1;
 		}
 		
 		return 0L;
@@ -802,25 +806,22 @@ public class ApplicationService {
 				
 				if (invoiceVo.getInvoiceNumber().contains("XXXXXXXX")) {
 					if (invoiceVo.getInvoiceType().equalsIgnoreCase(BOLETA)) {
-						// Boleta
 						Long receiptNbr = getNextInvoiceSequence(BOLETA);
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
 					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(FACTURA)) {
-						// Factura
 						Long receiptNbr = getNextInvoiceSequence(FACTURA);
 						String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
 						invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
 					} else if (invoiceVo.getInvoiceType().equalsIgnoreCase(NOTADECREDITO)) {
-						// Nota de credito
 						if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(BOLETA)) {
-							Long receiptNbr = getNextInvoiceSequence(BOLETA);
+							Long receiptNbr = getNextInvoiceSequence(NOTADECREDITO);
 							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
-							invoiceVo.setInvoiceNumber("B001-" + autocompletedReceiptNbr);
+							invoiceVo.setInvoiceNumber("FC01-" + autocompletedReceiptNbr);
 						} else if (invoiceVo.getInvoiceTypeModified().equalsIgnoreCase(FACTURA)) {
-							Long receiptNbr = getNextInvoiceSequence(FACTURA);
+							Long receiptNbr = getNextInvoiceSequence(NOTADECREDITO);
 							String autocompletedReceiptNbr = String.format("%08d", receiptNbr);
-							invoiceVo.setInvoiceNumber("F001-" + autocompletedReceiptNbr);
+							invoiceVo.setInvoiceNumber("FC01-" + autocompletedReceiptNbr);
 						}
 					}
 				}
@@ -865,6 +866,7 @@ public class ApplicationService {
 			}
 			
 		} catch (Exception e) {
+			logger.error("Error: ", e);
 			invoiceVo.setStatus("0");
 			invoiceVo.setSunatErrorStr("Error de Proceso. " + e.getMessage());
 		}
@@ -955,7 +957,11 @@ public class ApplicationService {
 	}
 	
 	public String makeInvoiceNumberVoided(String invoiceNumber) {
-		return (new StringBuilder(invoiceNumber).replace(1, 2, "A")).toString();
+		if (invoiceNumber.contains(NOTADECREDITO_PREFIX)) {
+			return (new StringBuilder(invoiceNumber).replace(2, 3, "A")).toString(); 
+		} else {
+			return (new StringBuilder(invoiceNumber).replace(1, 2, "A")).toString();
+		}	
 	}
 	
 	public BonusPointsOperationResponse accumulateInvoiceForBonusPoints(InvoiceVo invoiceVo) {

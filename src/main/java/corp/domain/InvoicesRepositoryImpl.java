@@ -281,18 +281,16 @@ public class InvoicesRepositoryImpl implements InvoicesRepositoryCustom {
 		
 		Query query = null;
 		Criteria invoiceTypeCriteria = null;
-		Criteria notaDeCreditoOfInvoiceTypeCriteria = null;
 		
 		if (invoiceType.equals(ApplicationService.BOLETA)) {
 			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceType").is(ApplicationService.BOLETA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.BOLETA);
-			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
-		} else {
+		} else if (invoiceType.equals(ApplicationService.FACTURA)) {
 			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceType").is(ApplicationService.FACTURA);
-			notaDeCreditoOfInvoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceTypeModified").is(ApplicationService.FACTURA);
-			query = new Query(new Criteria().orOperator(invoiceTypeCriteria, notaDeCreditoOfInvoiceTypeCriteria));
+		} else if (invoiceType.equals(ApplicationService.NOTADECREDITO)) {
+			invoiceTypeCriteria = Criteria.where("sunatStatus").ne(ApplicationService.VOIDED_STATUS).and("invoiceType").is(ApplicationService.NOTADECREDITO);
 		}
 		
+		query = new Query(invoiceTypeCriteria);
 		query.limit(1);
 		query.with(new Sort(Direction.DESC, "date"));
 		

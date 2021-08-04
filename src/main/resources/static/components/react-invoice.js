@@ -345,7 +345,7 @@ class TableDashboard extends React.Component {
   
   _validateInvoiceNumber(invoiceNumber) {
 	  
-	  var re = /^([BF])?001-[0-9]{8}$/;
+	  var re = /(^([BF])?001|^(FC)?01)-[0-9]{8}$/;
 	  
 	  if (invoiceNumber != '' && !re.test(invoiceNumber)) {
 		  return false

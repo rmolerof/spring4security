@@ -27,7 +27,7 @@ import corp.model.SunatSubmitServiceResponse;
 import corp.services.GlobalProperties;
 import corp.services.Utils;
 import firmacpesunat.FirmaCPESunat;
-import generadorxmlcpe.CPESunat;
+import corp.sunat.CPESunat;
 
 public class XmlSunat {
 	

@@ -292,13 +292,13 @@ class InvoiceTableSummary extends React.Component {
 					var ctacble = '';
 					var glosa = '';
 					if (invoicesSummaryData[i].galsD2 > 0) {
-						ctacble = '701112';
+						ctacble = '701212';
 						glosa = 'DIESEL';
 					} else if (invoicesSummaryData[i].galsG90 > 0) {
-						ctacble = '701114';
+						ctacble = '701213';
 						glosa = 'GASOHOL-90';
 					} else if (invoicesSummaryData[i].galsG95 > 0) {
-						ctacble = '701115';
+						ctacble = '701214';
 						glosa = 'GASOHOL-95';
 					} else {
 						ctacble = '700000';
